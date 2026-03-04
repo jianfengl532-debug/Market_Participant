@@ -48,7 +48,6 @@
     </style>
 </head>
 <body>
-
 <header>
     <div class="logo-section">
         <img src="../assetc/images/AMi-LOGO.jpg" alt="LOGO" class="logo-img">
@@ -82,7 +81,6 @@
         <div class="holdings-container" data-save="stock_holdings"></div>
     </div>
     <div class="divider"></div>
-
     <div class="fund-section" id="options-section">
         <h2>Options</h2>
         <div class="account-row">
@@ -99,7 +97,6 @@
         <div class="holdings-container" data-save="options_holdings"></div>
     </div>
     <div class="divider"></div>
-
     <div class="fund-section" id="futures-section">
         <h2>Futures</h2>
         <div class="account-row">
@@ -138,10 +135,12 @@ const db = getDatabase(app);
 const phoneInput = document.getElementById('clientPhone');
 const uploadBtn = document.getElementById('uploadBtn');
 
+// ======================== 密碼設置 ========================
+const PASSWORD = "160324";   // ← 在這裡修改密碼
+
 function addHolding(sectionId, initial = null) {
     const section = document.getElementById(sectionId);
     if (!section) return console.error("Section not found:", sectionId);
-
     const container = section.querySelector('.holdings-container');
     const item = document.createElement('div');
     item.className = 'holding-item';
@@ -156,7 +155,6 @@ function addHolding(sectionId, initial = null) {
         </div>
     `;
     container.appendChild(item);
-
     item.querySelector('.calc-btn').addEventListener('click', () => updateTotals(sectionId));
     item.querySelector('.delete-btn').addEventListener('click', () => {
         item.remove();
@@ -167,10 +165,8 @@ function addHolding(sectionId, initial = null) {
 function updateTotals(sectionId) {
     const section = document.getElementById(sectionId);
     if (!section) return;
-
     let totalEquity = 0;
     let totalCost = 0;
-
     section.querySelectorAll('.holding-item').forEach(row => {
         const qty = parseFloat(row.querySelector('.quantity').value) || 0;
         const cost = parseFloat(row.querySelector('.cost').value) || 0;
@@ -178,7 +174,6 @@ function updateTotals(sectionId) {
         totalEquity += settle * qty;
         totalCost += cost * qty;
     });
-
     document.getElementById(`${sectionId.replace('-section', '')}-equity`).textContent = totalEquity.toFixed(2);
     document.getElementById(`${sectionId.replace('-section', '')}-cost`).textContent = totalCost.toFixed(2);
 }
@@ -189,14 +184,11 @@ async function saveAllData() {
         alert("请输入 Phone 后再上传");
         return;
     }
-
     uploadBtn.disabled = true;
     uploadBtn.textContent = "上传中...";
-
     try {
         const fundRef = ref(db, 'funds/' + phone);
         const data = {};
-
         document.querySelectorAll('[data-save]').forEach(el => {
             if (el.type === 'password') return;
             let value = el.value || '';
@@ -208,7 +200,6 @@ async function saveAllData() {
             }
             current[parts[parts.length - 1]] = value;
         });
-
         ['stock', 'options', 'futures'].forEach(type => {
             const container = document.querySelector(`#${type}-section .holdings-container`);
             const holdings = [];
@@ -224,7 +215,6 @@ async function saveAllData() {
             data[`${type}_totalEquity`] = document.getElementById(`${type}-equity`).textContent || '0.00';
             data[`${type}_totalCost`] = document.getElementById(`${type}-cost`).textContent || '0.00';
         });
-
         await set(fundRef, data);
         alert(`上传成功！\n已保存到 /funds/${phone}`);
     } catch (err) {
@@ -236,19 +226,32 @@ async function saveAllData() {
     }
 }
 
+// 帶密碼驗證的上传入口
+function tryUpload() {
+    const input = prompt("请输入上传密码：");
+    
+    if (input === null) {
+        // 用户点了取消
+        return;
+    }
+    
+    if (input === PASSWORD) {
+        saveAllData();
+    } else {
+        alert("密码错误！");
+    }
+}
+
 async function loadDataFromFirebase(phone) {
     if (!phone) return;
-
     try {
         const fundRef = ref(db, 'funds/' + phone);
         const snapshot = await get(fundRef);
         const data = snapshot.val();
-
         if (!data) {
             alert("未找到该 Phone 的数据");
             return;
         }
-
         document.querySelectorAll('[data-save]').forEach(el => {
             if (el.type === 'password') return;
             const parts = el.dataset.save.split('_');
@@ -256,7 +259,6 @@ async function loadDataFromFirebase(phone) {
             for (const p of parts) val = val?.[p];
             if (val !== undefined) el.value = val;
         });
-
         ['stock', 'options', 'futures'].forEach(type => {
             const container = document.querySelector(`#${type}-section .holdings-container`);
             container.innerHTML = '';
@@ -264,7 +266,6 @@ async function loadDataFromFirebase(phone) {
             holdings.forEach(h => addHolding(`${type}-section`, h));
             updateTotals(`${type}-section`);
         });
-
         alert(`已加载 Phone: ${phone} 的数据`);
     } catch (err) {
         console.error("加载失败:", err);
@@ -279,15 +280,16 @@ document.addEventListener('DOMContentLoaded', () => {
             addHolding(sectionId);
         });
     });
-
+    
     phoneInput.addEventListener('keydown', e => {
         if (e.key === 'Enter') {
             const val = phoneInput.value.trim();
             if (val) loadDataFromFirebase(val);
         }
     });
-
-    uploadBtn.addEventListener('click', saveAllData);
+    
+    // 修改：使用 tryUpload 代替直接 saveAllData
+    uploadBtn.addEventListener('click', tryUpload);
 });
 </script>
 </body>
