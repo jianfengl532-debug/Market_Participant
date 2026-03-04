@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>plan-修改</title> <!-- 首页可改成 POSITION - Plan -->
+<style>
+body {background:#0f1114;color:#e0e0e0;font-family:"Segoe UI",Arial,sans-serif;margin:0;}
+header {background:#111418;border-bottom:1px solid #222;padding:12px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;}
+.logo-section {display:flex;align-items:center;gap:12px;}
+.logo-img {height:36px;}
+.main-title {font-size:1.6rem;font-weight:bold;color:#fff;}
+.sub-title {font-size:0.9rem;color:#aaa;}
+.header-form {display:flex;align-items:center;gap:12px;flex:1;justify-content:flex-end;}
+.header-form input {background:#1a1d21;border:none;padding:8px 12px;border-radius:4px;color:#fff;}
+.header-form input:first-child {min-width:480px;flex:1.5;}
+.header-form input:nth-child(2) {width:180px;}
+.plan-top {padding:24px;border-bottom:1px solid #222;}
+.strategy-container {display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:20px;}
+.strategy-box {background:#14171c;border:1px solid #222;border-radius:6px;padding:16px;min-height:220px;}
+.strategy-box textarea {width:100%;height:200px;background:#1a1d21;border:none;border-radius:4px;padding:10px;color:#fff;resize:vertical;}
+.solutions {padding:40px 24px;}
+.solutions h2 {text-align:center;margin-bottom:40px;font-size:1.6rem;color:#ccc;}
+.solution-grid {display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.solution-card {background:#14171c;border:1px solid #222;border-radius:6px;padding:20px;}
+.solution-card h3 {text-align:center;margin-bottom:20px;color:#ddd;}
+.solution-layout {display:grid;grid-template-columns:1fr 160px;gap:16px;}
+.left-area .row {margin-bottom:14px;}
+.row label {display:block;font-size:0.85rem;color:#aaa;margin-bottom:6px;}
+.row input,.row textarea {width:100%;background:#1a1d21;border:none;padding:8px;border-radius:4px;color:#fff;box-sizing:border-box;}
+.inline-row {display:flex;gap:10px;}
+.inline-row input {flex:1;}
+.plan-grid {display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.price-area {background:#1a1d21;border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:12px;}
+.price-area input[type="number"] {background:#222;border:none;padding:8px;border-radius:4px;color:#fff;font-size:1rem;}
+.calc-btn {background:#3a8cff;border:none;padding:10px;border-radius:4px;color:#fff;cursor:pointer;font-weight:bold;}
+.calc-btn:hover {background:#1e70e6;}
+.result-list {margin-top:12px;max-height:280px;overflow-y:auto;background:#222;border-radius:4px;padding:8px;}
+.result-list div {padding:6px 10px;border-bottom:1px solid #333;font-size:0.95rem;text-align:right;}
+.result-list div:last-child {border-bottom:none;}
+.upload-btn {background:#3a8cff;border:none;padding:8px 16px;border-radius:4px;color:#fff;cursor:pointer;font-weight:bold;}
+.upload-btn:hover {background:#1e70e6;}
+@media(max-width:1100px){.solution-grid,.strategy-container{grid-template-columns:1fr;}.solution-layout{grid-template-columns:1fr;}.price-area{margin-top:16px;}}
+</style>
+</head>
+<body>
+<header>
+    <div class="logo-section">
+        <img src="../assetc/images/AMi-LOGO.jpg" class="logo-img" alt="logo"> <!-- 子目录用 ../ ；根目录改成 assetc/... -->
+        <div>
+            <div class="main-title">POSITION</div>
+            <div class="sub-title">Plan</div>
+        </div>
+    </div>
+    <div class="header-form">
+        <input type="text" id="heading" placeholder="Heading" data-save="heading">
+        <input type="text" id="expiry" placeholder="Expiry Time" data-save="expiry">
+        <button class="upload-btn">上传</button>
+    </div>
+</header>
+<div class="plan-top">
+    <div class="strategy-container">
+        <div class="strategy-box"><textarea data-save="basic" placeholder="基本描述"></textarea></div>
+        <div class="strategy-box"><textarea data-save="strategy1" placeholder="策略 1"></textarea></div>
+        <div class="strategy-box"><textarea data-save="strategy2" placeholder="策略 2"></textarea></div>
+    </div>
+</div>
+<div class="solutions">
+<h2>Solutions</h2>
+<div class="solution-grid">
+    <!-- Stock -->
+    <div class="solution-card">
+        <h3>Stock</h3>
+        <div class="solution-layout">
+            <div class="left-area">
+                <div class="row inline-row">
+                    <input placeholder="品种" data-save="stock.variety">
+                    <input placeholder="代码" data-save="stock.code">
+                </div>
+                <div class="row">
+                    <label>目标</label>
+                    <input data-save="stock.target">
+                </div>
+                <div class="row inline-row">
+                    <input placeholder="D" data-save="stock.d">
+                    <input placeholder="W" data-save="stock.w">
+                    <input placeholder="Mo" data-save="stock.mo">
+                </div>
+                <div class="row plan-grid">
+                    <textarea placeholder="Plan 1" data-save="stock.plan1"></textarea>
+                    <textarea placeholder="Plan 2" data-save="stock.plan2"></textarea>
+                    <textarea placeholder="Plan 3" data-save="stock.plan3"></textarea>
+                    <textarea placeholder="Plan 4" data-save="stock.plan4"></textarea>
+                </div>
+                <div class="row">
+                    <label>结论</label>
+                    <textarea data-save="stock.conclusion" style="min-height:120px;"></textarea>
+                </div>
+            </div>
+            <div class="price-area">
+                <input type="number" min="1" step="1" placeholder="价格1" data-save="stock.price1">
+                <input type="number" min="1" step="1" placeholder="价格2" data-save="stock.price2">
+                <input type="number" min="1" step="1" placeholder="价格3" data-save="stock.price3">
+                <button class="calc-btn">计算</button>
+                <div class="result-list" data-save="stock.result"></div>
+            </div>
+        </div>
+    </div>
+    <!-- Options -->
+    <div class="solution-card">
+        <h3>Options</h3>
+        <div class="solution-layout">
+            <div class="left-area">
+                <div class="row inline-row">
+                    <input placeholder="品种" data-save="options.variety">
+                    <input placeholder="代码" data-save="options.code">
+                </div>
+                <div class="row">
+                    <label>目标</label>
+                    <input data-save="options.target">
+                </div>
+                <div class="row inline-row">
+                    <input placeholder="D" data-save="options.d">
+                    <input placeholder="W" data-save="options.w">
+                    <input placeholder="Mo" data-save="options.mo">
+                </div>
+                <div class="row plan-grid">
+                    <textarea placeholder="Plan 1" data-save="options.plan1"></textarea>
+                    <textarea placeholder="Plan 2" data-save="options.plan2"></textarea>
+                    <textarea placeholder="Plan 3" data-save="options.plan3"></textarea>
+                    <textarea placeholder="Plan 4" data-save="options.plan4"></textarea>
+                </div>
+                <div class="row">
+                    <label>结论</label>
+                    <textarea data-save="options.conclusion" style="min-height:120px;"></textarea>
+                </div>
+            </div>
+            <div class="price-area">
+                <input type="number" min="1" step="1" placeholder="价格1" data-save="options.price1">
+                <input type="number" min="1" step="1" placeholder="价格2" data-save="options.price2">
+                <input type="number" min="1" step="1" placeholder="价格3" data-save="options.price3">
+                <button class="calc-btn">计算</button>
+                <div class="result-list" data-save="options.result"></div>
+            </div>
+        </div>
+    </div>
+    <!-- Futures -->
+    <div class="solution-card">
+        <h3>Futures</h3>
+        <div class="solution-layout">
+            <div class="left-area">
+                <div class="row inline-row">
+                    <input placeholder="品种" data-save="futures.variety">
+                    <input placeholder="代码" data-save="futures.code">
+                </div>
+                <div class="row">
+                    <label>目标</label>
+                    <input data-save="futures.target">
+                </div>
+                <div class="row inline-row">
+                    <input placeholder="D" data-save="futures.d">
+                    <input placeholder="W" data-save="futures.w">
+                    <input placeholder="Mo" data-save="futures.mo">
+                </div>
+                <div class="row plan-grid">
+                    <textarea placeholder="Plan 1" data-save="futures.plan1"></textarea>
+                    <textarea placeholder="Plan 2" data-save="futures.plan2"></textarea>
+                    <textarea placeholder="Plan 3" data-save="futures.plan3"></textarea>
+                    <textarea placeholder="Plan 4" data-save="futures.plan4"></textarea>
+                </div>
+                <div class="row">
+                    <label>结论</label>
+                    <textarea data-save="futures.conclusion" style="min-height:120px;"></textarea>
+                </div>
+            </div>
+            <div class="price-area">
+                <input type="number" min="1" step="1" placeholder="价格1" data-save="futures.price1">
+                <input type="number" min="1" step="1" placeholder="价格2" data-save="futures.price2">
+                <input type="number" min="1" step="1" placeholder="价格3" data-save="futures.price3">
+                <button class="calc-btn">计算</button>
+                <div class="result-list" data-save="futures.result"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script type="module">
+// 引入 Firebase SDK (使用 CDN)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyAZ-2yPwU8CJjH_aYOCWcTe4roVoeuBLE0",
+  authDomain: "myposition-5ac17.firebaseapp.com",
+  databaseURL: "https://myposition-5ac17-default-rtdb.firebaseio.com",
+  projectId: "myposition-5ac17",
+  storageBucket: "myposition-5ac17.firebasestorage.app",
+  messagingSenderId: "73151832359",
+  appId: "1:73151832359:web:4727b07af94e2d14220902",
+  measurementId: "G-R3F88K50DV"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+// 获取Heading元素
+const headingInput = document.getElementById('heading');
+// 保存所有数据到 Firebase，使用Heading作为键
+function saveAllData() {
+  const headingValue = headingInput.value.trim();
+  if (!headingValue) {
+    alert("Heading 不能为空，请输入Heading后再上传。");
+    return;
+  }
+  const planRef = ref(db, 'plans/' + headingValue);
+  const data = {};
+  document.querySelectorAll('[data-save]').forEach(el => {
+    const key = el.dataset.save;
+    let value = '';
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+      value = el.value || '';
+    } else if (el.classList.contains('result-list')) {
+      value = el.innerHTML || '';
+    }
+    const parts = key.split('.');
+    let current = data;
+    for (let i = 0; i < parts.length - 1; i++) {
+      const p = parts[i];
+      current[p] = current[p] || {};
+      current = current[p];
+    }
+    current[parts[parts.length - 1]] = value;
+  });
+  set(planRef, data)
+    .then(() => {
+      console.log("已保存到 Firebase → /plans/" + headingValue);
+      alert("数据已成功上传/覆盖到 " + headingValue);
+    })
+    .catch(err => {
+      console.error("保存失败", err.code || err);
+      alert("保存失败，请检查控制台错误：" + (err.message || err));
+    });
+}
+// 从 Firebase 加载数据（基于Heading）
+function loadDataFromFirebase(headingValue) {
+  if (!headingValue) return;
+  const planRef = ref(db, 'plans/' + headingValue);
+  get(planRef).then((snapshot) => {
+    const data = snapshot.val();
+    if (!data) {
+      console.log("云端无匹配数据: " + headingValue);
+      alert("未找到匹配的Heading: " + headingValue);
+      return;
+    }
+    document.querySelectorAll('[data-save]').forEach(el => {
+      const path = el.dataset.save.split('.');
+      let val = data;
+      for (const p of path) {
+        val = val?.[p];
+        if (val === undefined) return;
+      }
+      if (val !== undefined) {
+        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+          el.value = val;
+        } else if (el.classList.contains('result-list')) {
+          el.innerHTML = val;
+        }
+      }
+    });
+    console.log("数据已从 Firebase 加载: " + headingValue);
+    alert("已加载匹配的Heading数据: " + headingValue);
+  }).catch(err => {
+    console.error("加载失败", err);
+    alert("加载失败: " + (err.message || err));
+  });
+}
+// Heading输入框搜索功能：按回车搜索并加载
+headingInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const headingValue = headingInput.value.trim();
+    if (headingValue) {
+      loadDataFromFirebase(headingValue);
+    } else {
+      alert("请输入Heading后再按回车搜索。");
+    }
+  }
+});
+// 上传按钮：保存/覆盖数据
+document.querySelector('.upload-btn').addEventListener('click', saveAllData);
+// 输入防抖保存（但现在改为手动上传，所以可选；这里保留但不自动保存）
+let saveTimer;
+// document.addEventListener('input', e => {
+//   if (e.target.matches('[data-save]') || e.target.closest('.result-list')) {
+//     clearTimeout(saveTimer);
+//     saveTimer = setTimeout(saveAllData, 800);
+//   }
+// }, true);
+// 计算按钮逻辑（不变），但计算后不自动保存，需点击上传
+document.querySelectorAll('.calc-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const area = this.closest('.price-area');
+    const inputs = area.querySelectorAll('input[type="number"]');
+    const resultDiv = area.querySelector('.result-list');
+    const values = Array.from(inputs).map(el => Number(el.value) || 0);
+    const [x, y, z] = values;
+    const rates = [0.125, 0.25, 0.333, 0.50, 0.625, 0.667, 0.75, 0.875];
+    let results = [];
+    [x, y, z].forEach(base => {
+      if (base > 0) rates.forEach(r => results.push(Number((base * r).toFixed(2))));
+    });
+    results.sort((a,b)=>b-a);
+    resultDiv.innerHTML = results.length === 0
+      ? '<div style="color:#888;text-align:center;">无有效数据</div>'
+      : results.map(v => `<div>${v}</div>`).join('');
+    // saveAllData(); // 注释掉自动保存，改为手动上传
+  });
+});
+// 页面加载时不预加载示例数据，因为现在是动态的
+window.addEventListener('DOMContentLoaded', () => {
+  // 可以在这里添加初始逻辑，如果需要
+});
+</script>
+</body>
+</html>
