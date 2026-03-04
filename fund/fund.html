@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POSITION - Fund Overview</title>
+    <link rel="stylesheet" href="../assetc/css/style.css">
+    <style>
+        body { background: #0f1114; color: #e0e0e0; font-family: "Segoe UI", Arial, sans-serif; margin: 0; }
+        header { background: #111418; border-bottom: 1px solid #222; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+        .logo-section { display: flex; align-items: center; gap: 12px; }
+        .logo-img { height: 36px; }
+        .main-title { font-size: 1.6rem; font-weight: bold; color: #fff; }
+        .sub-title { font-size: 0.9rem; color: #aaa; }
+        .top-form { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .top-form input { background: #1a1d21; border: none; padding: 8px 12px; border-radius: 4px; color: #fff; min-width: 140px; }
+        .main-container { padding: 24px; display: flex; gap: 24px; flex-wrap: wrap; }
+        .fund-section { flex: 1; min-width: 320px; background: #14171c; border: 1px solid #222; border-radius: 6px; padding: 20px; }
+        .fund-section h2 { text-align: center; margin-bottom: 20px; color: #ddd; font-size: 1.4rem; }
+        .account-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+        .account-row input { flex: 1; min-width: 140px; background: #1a1d21; border: none; padding: 10px; border-radius: 4px; color: #fff; }
+        .value-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 32px; }
+        .value-card { background: #1a1d21; padding: 16px; text-align: center; border-radius: 6px; }
+        .value-card:nth-child(1) { background: #222; }
+        .value-card:nth-child(2) { background: #1a1d21; }
+        .value-card:nth-child(3) { background: #222; }
+        .value-label { font-size: 0.9rem; color: #aaa; margin-bottom: 8px; }
+        .value-number { font-size: 1.3rem; font-weight: bold; color: #0f8; }
+        .add-btn-container { text-align: center; margin: 20px 0; }
+        .add-btn { width: 48px; height: 48px; background: #c0392b; border: none; border-radius: 50%; color: #fff; font-size: 2rem; cursor: pointer; line-height: 48px; transition: 0.2s; }
+        .add-btn:hover { background: #e74c3c; }
+        .divider { width: 1px; background: #222; margin: 0 12px; }
+        .holding-item { background: #1a1d21; border: 1px solid #333; border-radius: 6px; padding: 12px 16px; margin-top: 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+        .holding-item > div { flex: 1; min-width: 110px; }
+        .holding-item input { width: 100%; background: #222; border: none; padding: 8px 10px; border-radius: 4px; color: #fff; font-size: 0.95rem; }
+        .holding-item label { font-size: 0.85rem; color: #aaa; margin-bottom: 4px; display: block; }
+        .holding-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .calc-btn { background: #3a8cff; border: none; color: #fff; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
+        .calc-btn:hover { background: #1e70e6; }
+        .delete-btn { background: #c0392b; border: none; color: #fff; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
+        .delete-btn:hover { background: #a93226; }
+        .available-funds input { width: 100%; font-size: 1.3rem; font-weight: bold; color: #0f8; text-align: center; background: #0f2a1a; padding: 12px; box-sizing: border-box; }
+        .upload-btn { background: #3a8cff; border: none; padding: 8px 16px; border-radius: 4px; color: #fff; cursor: pointer; font-weight: bold; }
+        .upload-btn:hover { background: #1e70e6; }
+        .upload-btn:disabled { background: #555; cursor: not-allowed; opacity: 0.7; }
+        @media (max-width: 1100px) { .value-row { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 700px) { .value-row { grid-template-columns: 1fr; } .top-form { flex-direction: column; align-items: stretch; } .top-form input { min-width: auto; width: 100%; } }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-section">
+        <img src="../assetc/images/AMi-LOGO.jpg" alt="LOGO" class="logo-img">
+        <div>
+            <div class="main-title">POSITION</div>
+            <div class="sub-title"> Fund</div>
+        </div>
+    </div>
+    <div class="top-form">
+        <input type="text" placeholder="Name" id="clientName" data-save="client_name">
+        <input type="tel" placeholder="Phone" id="clientPhone" data-save="client_phone">
+        <input type="text" placeholder="Notes" id="clientNotes" style="flex:1; min-width:220px;" data-save="client_notes">
+        <button class="upload-btn" id="uploadBtn">上传</button>
+    </div>
+</header>
+
+<div class="main-container">
+    <div class="fund-section" id="stock-section">
+        <h2>Stock</h2>
+        <div class="account-row">
+            <input placeholder="开户公司" data-save="stock_broker">
+            <input placeholder="客户号" data-save="stock_account">
+            <input type="password" placeholder="登录密码" data-save="stock_password">
+        </div>
+        <div class="value-row">
+            <div class="value-card"><div class="value-label">持仓权益</div><div class="value-number" id="stock-equity">0.00</div></div>
+            <div class="value-card"><div class="value-label">持仓成本</div><div class="value-number" id="stock-cost">0.00</div></div>
+            <div class="value-card available-funds"><div class="value-label">可用资金</div><input type="number" step="0.01" value="0.00" id="stock-available" data-save="stock_available"></div>
+        </div>
+        <div class="add-btn-container"><button class="add-btn" data-section="stock-section">+</button></div>
+        <div class="holdings-container" data-save="stock_holdings"></div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="fund-section" id="options-section">
+        <h2>Options</h2>
+        <div class="account-row">
+            <input placeholder="开户公司" data-save="options_broker">
+            <input placeholder="客户号" data-save="options_account">
+            <input type="password" placeholder="登录密码" data-save="options_password">
+        </div>
+        <div class="value-row">
+            <div class="value-card"><div class="value-label">持仓权益</div><div class="value-number" id="options-equity">0.00</div></div>
+            <div class="value-card"><div class="value-label">持仓成本</div><div class="value-number" id="options-cost">0.00</div></div>
+            <div class="value-card available-funds"><div class="value-label">可用资金</div><input type="number" step="0.01" value="0.00" id="options-available" data-save="options_available"></div>
+        </div>
+        <div class="add-btn-container"><button class="add-btn" data-section="options-section">+</button></div>
+        <div class="holdings-container" data-save="options_holdings"></div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="fund-section" id="futures-section">
+        <h2>Futures</h2>
+        <div class="account-row">
+            <input placeholder="开户公司" data-save="futures_broker">
+            <input placeholder="客户号" data-save="futures_account">
+            <input type="password" placeholder="登录密码" data-save="futures_password">
+        </div>
+        <div class="value-row">
+            <div class="value-card"><div class="value-label">持仓权益</div><div class="value-number" id="futures-equity">0.00</div></div>
+            <div class="value-card"><div class="value-label">持仓成本</div><div class="value-number" id="futures-cost">0.00</div></div>
+            <div class="value-card available-funds"><div class="value-label">可用资金</div><input type="number" step="0.01" value="0.00" id="futures-available" data-save="futures_available"></div>
+        </div>
+        <div class="add-btn-container"><button class="add-btn" data-section="futures-section">+</button></div>
+        <div class="holdings-container" data-save="futures_holdings"></div>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAZ-2yPwU8CJjH_aYOCWcTe4roVoeuBLE0",
+  authDomain: "myposition-5ac17.firebaseapp.com",
+  databaseURL: "https://myposition-5ac17-default-rtdb.firebaseio.com",
+  projectId: "myposition-5ac17",
+  storageBucket: "myposition-5ac17.firebasestorage.app",
+  messagingSenderId: "73151832359",
+  appId: "1:73151832359:web:4727b07af94e2d14220902",
+  measurementId: "G-R3F88K50DV"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const phoneInput = document.getElementById('clientPhone');
+const uploadBtn = document.getElementById('uploadBtn');
+
+function addHolding(sectionId, initial = null) {
+    const section = document.getElementById(sectionId);
+    if (!section) return console.error("Section not found:", sectionId);
+
+    const container = section.querySelector('.holdings-container');
+    const item = document.createElement('div');
+    item.className = 'holding-item';
+    item.innerHTML = `
+        <div><label>代码</label><input type="text" placeholder="代码" class="code" value="${initial?.code || ''}"></div>
+        <div><label>成本价</label><input type="number" step="0.01" value="${initial?.cost || '0.00'}" class="cost"></div>
+        <div><label>数量</label><input type="number" step="1" value="${initial?.quantity || '0'}" class="quantity"></div>
+        <div><label>结算价</label><input type="number" step="0.01" value="${initial?.settle || '0.00'}" class="settle"></div>
+        <div class="holding-actions">
+            <button class="calc-btn">计算</button>
+            <button class="delete-btn">删除</button>
+        </div>
+    `;
+    container.appendChild(item);
+
+    item.querySelector('.calc-btn').addEventListener('click', () => updateTotals(sectionId));
+    item.querySelector('.delete-btn').addEventListener('click', () => {
+        item.remove();
+        updateTotals(sectionId);
+    });
+}
+
+function updateTotals(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+
+    let totalEquity = 0;
+    let totalCost = 0;
+
+    section.querySelectorAll('.holding-item').forEach(row => {
+        const qty = parseFloat(row.querySelector('.quantity').value) || 0;
+        const cost = parseFloat(row.querySelector('.cost').value) || 0;
+        const settle = parseFloat(row.querySelector('.settle').value) || 0;
+        totalEquity += settle * qty;
+        totalCost += cost * qty;
+    });
+
+    document.getElementById(`${sectionId.replace('-section', '')}-equity`).textContent = totalEquity.toFixed(2);
+    document.getElementById(`${sectionId.replace('-section', '')}-cost`).textContent = totalCost.toFixed(2);
+}
+
+async function saveAllData() {
+    const phone = phoneInput.value.trim();
+    if (!phone) {
+        alert("请输入 Phone 后再上传");
+        return;
+    }
+
+    uploadBtn.disabled = true;
+    uploadBtn.textContent = "上传中...";
+
+    try {
+        const fundRef = ref(db, 'funds/' + phone);
+        const data = {};
+
+        document.querySelectorAll('[data-save]').forEach(el => {
+            if (el.type === 'password') return;
+            let value = el.value || '';
+            const parts = el.dataset.save.split('_');
+            let current = data;
+            for (let i = 0; i < parts.length - 1; i++) {
+                current[parts[i]] = current[parts[i]] || {};
+                current = current[parts[i]];
+            }
+            current[parts[parts.length - 1]] = value;
+        });
+
+        ['stock', 'options', 'futures'].forEach(type => {
+            const container = document.querySelector(`#${type}-section .holdings-container`);
+            const holdings = [];
+            container.querySelectorAll('.holding-item').forEach(item => {
+                holdings.push({
+                    code: item.querySelector('.code')?.value || '',
+                    cost: item.querySelector('.cost')?.value || '0.00',
+                    quantity: item.querySelector('.quantity')?.value || '0',
+                    settle: item.querySelector('.settle')?.value || '0.00'
+                });
+            });
+            data[`${type}_holdings`] = holdings;
+            data[`${type}_totalEquity`] = document.getElementById(`${type}-equity`).textContent || '0.00';
+            data[`${type}_totalCost`] = document.getElementById(`${type}-cost`).textContent || '0.00';
+        });
+
+        await set(fundRef, data);
+        alert(`上传成功！\n已保存到 /funds/${phone}`);
+    } catch (err) {
+        console.error("保存失败:", err);
+        alert("上传失败：\n" + (err.message || err.code || "未知错误，请查看控制台"));
+    } finally {
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = "上传";
+    }
+}
+
+async function loadDataFromFirebase(phone) {
+    if (!phone) return;
+
+    try {
+        const fundRef = ref(db, 'funds/' + phone);
+        const snapshot = await get(fundRef);
+        const data = snapshot.val();
+
+        if (!data) {
+            alert("未找到该 Phone 的数据");
+            return;
+        }
+
+        document.querySelectorAll('[data-save]').forEach(el => {
+            if (el.type === 'password') return;
+            const parts = el.dataset.save.split('_');
+            let val = data;
+            for (const p of parts) val = val?.[p];
+            if (val !== undefined) el.value = val;
+        });
+
+        ['stock', 'options', 'futures'].forEach(type => {
+            const container = document.querySelector(`#${type}-section .holdings-container`);
+            container.innerHTML = '';
+            const holdings = data[`${type}_holdings`] || [];
+            holdings.forEach(h => addHolding(`${type}-section`, h));
+            updateTotals(`${type}-section`);
+        });
+
+        alert(`已加载 Phone: ${phone} 的数据`);
+    } catch (err) {
+        console.error("加载失败:", err);
+        alert("加载失败：" + (err.message || err.code));
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.add-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const sectionId = btn.dataset.section;
+            addHolding(sectionId);
+        });
+    });
+
+    phoneInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            const val = phoneInput.value.trim();
+            if (val) loadDataFromFirebase(val);
+        }
+    });
+
+    uploadBtn.addEventListener('click', saveAllData);
+});
+</script>
+</body>
+</html>
