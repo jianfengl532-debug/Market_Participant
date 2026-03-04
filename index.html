@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>plan-修改</title> <!-- 首页可改成 POSITION - Plan -->
+<title>plan-修改</title>
 <style>
 body {background:#0f1114;color:#e0e0e0;font-family:"Segoe UI",Arial,sans-serif;margin:0;}
 header {background:#111418;border-bottom:1px solid #222;padding:12px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;}
@@ -40,13 +40,12 @@ header {background:#111418;border-bottom:1px solid #222;padding:12px 24px;displa
 .result-list div:last-child {border-bottom:none;}
 .upload-btn {background:#3a8cff;border:none;padding:8px 16px;border-radius:4px;color:#fff;cursor:pointer;font-weight:bold;}
 .upload-btn:hover {background:#1e70e6;}
-@media(max-width:1100px){.solution-grid,.strategy-container{grid-template-columns:1fr;}.solution-layout{grid-template-columns:1fr;}.price-area{margin-top:16px;}}
 </style>
 </head>
 <body>
 <header>
     <div class="logo-section">
-        <img src="assetc/images/AMi-LOGO.jpg" class="logo-img" alt="logo"> <!-- 子目录用 ../ ；根目录改成 assetc/... -->
+        <img src="assetc/images/AMi-LOGO.jpg" class="logo-img" alt="logo">
         <div>
             <div class="main-title">POSITION</div>
             <div class="sub-title">Plan</div>
@@ -58,6 +57,7 @@ header {background:#111418;border-bottom:1px solid #222;padding:12px 24px;displa
         <button class="upload-btn">上传</button>
     </div>
 </header>
+
 <div class="plan-top">
     <div class="strategy-container">
         <div class="strategy-box"><textarea data-save="basic" placeholder="基本描述"></textarea></div>
@@ -65,6 +65,7 @@ header {background:#111418;border-bottom:1px solid #222;padding:12px 24px;displa
         <div class="strategy-box"><textarea data-save="strategy2" placeholder="策略 2"></textarea></div>
     </div>
 </div>
+
 <div class="solutions">
 <h2>Solutions</h2>
 <div class="solution-grid">
@@ -106,6 +107,7 @@ header {background:#111418;border-bottom:1px solid #222;padding:12px 24px;displa
             </div>
         </div>
     </div>
+
     <!-- Options -->
     <div class="solution-card">
         <h3>Options</h3>
@@ -144,6 +146,7 @@ header {background:#111418;border-bottom:1px solid #222;padding:12px 24px;displa
             </div>
         </div>
     </div>
+
     <!-- Futures -->
     <div class="solution-card">
         <h3>Futures</h3>
@@ -184,10 +187,12 @@ header {background:#111418;border-bottom:1px solid #222;padding:12px 24px;displa
     </div>
 </div>
 </div>
+
 <script type="module">
-// 引入 Firebase SDK (使用 CDN)
+// 引入 Firebase SDK
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyAZ-2yPwU8CJjH_aYOCWcTe4roVoeuBLE0",
   authDomain: "myposition-5ac17.firebaseapp.com",
@@ -198,19 +203,24 @@ const firebaseConfig = {
   appId: "1:73151832359:web:4727b07af94e2d14220902",
   measurementId: "G-R3F88K50DV"
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-// 获取Heading元素
-const headingInput = document.getElementById('heading');
-// 保存所有数据到 Firebase，使用Heading作为键
+
+// ======================== 密码设置 ========================
+const PASSWORD = "160324";   // ← 在这里修改密码
+
+// 保存所有数据到 Firebase
 function saveAllData() {
-  const headingValue = headingInput.value.trim();
+  const headingValue = document.getElementById('heading').value.trim();
   if (!headingValue) {
     alert("Heading 不能为空，请输入Heading后再上传。");
     return;
   }
+
   const planRef = ref(db, 'plans/' + headingValue);
   const data = {};
+
   document.querySelectorAll('[data-save]').forEach(el => {
     const key = el.dataset.save;
     let value = '';
@@ -228,24 +238,41 @@ function saveAllData() {
     }
     current[parts[parts.length - 1]] = value;
   });
+
   set(planRef, data)
     .then(() => {
       console.log("已保存到 Firebase → /plans/" + headingValue);
       alert("数据已成功上传/覆盖到 " + headingValue);
     })
     .catch(err => {
-      console.error("保存失败", err.code || err);
+      console.error("保存失败", err);
       alert("保存失败，请检查控制台错误：" + (err.message || err));
     });
 }
-// 从 Firebase 加载数据（基于Heading）
+
+// 带密码验证的上传入口
+function tryUpload() {
+  const input = prompt("请输入上传密码：");
+  
+  if (input === null) {
+    // 用户点了取消
+    return;
+  }
+  
+  if (input === PASSWORD) {
+    saveAllData();
+  } else {
+    alert("密码错误！");
+  }
+}
+
+// 从 Firebase 加载数据（保持原样）
 function loadDataFromFirebase(headingValue) {
   if (!headingValue) return;
   const planRef = ref(db, 'plans/' + headingValue);
   get(planRef).then((snapshot) => {
     const data = snapshot.val();
     if (!data) {
-      console.log("云端无匹配数据: " + headingValue);
       alert("未找到匹配的Heading: " + headingValue);
       return;
     }
@@ -264,35 +291,25 @@ function loadDataFromFirebase(headingValue) {
         }
       }
     });
-    console.log("数据已从 Firebase 加载: " + headingValue);
     alert("已加载匹配的Heading数据: " + headingValue);
   }).catch(err => {
-    console.error("加载失败", err);
     alert("加载失败: " + (err.message || err));
   });
 }
-// Heading输入框搜索功能：按回车搜索并加载
-headingInput.addEventListener('keydown', (e) => {
+
+// Heading 回车加载
+document.getElementById('heading').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
-    const headingValue = headingInput.value.trim();
-    if (headingValue) {
-      loadDataFromFirebase(headingValue);
-    } else {
-      alert("请输入Heading后再按回车搜索。");
-    }
+    const val = e.target.value.trim();
+    if (val) loadDataFromFirebase(val);
+    else alert("请输入Heading后再按回车搜索。");
   }
 });
-// 上传按钮：保存/覆盖数据
-document.querySelector('.upload-btn').addEventListener('click', saveAllData);
-// 输入防抖保存（但现在改为手动上传，所以可选；这里保留但不自动保存）
-let saveTimer;
-// document.addEventListener('input', e => {
-//   if (e.target.matches('[data-save]') || e.target.closest('.result-list')) {
-//     clearTimeout(saveTimer);
-//     saveTimer = setTimeout(saveAllData, 800);
-//   }
-// }, true);
-// 计算按钮逻辑（不变），但计算后不自动保存，需点击上传
+
+// 上传按钮 → 验证密码后才保存
+document.querySelector('.upload-btn').addEventListener('click', tryUpload);
+
+// 计算按钮（不变）
 document.querySelectorAll('.calc-btn').forEach(btn => {
   btn.addEventListener('click', function() {
     const area = this.closest('.price-area');
@@ -309,13 +326,9 @@ document.querySelectorAll('.calc-btn').forEach(btn => {
     resultDiv.innerHTML = results.length === 0
       ? '<div style="color:#888;text-align:center;">无有效数据</div>'
       : results.map(v => `<div>${v}</div>`).join('');
-    // saveAllData(); // 注释掉自动保存，改为手动上传
   });
 });
-// 页面加载时不预加载示例数据，因为现在是动态的
-window.addEventListener('DOMContentLoaded', () => {
-  // 可以在这里添加初始逻辑，如果需要
-});
+
 </script>
 </body>
 </html>
