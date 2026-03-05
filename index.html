@@ -57,7 +57,6 @@
             font-size: 1.4rem; 
         }
 
-        /* Plan 布局核心样式 */
         .plan-layout {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -104,7 +103,6 @@
             resize: vertical;
         }
 
-        /* 右侧价格区 */
         .price-area {
             display: flex;
             flex-direction: column;
@@ -150,7 +148,6 @@
             border-bottom: none;
         }
 
-        /* Fund 部分样式保持不变（略） */
         .account-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
         .account-row input { flex: 1; min-width: 140px; background: #1a1d21; border: none; padding: 10px; border-radius: 4px; color: #fff; }
         .value-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 32px; }
@@ -169,6 +166,8 @@
         .holding-item input { width: 100%; background: #222; border: none; padding: 8px 10px; border-radius: 4px; color: #fff; font-size: 0.95rem; }
         .holding-item label { font-size: 0.85rem; color: #aaa; margin-bottom: 4px; display: block; }
         .holding-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .calc-btn { background: #3a8cff; border: none; color: #fff; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
+        .calc-btn:hover { background: #1e70e6; }
         .delete-btn { background: #c0392b; border: none; color: #fff; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
         .delete-btn:hover { background: #a93226; }
 
@@ -181,7 +180,7 @@
 <body>
     <header>
         <div class="logo-section">
-            <img src="assetc/images/AMi-LOGO.jpg" alt="LOGO" class="logo-img">
+            <img src="../assetc/images/AMi-LOGO.jpg" alt="LOGO" class="logo-img">
             <div>
                 <div class="main-title">POSITION</div>
                 <div class="sub-title">Plan - Fund (overview)</div>
@@ -195,11 +194,9 @@
     </header>
 
     <div class="main-container">
-        <!-- Plan 区域 -->
         <div class="plan-section">
             <h2>Plan</h2>
             <div class="plan-layout">
-                <!-- 左侧主要输入区 -->
                 <div class="left-area">
                     <div class="row inline-row">
                         <input id="plan-variety" placeholder="品种">
@@ -228,7 +225,6 @@
                     </div>
                 </div>
 
-                <!-- 右侧价格 + 计算 -->
                 <div class="price-area">
                     <input type="number" id="plan-price1" placeholder="价格1" step="0.01">
                     <input type="number" id="plan-price2" placeholder="价格2" step="0.01">
@@ -239,7 +235,6 @@
             </div>
         </div>
 
-        <!-- Fund 区域（保持原样，可继续使用之前的 fund 逻辑） -->
         <div class="fund-section" id="fund-section">
             <h2>Fund</h2>
             <div class="account-row">
@@ -258,7 +253,6 @@
     </div>
 
     <script type="module">
-        // Firebase 初始化（保持不变）
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
         import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
@@ -276,7 +270,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Plan 计算逻辑（示例：价格 × 常见比例）
+        // Plan 计算按钮
         document.querySelector('.calc-btn').addEventListener('click', () => {
             const prices = [
                 Number(document.getElementById('plan-price1').value) || 0,
@@ -286,19 +280,177 @@
             const rates = [0.125, 0.25, 0.333, 0.50, 0.625, 0.667, 0.75, 0.875];
             let results = [];
             prices.forEach(p => {
-                if (p > 0) {
-                    rates.forEach(r => results.push((p * r).toFixed(2)));
-                }
+                if (p > 0) rates.forEach(r => results.push((p * r).toFixed(2)));
             });
             results.sort((a,b) => b - a);
-            const resultDiv = document.getElementById('plan-result');
-            resultDiv.innerHTML = results.length === 0 
-                ? '<div style="color:#888; text-align:center;">无有效价格</div>'
+            document.getElementById('plan-result').innerHTML = results.length === 0 
+                ? '<div style="color:#888;text-align:center;">无有效价格</div>'
                 : results.map(v => `<div>${v}</div>`).join('');
         });
 
-        // 后续的搜索逻辑、Fund 添加持仓等代码可继续沿用你之前的版本...
-        // 这里省略以保持简洁，如需要可直接拼接回去
+        // 添加持仓函数（Fund）
+        function addHolding(sectionId, initial = null) {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+            const container = section.querySelector('.holdings-container');
+            const item = document.createElement('div');
+            item.className = 'holding-item';
+            item.innerHTML = `
+                <div><label>代码</label><input type="text" placeholder="代码" class="code" value="${initial?.code || ''}"></div>
+                <div><label>成本价</label><input type="number" step="0.01" value="${initial?.cost || '0.00'}" class="cost"></div>
+                <div><label>数量</label><input type="number" step="1" value="${initial?.quantity || '0'}" class="quantity"></div>
+                <div><label>结算价</label><input type="number" step="0.01" value="${initial?.settle || '0.00'}" class="settle"></div>
+                <div class="holding-actions">
+                    <button class="calc-btn">计算</button>
+                    <button class="delete-btn">删除</button>
+                </div>
+            `;
+            container.appendChild(item);
+            item.querySelector('.calc-btn').addEventListener('click', () => updateTotals(sectionId));
+            item.querySelector('.delete-btn').addEventListener('click', () => {
+                item.remove();
+                updateTotals(sectionId);
+            });
+        }
+
+        function updateTotals(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+            let totalEquity = 0, totalCost = 0;
+            section.querySelectorAll('.holding-item').forEach(row => {
+                const qty = parseFloat(row.querySelector('.quantity').value) || 0;
+                const cost = parseFloat(row.querySelector('.cost').value) || 0;
+                const settle = parseFloat(row.querySelector('.settle').value) || 0;
+                totalEquity += settle * qty;
+                totalCost += cost * qty;
+            });
+            document.getElementById('fund-equity').textContent = totalEquity.toFixed(2);
+            document.getElementById('fund-cost').textContent = totalCost.toFixed(2);
+        }
+
+        document.querySelector('.add-btn').addEventListener('click', () => addHolding('fund-section'));
+
+        // Plan 搜索（方案A：优先匹配 heading，其次匹配 code）
+        document.getElementById('plan-code').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                let code = e.target.value.trim();
+                if (!code) return alert('请输入代码');
+
+                const plansRef = ref(db, 'plans');
+                get(plansRef).then(snapshot => {
+                    const data = snapshot.val();
+                    if (!data) return alert('plans 节点为空');
+
+                    let planData = null;
+                    let matchedSection = null;
+
+                    // 优先：把输入当作 heading 直接查找
+                    if (data[code]) {
+                        planData = data[code];
+                        if (planData.stock?.code) matchedSection = 'stock';
+                        else if (planData.options?.code) matchedSection = 'options';
+                        else if (planData.futures?.code) matchedSection = 'futures';
+                    }
+
+                    // 如果没找到，再遍历找 code 匹配的
+                    if (!planData) {
+                        for (const key in data) {
+                            const p = data[key];
+                            if (p.stock?.code === code)      { planData = p; matchedSection = 'stock';      break; }
+                            if (p.options?.code === code)    { planData = p; matchedSection = 'options';    break; }
+                            if (p.futures?.code === code)    { planData = p; matchedSection = 'futures';    break; }
+                        }
+                    }
+
+                    if (planData && matchedSection) {
+                        const s = planData[matchedSection];
+                        document.getElementById('plan-variety').value   = s.variety   || '';
+                        document.getElementById('plan-code').value      = s.code      || code;
+                        document.getElementById('plan-target').value    = s.target    || '';
+                        document.getElementById('plan-d').value         = s.d         || '';
+                        document.getElementById('plan-w').value         = s.w         || '';
+                        document.getElementById('plan-mo').value        = s.mo        || '';
+                        document.getElementById('plan-plan1').value     = s.plan1     || '';
+                        document.getElementById('plan-plan2').value     = s.plan2     || '';
+                        document.getElementById('plan-plan3').value     = s.plan3     || '';
+                        document.getElementById('plan-plan4').value     = s.plan4     || '';
+                        document.getElementById('plan-conclusion').value= s.conclusion|| '';
+                        document.getElementById('plan-result').innerHTML= s.result    || '';
+
+                        alert(`已加载 Plan: ${code} (${matchedSection})`);
+                    } else {
+                        alert(`未找到代码/标题为 ${code} 的 Plan 数据`);
+                    }
+                }).catch(err => alert('查询失败：' + err.message));
+            }
+        });
+
+        // Fund 搜索（方案A：优先匹配 phone，其次匹配 account）
+        document.getElementById('fund-account').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                let inputVal = e.target.value.trim();
+                if (!inputVal) return alert('请输入客户号或关联手机号');
+
+                const fundsRef = ref(db, 'funds');
+                get(fundsRef).then(snapshot => {
+                    const allFunds = snapshot.val();
+                    if (!allFunds) return alert('funds 节点为空');
+
+                    let foundData = null;
+                    let matchedType = null;
+                    let matchedPhone = null;
+
+                    // 优先：把输入当作 phone 直接查找
+                    if (allFunds[inputVal]) {
+                        foundData = allFunds[inputVal];
+                        matchedPhone = inputVal;
+                        if (foundData.stock?.account)       matchedType = 'stock';
+                        else if (foundData.options?.account) matchedType = 'options';
+                        else if (foundData.futures?.account) matchedType = 'futures';
+                    }
+
+                    // 如果没找到，再遍历所有 phone 找 account 匹配的
+                    if (!foundData) {
+                        for (const phone in allFunds) {
+                            const data = allFunds[phone];
+                            if (data.stock?.account === inputVal) {
+                                foundData = data; matchedType = 'stock'; matchedPhone = phone; break;
+                            }
+                            if (data.options?.account === inputVal) {
+                                foundData = data; matchedType = 'options'; matchedPhone = phone; break;
+                            }
+                            if (data.futures?.account === inputVal) {
+                                foundData = data; matchedType = 'futures'; matchedPhone = phone; break;
+                            }
+                        }
+                    }
+
+                    if (foundData && matchedType) {
+                        const section = foundData[matchedType];
+                        const prefix = matchedType + '_';
+
+                        document.getElementById('fund-broker').value   = section.broker   || '';
+                        document.getElementById('fund-account').value   = section.account  || inputVal;
+                        document.getElementById('fund-password').value = section.password || '';
+
+                        document.getElementById('fund-equity').textContent = foundData[`${prefix}totalEquity`] || foundData[`${matchedType}_totalEquity`] || '0.00';
+                        document.getElementById('fund-cost').textContent   = foundData[`${prefix}totalCost`]   || foundData[`${matchedType}_totalCost`]   || '0.00';
+                        document.getElementById('fund-available').value    = section.available || '0.00';
+
+                        const container = document.querySelector('#fund-section .holdings-container');
+                        container.innerHTML = '';
+                        const holdings = foundData[`${matchedType}_holdings`] || [];
+                        holdings.forEach(h => addHolding('fund-section', h));
+
+                        updateTotals('fund-section');
+
+                        alert(`已加载 Fund 数据（手机号: ${matchedPhone}，类型: ${matchedType}）`);
+                    } else {
+                        alert(`未找到客户号/手机号为 ${inputVal} 的 Fund 数据`);
+                    }
+                }).catch(err => alert('查询失败：' + err.message));
+            }
+        });
     </script>
 </body>
 </html>
