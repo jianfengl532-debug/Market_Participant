@@ -6,45 +6,69 @@
     <title>POSITION - Fund Overview</title>
     <link rel="stylesheet" href="../assetc/css/style.css">
     <style>
-        body { background: #0f1114; color: #e0e0e0; font-family: "Segoe UI", Arial, sans-serif; margin: 0; }
-        header { background: #111418; border-bottom: 1px solid #222; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-        .logo-section { display: flex; align-items: center; gap: 12px; }
-        .logo-img { height: 36px; }
-        .main-title { font-size: 1.6rem; font-weight: bold; color: #fff; }
-        .sub-title { font-size: 0.9rem; color: #aaa; }
-        .top-form { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .top-form input { background: #1a1d21; border: none; padding: 8px 12px; border-radius: 4px; color: #fff; min-width: 140px; }
-        .main-container { padding: 24px; display: flex; gap: 24px; flex-wrap: wrap; }
-        .fund-section { flex: 1; min-width: 320px; background: #14171c; border: 1px solid #222; border-radius: 6px; padding: 20px; }
-        .fund-section h2 { text-align: center; margin-bottom: 20px; color: #ddd; font-size: 1.4rem; }
-        .account-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-        .account-row input { flex: 1; min-width: 140px; background: #1a1d21; border: none; padding: 10px; border-radius: 4px; color: #fff; }
-        .value-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 32px; }
-        .value-card { background: #1a1d21; padding: 16px; text-align: center; border-radius: 6px; }
-        .value-card:nth-child(1) { background: #222; }
-        .value-card:nth-child(2) { background: #1a1d21; }
-        .value-card:nth-child(3) { background: #222; }
-        .value-label { font-size: 0.9rem; color: #aaa; margin-bottom: 8px; }
-        .value-number { font-size: 1.3rem; font-weight: bold; color: #0f8; }
-        .add-btn-container { text-align: center; margin: 20px 0; }
-        .add-btn { width: 48px; height: 48px; background: #c0392b; border: none; border-radius: 50%; color: #fff; font-size: 2rem; cursor: pointer; line-height: 48px; transition: 0.2s; }
-        .add-btn:hover { background: #e74c3c; }
-        .divider { width: 1px; background: #222; margin: 0 12px; }
-        .holding-item { background: #1a1d21; border: 1px solid #333; border-radius: 6px; padding: 12px 16px; margin-top: 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-        .holding-item > div { flex: 1; min-width: 110px; }
-        .holding-item input { width: 100%; background: #222; border: none; padding: 8px 10px; border-radius: 4px; color: #fff; font-size: 0.95rem; }
-        .holding-item label { font-size: 0.85rem; color: #aaa; margin-bottom: 4px; display: block; }
-        .holding-actions { display: flex; gap: 8px; flex-shrink: 0; }
-        .calc-btn { background: #3a8cff; border: none; color: #fff; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
-        .calc-btn:hover { background: #1e70e6; }
-        .delete-btn { background: #c0392b; border: none; color: #fff; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
-        .delete-btn:hover { background: #a93226; }
-        .available-funds input { width: 100%; font-size: 1.3rem; font-weight: bold; color: #0f8; text-align: center; background: #0f2a1a; padding: 12px; box-sizing: border-box; }
-        .upload-btn { background: #3a8cff; border: none; padding: 8px 16px; border-radius: 4px; color: #fff; cursor: pointer; font-weight: bold; }
-        .upload-btn:hover { background: #1e70e6; }
-        .upload-btn:disabled { background: #555; cursor: not-allowed; opacity: 0.7; }
-        @media (max-width: 1100px) { .value-row { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 700px) { .value-row { grid-template-columns: 1fr; } .top-form { flex-direction: column; align-items: stretch; } .top-form input { min-width: auto; width: 100%; } }
+        /* Fund-specific styles */
+        .top-form {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .top-form input {
+            min-width: 140px;
+        }
+
+        .top-form input:last-child {
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .fund-section h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ddd;
+            font-size: 1.4rem;
+        }
+
+        .value-card:nth-child(1) {
+            background: #222;
+        }
+
+        .value-card:nth-child(2) {
+            background: #1a1d21;
+        }
+
+        .value-card:nth-child(3) {
+            background: #222;
+        }
+
+        .divider {
+            width: 1px;
+            background: #222;
+            margin: 0 12px;
+        }
+
+        @media (max-width: 1100px) {
+            .value-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 700px) {
+            .value-row {
+                grid-template-columns: 1fr;
+            }
+
+            .top-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .top-form input {
+                min-width: auto;
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
