@@ -1,52 +1,140 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>plan-修改</title> <!-- 首页可改成 POSITION - Plan -->
-<style>
-body {background:#0f1114;color:#e0e0e0;font-family:"Segoe UI",Arial,sans-serif;margin:0;}
-header {background:#111418;border-bottom:1px solid #222;padding:12px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;}
-.logo-section {display:flex;align-items:center;gap:12px;}
-.logo-img {height:36px;}
-.main-title {font-size:1.6rem;font-weight:bold;color:#fff;}
-.sub-title {font-size:0.9rem;color:#aaa;}
-.header-form {display:flex;align-items:center;gap:12px;flex:1;justify-content:flex-end;}
-.header-form input {background:#1a1d21;border:none;padding:8px 12px;border-radius:4px;color:#fff;}
-.header-form input:first-child {min-width:480px;flex:1.5;}
-.header-form input:nth-child(2) {width:180px;}
-.plan-top {padding:24px;border-bottom:1px solid #222;}
-.strategy-container {display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:20px;}
-.strategy-box {background:#14171c;border:1px solid #222;border-radius:6px;padding:16px;min-height:220px;}
-.strategy-box textarea {width:100%;height:200px;background:#1a1d21;border:none;border-radius:4px;padding:10px;color:#fff;resize:vertical;}
-.solutions {padding:40px 24px;}
-.solutions h2 {text-align:center;margin-bottom:40px;font-size:1.6rem;color:#ccc;}
-.solution-grid {display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
-.solution-card {background:#14171c;border:1px solid #222;border-radius:6px;padding:20px;}
-.solution-card h3 {text-align:center;margin-bottom:20px;color:#ddd;}
-.solution-layout {display:grid;grid-template-columns:1fr 160px;gap:16px;}
-.left-area .row {margin-bottom:14px;}
-.row label {display:block;font-size:0.85rem;color:#aaa;margin-bottom:6px;}
-.row input,.row textarea {width:100%;background:#1a1d21;border:none;padding:8px;border-radius:4px;color:#fff;box-sizing:border-box;}
-.inline-row {display:flex;gap:10px;}
-.inline-row input {flex:1;}
-.plan-grid {display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.price-area {background:#1a1d21;border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:12px;}
-.price-area input[type="number"] {background:#222;border:none;padding:8px;border-radius:4px;color:#fff;font-size:1rem;}
-.calc-btn {background:#3a8cff;border:none;padding:10px;border-radius:4px;color:#fff;cursor:pointer;font-weight:bold;}
-.calc-btn:hover {background:#1e70e6;}
-.result-list {margin-top:12px;max-height:280px;overflow-y:auto;background:#222;border-radius:4px;padding:8px;}
-.result-list div {padding:6px 10px;border-bottom:1px solid #333;font-size:0.95rem;text-align:right;}
-.result-list div:last-child {border-bottom:none;}
-.upload-btn {background:#3a8cff;border:none;padding:8px 16px;border-radius:4px;color:#fff;cursor:pointer;font-weight:bold;}
-.upload-btn:hover {background:#1e70e6;}
-@media(max-width:1100px){.solution-grid,.strategy-container{grid-template-columns:1fr;}.solution-layout{grid-template-columns:1fr;}.price-area{margin-top:16px;}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POSITION - Plan</title>
+    <link rel="stylesheet" href="../assetc/css/style.css">
+    <style>
+        /* Plan-specific styles */
+        .header-form {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            justify-content: flex-end;
+        }
+
+        .header-form input {
+            min-width: 140px;
+        }
+
+        .header-form input:first-child {
+            min-width: 480px;
+            flex: 1.5;
+        }
+
+        .header-form input:nth-child(2) {
+            width: 180px;
+        }
+
+        .plan-top {
+            padding: 24px;
+            border-bottom: 1px solid #222;
+        }
+
+        .strategy-container {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .strategy-box {
+            background: #14171c;
+            border: 1px solid #222;
+            border-radius: 6px;
+            padding: 16px;
+            min-height: 220px;
+        }
+
+        .strategy-box textarea {
+            width: 100%;
+            height: 200px;
+            resize: vertical;
+        }
+
+        .solutions {
+            padding: 40px 24px;
+        }
+
+        .solutions h2 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.6rem;
+            color: #ccc;
+        }
+
+        .solution-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .solution-card {
+            background: #14171c;
+            border: 1px solid #222;
+            border-radius: 6px;
+            padding: 20px;
+        }
+
+        .solution-card h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ddd;
+        }
+
+        .solution-layout {
+            display: grid;
+            grid-template-columns: 1fr 160px;
+            gap: 16px;
+        }
+
+        .left-area .row {
+            margin-bottom: 14px;
+        }
+
+        .row input,
+        .row textarea {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .inline-row {
+            gap: 10px;
+        }
+
+        .inline-row input {
+            flex: 1;
+        }
+
+        .plan-grid {
+            gap: 10px;
+        }
+
+        .price-area input[type="number"] {
+            text-align: right;
+        }
+
+        @media (max-width: 1100px) {
+            .solution-grid,
+            .strategy-container {
+                grid-template-columns: 1fr;
+            }
+
+            .solution-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .price-area {
+                margin-top: 16px;
+            }
+        }
+    </style>
 </head>
 <body>
 <header>
     <div class="logo-section">
-        <img src="../assetc/images/AMi-LOGO.jpg" class="logo-img" alt="logo"> <!-- 子目录用 ../ ；根目录改成 assetc/... -->
+        <img src="../assetc/images/AMi-LOGO.jpg" class="logo-img" alt="logo">
         <div>
             <div class="main-title">POSITION</div>
             <div class="sub-title">Plan</div>
