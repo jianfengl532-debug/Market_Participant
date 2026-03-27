@@ -1,0 +1,406 @@
+/* POSITION - Main Stylesheet */
+/* Shared styles across all pages */
+
+/* CSS Reset and Base Styles */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: #0f1114;
+    color: #e0e0e0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Header Styles */
+header {
+    background: #111418;
+    border-bottom: 1px solid #222;
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-img {
+    height: 36px;
+    width: auto;
+}
+
+.main-title {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+.sub-title {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+/* Navigation */
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.nav span,
+.nav a {
+    font-size: 1rem;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #fff;
+}
+
+.nav .active {
+    background: #14171c;
+    color: #e0e0e0;
+}
+
+.nav a:hover {
+    background: #1a1d21;
+}
+
+/* Form Elements */
+input,
+textarea {
+    background: #1a1d21;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 0.95rem;
+}
+
+input[readonly],
+textarea[readonly] {
+    background: #222 !important;
+    color: #888 !important;
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+label {
+    display: block;
+    font-size: 0.85rem;
+    color: #aaa;
+    margin-bottom: 6px;
+}
+
+/* Buttons */
+.calc-btn {
+    background: #3a8cff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.calc-btn:hover {
+    background: #1e70e6;
+}
+
+.delete-btn {
+    background: #c0392b;
+    border: none;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.delete-btn:hover {
+    background: #a93226;
+}
+
+.upload-btn {
+    background: #3a8cff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.upload-btn:hover {
+    background: #1e70e6;
+}
+
+.upload-btn:disabled {
+    background: #555;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.add-btn {
+    width: 48px;
+    height: 48px;
+    background: #c0392b;
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 48px;
+    transition: 0.2s;
+}
+
+.add-btn:hover {
+    background: #e74c3c;
+}
+
+/* Layout Utilities */
+.main-container {
+    padding: 24px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.section {
+    flex: 1;
+    min-width: 320px;
+    background: #14171c;
+    border: 1px solid #222;
+    border-radius: 6px;
+    padding: 20px;
+}
+
+.section h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #ddd;
+    font-size: 1.4rem;
+}
+
+/* Grid Layouts */
+.inline-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.inline-row input {
+    flex: 1;
+    min-width: 140px;
+}
+
+.plan-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.plan-grid textarea {
+    height: 90px;
+    resize: vertical;
+}
+
+.value-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+/* Cards and Containers */
+.value-card {
+    background: #1a1d21;
+    padding: 16px;
+    text-align: center;
+    border-radius: 6px;
+}
+
+.value-label {
+    font-size: 0.9rem;
+    color: #aaa;
+    margin-bottom: 8px;
+}
+
+.value-number {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #0f8;
+}
+
+.account-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.account-row input {
+    flex: 1;
+    min-width: 140px;
+}
+
+/* Holdings */
+.holding-item {
+    background: #1a1d21;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.holding-item > div {
+    flex: 1;
+    min-width: 110px;
+}
+
+.holding-item input {
+    width: 100%;
+    background: #222;
+    border: none;
+    padding: 8px 10px;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 0.95rem;
+}
+
+.holding-item label {
+    font-size: 0.85rem;
+    color: #aaa;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.holding-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* Price Areas */
+.price-area {
+    background: #1a1d21;
+    border-radius: 6px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.price-area input[type="number"] {
+    background: #222;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 1rem;
+    text-align: right;
+}
+
+/* Result Lists */
+.result-list {
+    margin-top: 12px;
+    background: #222;
+    border-radius: 4px;
+    padding: 10px;
+    max-height: 280px;
+    overflow-y: auto;
+    font-size: 0.95rem;
+}
+
+.result-list div {
+    padding: 6px 10px;
+    border-bottom: 1px solid #333;
+    text-align: right;
+}
+
+.result-list div:last-child {
+    border-bottom: none;
+}
+
+/* Special Inputs */
+.available-funds input {
+    width: 100%;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #0f8;
+    text-align: center;
+    background: #0f2a1a;
+    padding: 12px;
+    box-sizing: border-box;
+}
+
+/* Dividers */
+.divider {
+    width: 1px;
+    background: #222;
+    margin: 0 12px;
+}
+
+/* Add Button Container */
+.add-btn-container {
+    text-align: center;
+    margin: 20px 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1100px) {
+    .main-container {
+        flex-direction: column;
+    }
+
+    .value-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .plan-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .value-row {
+        grid-template-columns: 1fr;
+    }
+
+    .account-row,
+    .inline-row {
+        flex-direction: column;
+    }
+
+    .account-row input,
+    .inline-row input {
+        min-width: auto;
+        width: 100%;
+    }
+
+    header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .logo-section {
+        justify-content: center;
+    }
+
+    .nav {
+        justify-content: center;
+    }
+}
