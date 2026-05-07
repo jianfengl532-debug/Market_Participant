@@ -234,10 +234,14 @@
 
             card.querySelectorAll('input').forEach(input => {
                 const label = input.closest('div').querySelector('.card-label')?.textContent.trim();
-                if (label === '买开均价' || label === '卖开均价') openPrice = parseFloat(input.value) || 0;
-                if (label === '平仓均价') closePrice = parseFloat(input.value) || 0;
-                if (label === '开始时间') startTime = input.value;
-                if (label === '结束时间') endTime = input.value;
+                const value = input.value.trim();
+
+                if ((label === '买开均价' && isLong) || (label === '卖开均价' && !isLong)) {
+                    openPrice = parseFloat(value) || 0;
+                }
+                if (label === '平仓均价') closePrice = parseFloat(value) || 0;
+                if (label === '开始时间') startTime = value;
+                if (label === '结束时间') endTime = value;
             });
 
             let days = 1;
@@ -261,16 +265,106 @@
         }
 
         function createPositionCard(type = 'long', savedData = {}) {
-            const id = savedData.id || 'd_' + Date.now();
             const isLong = type === 'long';
+
+            // 如果是通过按钮点击创建新仓位（没有savedData或没有code），则创建可编辑的空白卡片
+            const isNewPosition = !savedData.code || savedData.code.trim() === '';
+
+            if (isNewPosition) {
+                // 创建一个新的可编辑位置卡片，所有字段都可编辑
+                const tempId = 'temp_' + Date.now(); // 临时ID
+                const html = `
+                    <div class="${isLong ? 'card-red' : 'card-green'}" data-id="${tempId}">
+                        <div class="card-header">
+                            <div><div class="card-label">代码</div><input value="" placeholder="请输入代码"></div>
+                            <div><div class="card-label">目标</div><input value="" placeholder="请输入目标"></div>
+                            <div><div class="card-label">开始时间</div><input value="${getCurrentDateTime()}" readonly></div>
+                            <div><div class="card-label">结束时间</div><input value="" placeholder="请选择结束时间"></div>
+                            <div class="ml-auto text-right">
+                                <div class="card-label">日效益</div>
+                                <div class="profit-display">¥ 0.00</div>
+                            </div>
+                            <div class="card-actions">
+                                <button onclick="editPosition(this)" class="card-btn edit-btn">保存</button>
+                                <button onclick="deletePosition(this)" class="card-btn delete-btn">删除</button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div><div class="card-label">品种</div><input value="" placeholder="请输入品种"></div>
+                            <div>
+                                <div class="card-label">趋势</div>
+                                <div style="display:flex;gap:8px;">
+                                    <input value="" placeholder="D" style="width:72px;text-align:center;">
+                                    <input value="" placeholder="W" style="width:72px;text-align:center;">
+                                    <input value="" placeholder="Mo" style="width:72px;text-align:center;">
+                                </div>
+                            </div>
+                            <div><div class="card-label">${isLong ? '买开均价' : '卖开均价'}</div><input value="" placeholder="请输入开仓价格"></div>
+                            <div><div class="card-label">平仓均价</div><input value="" placeholder="请输入平仓价格"></div>
+                            <div class="ml-auto text-right">
+                                <div class="card-label">利润率</div>
+                                <div class="profit-rate" style="font-size:1.25rem;font-weight:bold;color:#00cc88;">0.00%</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                const container = document.getElementById('positions-container');
+                container.insertAdjacentHTML('beforeend', html);
+
+                const card = container.lastElementChild;
+                // 新创建的卡片所有输入框都是可编辑的
+                card.querySelectorAll('input').forEach(inp => {
+                    inp.readOnly = false;
+                    inp.addEventListener('input', () => calculateProfit(card));
+                });
+
+                // 自动聚焦到代码输入框
+                const codeInput = card.querySelector('.card-label').textContent === '代码' ?
+                    card.querySelector('.card-label').nextElementSibling :
+                    card.querySelector('input');
+                if (codeInput) codeInput.focus();
+
+                return card;
+            }
+
+            // 使用代码作为唯一标识
+            const id = savedData.code;
+
+            // 字段名映射：将保存时的中文键名映射回程序中使用的英文键名
+            const fieldMapping = {
+                '目标': '目标',
+                '开始时间': '开始时间',
+                '结束时间': '结束时间',
+                '品种': '品种',
+                '买开均价': '买开均价',
+                '卖开均价': '卖开均价',
+                '平仓均价': '平仓均价'
+            };
+
+            // 获取保存的数据值
+            const getSavedValue = (key) => {
+                // 首先尝试直接访问（兼容旧数据）
+                if (savedData[key]) return savedData[key];
+
+                // 然后尝试中文键名（新保存的数据格式）
+                for (const [chineseKey, englishKey] of Object.entries(fieldMapping)) {
+                    if (englishKey === key || chineseKey === key) {
+                    const chineseValue = savedData[chineseKey];
+                    if (chineseValue) return chineseValue;
+                }
+                }
+
+                return savedData[key] || '';
+            };
 
             const html = `
                 <div class="${isLong ? 'card-red' : 'card-green'}" data-id="${id}">
                     <div class="card-header">
                         <div><div class="card-label">代码</div><input value="${savedData.code || ''}" readonly></div>
-                        <div><div class="card-label">目标</div><input value="${savedData.target || ''}" readonly></div>
-                        <div><div class="card-label">开始时间</div><input value="${savedData.startTime || getCurrentDateTime()}" readonly></div>
-                        <div><div class="card-label">结束时间</div><input value="${savedData.endTime || ''}" readonly></div>
+                        <div><div class="card-label">目标</div><input value="${getSavedValue('目标')}" readonly></div>
+                        <div><div class="card-label">开始时间</div><input value="${getSavedValue('开始时间') || getCurrentDateTime()}" readonly></div>
+                        <div><div class="card-label">结束时间</div><input value="${getSavedValue('结束时间')}" readonly></div>
                         <div class="ml-auto text-right">
                             <div class="card-label">日效益</div>
                             <div class="profit-display">¥ 0.00</div>
@@ -281,7 +375,7 @@
                         </div>
                     </div>
                     <div class="card-content">
-                        <div><div class="card-label">品种</div><input value="${savedData.variety || ''}" readonly></div>
+                        <div><div class="card-label">品种</div><input value="${getSavedValue('品种')}" readonly></div>
                         <div>
                             <div class="card-label">趋势</div>
                             <div style="display:flex;gap:8px;">
@@ -290,8 +384,8 @@
                                 <input value="${savedData.trend3 || ''}" style="width:72px;text-align:center;" readonly>
                             </div>
                         </div>
-                        <div><div class="card-label">${isLong ? '买开均价' : '卖开均价'}</div><input value="${savedData.openPrice || ''}" readonly></div>
-                        <div><div class="card-label">平仓均价</div><input value="${savedData.closePrice || ''}" readonly></div>
+                        <div><div class="card-label">${isLong ? '买开均价' : '卖开均价'}</div><input value="${getSavedValue(isLong ? '买开均价' : '卖开均价')}" readonly></div>
+                        <div><div class="card-label">平仓均价</div><input value="${getSavedValue('平仓均价')}" readonly></div>
                         <div class="ml-auto text-right">
                             <div class="card-label">利润率</div>
                             <div class="profit-rate" style="font-size:1.25rem;font-weight:bold;color:#00cc88;">0.00%</div>
@@ -317,50 +411,297 @@
         window.editPosition = function(btn) {
             const card = btn.closest('.card-red, .card-green');
             const inputs = card.querySelectorAll('input');
+
             if (btn.textContent === '编辑') {
+                // 切换到编辑模式
                 inputs.forEach(i => i.readOnly = false);
                 btn.textContent = '保存';
             } else {
+                // 切换到保存模式
+                // 检查代码是否已填写
+                let code = '';
+                card.querySelectorAll('input').forEach(input => {
+                    const label = input.closest('div').querySelector('.card-label')?.textContent.trim();
+                    if (label === '代码') {
+                        code = input.value.trim();
+                    }
+                });
+
+                if (!code) {
+                    alert('请输入代码后再保存');
+                    return;
+                }
+
+                // 设置所有输入框为只读
                 inputs.forEach(i => i.readOnly = true);
                 btn.textContent = '编辑';
+
+                // 保存到数据库
                 saveToFirebase(card);
             }
         };
 
         function saveToFirebase(card) {
-            const id = card.dataset.id;
-            const data = { id, type: card.classList.contains('card-red') ? 'long' : 'short' };
+            // 获取代码值作为唯一标识
+            const codeInput = card.querySelector('.card-label').textContent === '代码' ?
+                card.querySelector('.card-label').nextElementSibling :
+                card.querySelector('input[value]');
+
+            let code = '';
+            card.querySelectorAll('input').forEach(input => {
+                const label = input.closest('div').querySelector('.card-label')?.textContent.trim();
+                if (label === '代码') {
+                    code = input.value.trim();
+                }
+            });
+
+            // 如果没有代码，则不保存
+            if (!code) {
+                alert('请输入代码后再保存');
+                return;
+            }
+
+            const data = {
+                code: code,
+                type: card.classList.contains('card-red') ? 'long' : 'short'
+            };
 
             card.querySelectorAll('input').forEach(input => {
                 const label = input.closest('div').querySelector('.card-label')?.textContent.trim();
-                if (label) data[label.toLowerCase().replace(/ /g,'')] = input.value;
+                if (label && label !== '代码') {
+                    data[label.toLowerCase().replace(/ /g,'')] = input.value;
+                }
             });
 
             data.dailyProfit = card.querySelector('.profit-display').textContent;
             data.profitRate = card.querySelector('.profit-rate').textContent;
 
-            set(ref(db, 'deploys/' + id), data);
+            // 使用代码作为键名保存到数据库
+            set(ref(db, 'deploys/' + code), data)
+                .then(() => {
+                    console.log('数据保存成功:', code);
+                })
+                .catch((error) => {
+                    console.error('数据保存失败:', error);
+                    alert('保存失败，请检查网络连接');
+                });
         }
 
         window.deletePosition = function(btn) {
             if (confirm('确定要删除此仓位吗？')) {
                 const card = btn.closest('.card-red, .card-green');
-                remove(ref(db, 'deploys/' + card.dataset.id));
+
+                // 获取代码值
+                let code = '';
+                card.querySelectorAll('input').forEach(input => {
+                    const label = input.closest('div').querySelector('.card-label')?.textContent.trim();
+                    if (label === '代码') {
+                        code = input.value.trim();
+                    }
+                });
+
+                // 从数据库删除对应数据
+                if (code) {
+                    remove(ref(db, 'deploys/' + code))
+                        .then(() => {
+                            console.log('数据库删除成功:', code);
+                        })
+                        .catch((error) => {
+                            console.error('数据库删除失败:', error);
+                        });
+                }
+
+                // 删除页面上的卡片
                 card.remove();
             }
         };
 
-        // 加载已有数据
-        async function loadDeploys() {
-            const snapshot = await get(deploysRef);
-            const data = snapshot.val();
-            if (!data) return;
-            document.getElementById('positions-container').innerHTML = '';
-            Object.values(data).forEach(item => {
-                createPositionCard(item.type || 'long', item);
-            });
+        // ==================== Plan 搜索（完整字段加载） ====================
+        document.getElementById('plan-code').addEventListener('keydown', async (e) => {
+            if (e.key !== 'Enter') return;
+            const code = e.target.value.trim();
+            if (!code) return alert('请输入代码');
+
+            const snapshot = await get(ref(db, 'plans'));
+            const allPlans = snapshot.val();
+            if (!allPlans) return alert('plans 节点为空');
+
+            let found = null;
+            for (let key in allPlans) {
+                const item = allPlans[key];
+                if (key === code || item.code === code ||
+                    (item.stock && item.stock.code === code) ||
+                    (item.futures && item.futures.code === code) ||
+                    (item.options && item.options.code === code)) {
+
+                    found = item.stock || item.futures || item.options || item;
+                    break;
+                }
+            }
+
+            if (found) {
+                // 基础字段
+                document.getElementById('plan-variety').value = found.variety || '';
+                document.getElementById('plan-code').value = found.code || code;
+                document.getElementById('plan-target').value = found.target || '';
+                document.getElementById('plan-d').value = found.d || '';
+                document.getElementById('plan-w').value = found.w || '';
+                document.getElementById('plan-mo').value = found.mo || '';
+                document.getElementById('plan-plan1').value = found.plan1 || '';
+                document.getElementById('plan-plan2').value = found.plan2 || '';
+                document.getElementById('plan-plan3').value = found.plan3 || '';
+                document.getElementById('plan-plan4').value = found.plan4 || '';
+                document.getElementById('plan-conclusion').value = found.conclusion || '';
+
+                // 新增：价格和计算结果
+                document.getElementById('plan-price1').value = found.price1 || found.price_1 || '';
+                document.getElementById('plan-price2').value = found.price2 || found.price_2 || '';
+                document.getElementById('plan-price3').value = found.price3 || found.price_3 || '';
+
+                const resultDiv = document.getElementById('plan-result');
+                resultDiv.innerHTML = found.result ? found.result : '<div style="color:#888;text-align:center;">暂无计算结果</div>';
+
+                alert(`✅ Plan 加载成功: ${code}`);
+            } else {
+                alert(`❌ 未找到代码: ${code}`);
+            }
+        });
+
+        // ==================== Fund 搜索 ====================
+        document.getElementById('fund-account').addEventListener('keydown', async (e) => {
+            if (e.key !== 'Enter') return;
+            const val = e.target.value.trim();
+            if (!val) return alert('请输入客户号或手机号');
+
+            const snapshot = await get(ref(db, 'funds'));
+            const allFunds = snapshot.val();
+            if (!allFunds) return alert('funds 节点为空');
+
+            let found = null;
+            for (let phone in allFunds) {
+                const entry = allFunds[phone];
+                if (phone === val || entry.client?.phone === val) {
+                    found = entry;
+                    break;
+                }
+                if (entry.stock && entry.stock.account === val) { found = entry.stock; break; }
+                if (entry.futures && entry.futures.account === val) { found = entry.futures; break; }
+                if (entry.options && entry.options.account === val) { found = entry.options; break; }
+            }
+
+            if (found) {
+                document.getElementById('fund-broker').value = found.broker || '';
+                document.getElementById('fund-account').value = found.account || val;
+                document.getElementById('fund-password').value = found.password || '';
+
+                document.getElementById('fund-equity').textContent = found.stock_totalEquity || found.totalEquity || '0.00';
+                document.getElementById('fund-cost').textContent = found.stock_totalCost || found.totalCost || '0.00';
+                document.getElementById('fund-available').value = found.available || '0.00';
+
+                const container = document.querySelector('#fund-section .holdings-container');
+                container.innerHTML = '';
+                const holdings = found.stock_holdings || found.holdings || [];
+                if (Array.isArray(holdings)) holdings.forEach(h => addHolding('fund-section', h));
+
+                alert('✅ Fund 加载成功');
+            } else {
+                alert(`❌ 未找到: ${val}`);
+            }
+        });
+
+        // Fund 持仓函数
+        function addHolding(sectionId, initial = {}) {
+            const section = document.getElementById(sectionId);
+            const container = section.querySelector('.holdings-container');
+            const item = document.createElement('div');
+            item.className = 'holding-item';
+            item.innerHTML = `
+                <div><label>代码</label><input type="text" class="code" value="${initial.code || ''}" readonly></div>
+                <div><label>成本价</label><input type="number" class="cost" value="${initial.cost || '0.00'}" readonly></div>
+                <div><label>数量</label><input type="number" class="quantity" value="${initial.quantity || '0'}" readonly></div>
+                <div><label>结算价</label><input type="number" class="settle" value="${initial.settle || '0.00'}" readonly></div>
+                <div class="holding-actions">
+                    <button class="calc-btn">计算</button>
+                    <button class="delete-btn">删除</button>
+                </div>
+            `;
+            container.appendChild(item);
+            item.querySelector('.calc-btn').addEventListener('click', () => updateTotals(sectionId));
+            item.querySelector('.delete-btn').addEventListener('click', () => { item.remove(); updateTotals(sectionId); });
         }
 
+        function updateTotals(sectionId) {
+            const section = document.getElementById(sectionId);
+            let equity = 0, cost = 0;
+            section.querySelectorAll('.holding-item').forEach(row => {
+                const qty = parseFloat(row.querySelector('.quantity').value) || 0;
+                const c = parseFloat(row.querySelector('.cost').value) || 0;
+                const s = parseFloat(row.querySelector('.settle').value) || 0;
+                equity += s * qty;
+                cost += c * qty;
+            });
+            document.getElementById('fund-equity').textContent = equity.toFixed(2);
+            document.getElementById('fund-cost').textContent = cost.toFixed(2);
+        }
+
+        document.querySelector('.add-btn').addEventListener('click', () => addHolding('fund-section'));
+
+        // 加载已有数据
+        async function loadDeploys() {
+            try {
+                console.log('开始加载仓位数据...');
+
+                const snapshot = await get(deploysRef);
+                const data = snapshot.val();
+
+                if (!data) {
+                    console.log('数据库中没有仓位数据');
+                    return;
+                }
+
+                console.log('从数据库获取到原始数据:', data);
+
+                // 清空现有卡片
+                const container = document.getElementById('positions-container');
+                container.innerHTML = '';
+
+                // 按代码排序后加载数据
+                const sortedEntries = Object.entries(data).sort(([a], [b]) => a.localeCompare(b));
+
+                let loadedCount = 0;
+                let errorCount = 0;
+
+                for (const [code, item] of sortedEntries) {
+                    try {
+                        console.log(`加载仓位 ${code}:`, item);
+
+                        // 验证数据完整性
+                        if (!item.code) {
+                            console.warn(`仓位数据缺少代码字段，跳过: ${code}`);
+                            errorCount++;
+                            continue;
+                        }
+
+                        createPositionCard(item.type || 'long', item);
+                        loadedCount++;
+                    } catch (itemError) {
+                        console.error(`加载仓位 ${code} 时出错:`, itemError);
+                        errorCount++;
+                    }
+                }
+
+                console.log(`数据加载完成，成功加载 ${loadedCount} 条记录，${errorCount} 条记录加载失败`);
+
+                if (errorCount > 0) {
+                    alert(`数据加载完成，但有 ${errorCount} 条记录加载失败，请检查数据完整性`);
+                }
+            } catch (error) {
+                console.error('数据加载失败:', error);
+                alert('数据加载失败，请检查网络连接');
+            }
+        }
+
+        // 页面加载时自动加载数据
         window.addEventListener('load', loadDeploys);
     </script>
 </body>
