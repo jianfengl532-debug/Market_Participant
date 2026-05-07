@@ -3,61 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POSITION - Plan - Fund (overview)</title>
+    <title>POSITION - Plan - Deploy - Fund</title>
     <link rel="stylesheet" href="assetc/css/style.css">
     <style>
         /* Index-specific styles */
-        .plan-section, .fund-section {
+        .plan-section, .deploy-section, .fund-section {
             flex: 1;
             min-width: 320px;
             background: #14171c;
             border: 1px solid #222;
             border-radius: 6px;
             padding: 20px;
-        }
-
-        .plan-section h2, .fund-section h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #ddd;
-            font-size: 1.4rem;
-        }
-
-        .left-area .row {
-            margin-bottom: 16px;
-        }
-
-        .left-area label {
-            display: block;
-            font-size: 0.85rem;
-            color: #aaa;
-            margin-bottom: 6px;
-        }
-
-        .left-area input,
-        .left-area textarea {
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .conclusion textarea {
-            min-height: 140px;
-            resize: vertical;
-        }
-
-        .price-area {
             display: flex;
             flex-direction: column;
-            gap: 14px;
+        }
+        .main-container {
+            padding: 24px;
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
         }
 
-        .price-area .calc-btn {
-            margin-top: 8px;
+        /* Deploy 专属样式 */
+        .deploy-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .deploy-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            text-align: center;
+            flex: 1;
+        }
+        .deploy-buttons-left button,
+        .deploy-buttons-right button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-long { background: #8b2b2b; color: white; }
+        .btn-long:hover { background: #a13a3a; }
+        .btn-short { background: #2b8b4b; color: white; }
+        .btn-short:hover { background: #34a35a; }
+
+        .positions-container {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
-        .result-list {
-            margin-top: 16px;
-            max-height: 320px;
+        .card-red, .card-green {
+            border-radius: 8px;
+            overflow: hidden;
+            color: white;
+        }
+        .card-red { background: #8b2b2b; }
+        .card-green { background: #2b8b4b; }
+
+        .card-header, .card-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 16px;
+            flex-wrap: wrap;
+        }
+        .card-header { border-bottom: 1px solid rgba(255,255,255,0.15); }
+
+        .card-label {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.75);
+            margin-bottom: 4px;
+        }
+
+        .card-header input,
+        .card-content input {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+        .card-header input[readonly],
+        .card-content input[readonly] {
+            background: rgba(0,0,0,0.4);
+            color: #ddd;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -67,7 +111,7 @@
             <img src="assetc/images/AMi-LOGO.jpg" alt="LOGO" class="logo-img">
             <div>
                 <div class="main-title">POSITION</div>
-                <div class="sub-title">Plan - Fund (overview)</div>
+                <div class="sub-title">Plan - Deploy - Fund (overview)</div>
             </div>
         </div>
         <div class="nav">
@@ -78,14 +122,14 @@
     </header>
 
     <div class="main-container">
-        <!-- ==================== Plan 面板 ==================== -->
+        <!-- Plan 面板 -->
         <div class="plan-section">
             <h2>Plan</h2>
             <div class="plan-layout">
                 <div class="left-area">
                     <div class="row inline-row">
                         <input id="plan-variety" placeholder="品种" readonly>
-                        <input id="plan-code" placeholder="代码">   <!-- 唯一可编辑 -->
+                        <input id="plan-code" placeholder="代码">
                     </div>
                     <div class="row">
                         <label>目标</label>
@@ -109,7 +153,6 @@
                         <textarea id="plan-conclusion" placeholder="结论" readonly></textarea>
                     </div>
                 </div>
-
                 <div class="price-area">
                     <input type="number" id="plan-price1" placeholder="价格1" step="0.01" readonly>
                     <input type="number" id="plan-price2" placeholder="价格2" step="0.01" readonly>
@@ -120,12 +163,26 @@
             </div>
         </div>
 
-        <!-- ==================== Fund 面板 ==================== -->
+        <!-- Deploy 面板 -->
+        <div class="deploy-section">
+            <div class="deploy-header">
+                <div class="deploy-buttons-left">
+                    <button onclick="addLongPosition()" class="btn-long">+ 多单</button>
+                </div>
+                <h3 class="deploy-title">Deploy</h3>
+                <div class="deploy-buttons-right">
+                    <button onclick="addShortPosition()" class="btn-short">+ 空单</button>
+                </div>
+            </div>
+            <div class="positions-container" id="positions-container"></div>
+        </div>
+
+        <!-- Fund 面板 -->
         <div class="fund-section" id="fund-section">
             <h2>Fund</h2>
             <div class="account-row">
                 <input id="fund-broker" placeholder="开户公司" readonly>
-                <input id="fund-account" placeholder="客户号">   <!-- 唯一可编辑 -->
+                <input id="fund-account" placeholder="客户号">
                 <input id="fund-password" type="password" placeholder="登录密码" readonly>
             </div>
             <div class="value-row">
@@ -149,7 +206,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+        import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAZ-2yPwU8CJjH_aYOCWcTe4roVoeuBLE0",
@@ -164,180 +221,147 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const deploysRef = ref(db, 'deploys');
 
-        // ==================== Plan 计算按钮 ====================
-        document.querySelector('.calc-btn').addEventListener('click', () => {
-            const prices = [
-                Number(document.getElementById('plan-price1').value) || 0,
-                Number(document.getElementById('plan-price2').value) || 0,
-                Number(document.getElementById('plan-price3').value) || 0
-            ];
-            const rates = [0.125, 0.25, 0.333, 0.50, 0.625, 0.667, 0.75, 0.875];
-            let results = [];
-            prices.forEach(p => {
-                if (p > 0) rates.forEach(r => results.push((p * r).toFixed(2)));
+        function getCurrentDateTime() {
+            const now = new Date();
+            return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        }
+
+        function calculateProfit(card) {
+            const isLong = card.classList.contains('card-red');
+            let openPrice = 0, closePrice = 0, startTime = '', endTime = '';
+
+            card.querySelectorAll('input').forEach(input => {
+                const label = input.closest('div').querySelector('.card-label')?.textContent.trim();
+                if (label === '买开均价' || label === '卖开均价') openPrice = parseFloat(input.value) || 0;
+                if (label === '平仓均价') closePrice = parseFloat(input.value) || 0;
+                if (label === '开始时间') startTime = input.value;
+                if (label === '结束时间') endTime = input.value;
             });
-            results.sort((a,b) => b - a);
-            document.getElementById('plan-result').innerHTML = results.length === 0
-                ? '<div style="color:#888;text-align:center;">无有效价格</div>'
-                : results.map(v => `<div>${v}</div>`).join('');
-        });
 
-        // ==================== Fund 持仓相关函数 ====================
-        function addHolding(sectionId, initial = null) {
-            const section = document.getElementById(sectionId);
-            if (!section) return;
-            const container = section.querySelector('.holdings-container');
-            const item = document.createElement('div');
-            item.className = 'holding-item';
-            item.innerHTML = `
-                <div><label>代码</label><input type="text" placeholder="代码" class="code" value="${initial?.code || ''}" readonly></div>
-                <div><label>成本价</label><input type="number" step="0.01" value="${initial?.cost || '0.00'}" class="cost" readonly></div>
-                <div><label>数量</label><input type="number" step="1" value="${initial?.quantity || '0'}" class="quantity" readonly></div>
-                <div><label>结算价</label><input type="number" step="0.01" value="${initial?.settle || '0.00'}" class="settle" readonly></div>
-                <div class="holding-actions">
-                    <button class="calc-btn">计算</button>
-                    <button class="delete-btn">删除</button>
+            let days = 1;
+            if (startTime && endTime) {
+                const s = new Date(startTime.split(' ')[0]);
+                const e = new Date(endTime.split(' ')[0]);
+                days = Math.max(1, Math.ceil((e - s) / (86400000)));
+            }
+
+            let dailyProfit = 0, profitRate = 0;
+            if (isLong) {
+                dailyProfit = (closePrice - openPrice) / days;
+                profitRate = openPrice ? (closePrice - openPrice) / openPrice * 100 : 0;
+            } else {
+                dailyProfit = (openPrice - closePrice) / days;
+                profitRate = openPrice ? (openPrice - closePrice) / openPrice * 100 : 0;
+            }
+
+            card.querySelector('.profit-display').textContent = `¥ ${dailyProfit.toFixed(2)}`;
+            card.querySelector('.profit-rate').textContent = `${profitRate.toFixed(2)}%`;
+        }
+
+        function createPositionCard(type = 'long', savedData = {}) {
+            const id = savedData.id || 'd_' + Date.now();
+            const isLong = type === 'long';
+
+            const html = `
+                <div class="${isLong ? 'card-red' : 'card-green'}" data-id="${id}">
+                    <div class="card-header">
+                        <div><div class="card-label">代码</div><input value="${savedData.code || ''}" readonly></div>
+                        <div><div class="card-label">目标</div><input value="${savedData.target || ''}" readonly></div>
+                        <div><div class="card-label">开始时间</div><input value="${savedData.startTime || getCurrentDateTime()}" readonly></div>
+                        <div><div class="card-label">结束时间</div><input value="${savedData.endTime || ''}" readonly></div>
+                        <div class="ml-auto text-right">
+                            <div class="card-label">日效益</div>
+                            <div class="profit-display">¥ 0.00</div>
+                        </div>
+                        <div class="card-actions">
+                            <button onclick="editPosition(this)" class="card-btn edit-btn">编辑</button>
+                            <button onclick="deletePosition(this)" class="card-btn delete-btn">删除</button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div><div class="card-label">品种</div><input value="${savedData.variety || ''}" readonly></div>
+                        <div>
+                            <div class="card-label">趋势</div>
+                            <div style="display:flex;gap:8px;">
+                                <input value="${savedData.trend1 || ''}" style="width:72px;text-align:center;" readonly>
+                                <input value="${savedData.trend2 || ''}" style="width:72px;text-align:center;" readonly>
+                                <input value="${savedData.trend3 || ''}" style="width:72px;text-align:center;" readonly>
+                            </div>
+                        </div>
+                        <div><div class="card-label">${isLong ? '买开均价' : '卖开均价'}</div><input value="${savedData.openPrice || ''}" readonly></div>
+                        <div><div class="card-label">平仓均价</div><input value="${savedData.closePrice || ''}" readonly></div>
+                        <div class="ml-auto text-right">
+                            <div class="card-label">利润率</div>
+                            <div class="profit-rate" style="font-size:1.25rem;font-weight:bold;color:#00cc88;">0.00%</div>
+                        </div>
+                    </div>
                 </div>
             `;
-            container.appendChild(item);
 
-            item.querySelector('.calc-btn').addEventListener('click', () => updateTotals(sectionId));
-            item.querySelector('.delete-btn').addEventListener('click', () => {
-                item.remove();
-                updateTotals(sectionId);
+            const container = document.getElementById('positions-container');
+            container.insertAdjacentHTML('beforeend', html);
+
+            const card = container.lastElementChild;
+            card.querySelectorAll('input').forEach(inp => {
+                inp.addEventListener('input', () => calculateProfit(card));
+            });
+            calculateProfit(card);
+            return card;
+        }
+
+        window.addLongPosition = () => createPositionCard('long');
+        window.addShortPosition = () => createPositionCard('short');
+
+        window.editPosition = function(btn) {
+            const card = btn.closest('.card-red, .card-green');
+            const inputs = card.querySelectorAll('input');
+            if (btn.textContent === '编辑') {
+                inputs.forEach(i => i.readOnly = false);
+                btn.textContent = '保存';
+            } else {
+                inputs.forEach(i => i.readOnly = true);
+                btn.textContent = '编辑';
+                saveToFirebase(card);
+            }
+        };
+
+        function saveToFirebase(card) {
+            const id = card.dataset.id;
+            const data = { id, type: card.classList.contains('card-red') ? 'long' : 'short' };
+
+            card.querySelectorAll('input').forEach(input => {
+                const label = input.closest('div').querySelector('.card-label')?.textContent.trim();
+                if (label) data[label.toLowerCase().replace(/ /g,'')] = input.value;
+            });
+
+            data.dailyProfit = card.querySelector('.profit-display').textContent;
+            data.profitRate = card.querySelector('.profit-rate').textContent;
+
+            set(ref(db, 'deploys/' + id), data);
+        }
+
+        window.deletePosition = function(btn) {
+            if (confirm('确定要删除此仓位吗？')) {
+                const card = btn.closest('.card-red, .card-green');
+                remove(ref(db, 'deploys/' + card.dataset.id));
+                card.remove();
+            }
+        };
+
+        // 加载已有数据
+        async function loadDeploys() {
+            const snapshot = await get(deploysRef);
+            const data = snapshot.val();
+            if (!data) return;
+            document.getElementById('positions-container').innerHTML = '';
+            Object.values(data).forEach(item => {
+                createPositionCard(item.type || 'long', item);
             });
         }
 
-        function updateTotals(sectionId) {
-            const section = document.getElementById(sectionId);
-            if (!section) return;
-            let totalEquity = 0, totalCost = 0;
-            section.querySelectorAll('.holding-item').forEach(row => {
-                const qty = parseFloat(row.querySelector('.quantity').value) || 0;
-                const cost = parseFloat(row.querySelector('.cost').value) || 0;
-                const settle = parseFloat(row.querySelector('.settle').value) || 0;
-                totalEquity += settle * qty;
-                totalCost += cost * qty;
-            });
-            document.getElementById('fund-equity').textContent = totalEquity.toFixed(2);
-            document.getElementById('fund-cost').textContent = totalCost.toFixed(2);
-        }
-
-        document.querySelector('.add-btn').addEventListener('click', () => addHolding('fund-section'));
-
-        // ==================== Plan 搜索（仅代码可输入） ====================
-        document.getElementById('plan-code').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                let code = e.target.value.trim();
-                if (!code) return alert('请输入代码');
-                const plansRef = ref(db, 'plans');
-                get(plansRef).then(snapshot => {
-                    const data = snapshot.val();
-                    if (!data) return alert('plans 节点为空');
-
-                    let planData = null;
-                    let matchedSection = null;
-
-                    if (data[code]) {
-                        planData = data[code];
-                        if (planData.stock?.code) matchedSection = 'stock';
-                        else if (planData.options?.code) matchedSection = 'options';
-                        else if (planData.futures?.code) matchedSection = 'futures';
-                    }
-
-                    if (!planData) {
-                        for (const key in data) {
-                            const p = data[key];
-                            if (p.stock?.code === code) { planData = p; matchedSection = 'stock'; break; }
-                            if (p.options?.code === code) { planData = p; matchedSection = 'options'; break; }
-                            if (p.futures?.code === code) { planData = p; matchedSection = 'futures'; break; }
-                        }
-                    }
-
-                    if (planData && matchedSection) {
-                        const s = planData[matchedSection];
-                        document.getElementById('plan-variety').value = s.variety || '';
-                        document.getElementById('plan-code').value = s.code || code;
-                        document.getElementById('plan-target').value = s.target || '';
-                        document.getElementById('plan-d').value = s.d || '';
-                        document.getElementById('plan-w').value = s.w || '';
-                        document.getElementById('plan-mo').value = s.mo || '';
-                        document.getElementById('plan-plan1').value = s.plan1 || '';
-                        document.getElementById('plan-plan2').value = s.plan2 || '';
-                        document.getElementById('plan-plan3').value = s.plan3 || '';
-                        document.getElementById('plan-plan4').value = s.plan4 || '';
-                        document.getElementById('plan-conclusion').value = s.conclusion || '';
-                        document.getElementById('plan-result').innerHTML = s.result || '';
-                        alert(`已加载 Plan: ${code} (${matchedSection})`);
-                    } else {
-                        alert(`未找到代码/标题为 ${code} 的 Plan 数据`);
-                    }
-                }).catch(err => alert('查询失败：' + err.message));
-            }
-        });
-
-        // ==================== Fund 搜索（仅客户号可输入） ====================
-        document.getElementById('fund-account').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                let inputVal = e.target.value.trim();
-                if (!inputVal) return alert('请输入客户号或关联手机号');
-
-                const fundsRef = ref(db, 'funds');
-                get(fundsRef).then(snapshot => {
-                    const allFunds = snapshot.val();
-                    if (!allFunds) return alert('funds 节点为空');
-
-                    let foundData = null;
-                    let matchedType = null;
-                    let matchedPhone = null;
-
-                    if (allFunds[inputVal]) {
-                        foundData = allFunds[inputVal];
-                        matchedPhone = inputVal;
-                        if (foundData.stock?.account) matchedType = 'stock';
-                        else if (foundData.options?.account) matchedType = 'options';
-                        else if (foundData.futures?.account) matchedType = 'futures';
-                    }
-
-                    if (!foundData) {
-                        for (const phone in allFunds) {
-                            const data = allFunds[phone];
-                            if (data.stock?.account === inputVal) {
-                                foundData = data; matchedType = 'stock'; matchedPhone = phone; break;
-                            }
-                            if (data.options?.account === inputVal) {
-                                foundData = data; matchedType = 'options'; matchedPhone = phone; break;
-                            }
-                            if (data.futures?.account === inputVal) {
-                                foundData = data; matchedType = 'futures'; matchedPhone = phone; break;
-                            }
-                        }
-                    }
-
-                    if (foundData && matchedType) {
-                        const section = foundData[matchedType];
-                        const prefix = matchedType + '_';
-                        document.getElementById('fund-broker').value = section.broker || '';
-                        document.getElementById('fund-account').value = section.account || inputVal;
-                        document.getElementById('fund-password').value = section.password || '';
-                        document.getElementById('fund-equity').textContent = foundData[`${prefix}totalEquity`] || foundData[`${matchedType}_totalEquity`] || '0.00';
-                        document.getElementById('fund-cost').textContent = foundData[`${prefix}totalCost`] || foundData[`${matchedType}_totalCost`] || '0.00';
-                        document.getElementById('fund-available').value = section.available || '0.00';
-
-                        const container = document.querySelector('#fund-section .holdings-container');
-                        container.innerHTML = '';
-                        const holdings = foundData[`${matchedType}_holdings`] || [];
-                        holdings.forEach(h => addHolding('fund-section', h));
-                        updateTotals('fund-section');
-
-                        alert(`已加载 Fund 数据（手机号: ${matchedPhone}，类型: ${matchedType}）`);
-                    } else {
-                        alert(`未找到客户号/手机号为 ${inputVal} 的 Fund 数据`);
-                    }
-                }).catch(err => alert('查询失败：' + err.message));
-            }
-        });
+        window.addEventListener('load', loadDeploys);
     </script>
 </body>
 </html>
