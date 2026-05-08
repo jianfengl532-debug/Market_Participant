@@ -292,11 +292,10 @@
                         <div class="card-content">
                             <div><div class="card-label">品种</div><input value="" placeholder="请输入品种"></div>
                             <div>
-                                <div class="card-label">趋势</div>
                                 <div style="display:flex;gap:8px;">
-                                    <input value="" placeholder="D" style="width:72px;text-align:center;">
-                                    <input value="" placeholder="W" style="width:72px;text-align:center;">
-                                    <input value="" placeholder="Mo" style="width:72px;text-align:center;">
+                                    <div><div class="card-label">D趋势</div><input value="" placeholder="D" style="width:72px;text-align:center;"></div>
+                                    <div><div class="card-label">W趋势</div><input value="" placeholder="W" style="width:72px;text-align:center;"></div>
+                                    <div><div class="card-label">Mo趋势</div><input value="" placeholder="Mo" style="width:72px;text-align:center;"></div>
                                 </div>
                             </div>
                             <div><div class="card-label">${isLong ? '买开均价' : '卖开均价'}</div><input value="" placeholder="请输入开仓价格"></div>
@@ -339,7 +338,10 @@
                 '品种': '品种',
                 '买开均价': '买开均价',
                 '卖开均价': '卖开均价',
-                '平仓均价': '平仓均价'
+                '平仓均价': '平仓均价',
+                'D趋势': 'trend1',
+                'W趋势': 'trend2',
+                'Mo趋势': 'trend3'
             };
 
             // 获取保存的数据值
@@ -350,9 +352,9 @@
                 // 然后尝试中文键名（新保存的数据格式）
                 for (const [chineseKey, englishKey] of Object.entries(fieldMapping)) {
                     if (englishKey === key || chineseKey === key) {
-                    const chineseValue = savedData[chineseKey];
-                    if (chineseValue) return chineseValue;
-                }
+                        const chineseValue = savedData[chineseKey];
+                        if (chineseValue) return chineseValue;
+                    }
                 }
 
                 return savedData[key] || '';
@@ -377,11 +379,10 @@
                     <div class="card-content">
                         <div><div class="card-label">品种</div><input value="${getSavedValue('品种')}" readonly></div>
                         <div>
-                            <div class="card-label">趋势</div>
                             <div style="display:flex;gap:8px;">
-                                <input value="${savedData.trend1 || ''}" style="width:72px;text-align:center;" readonly>
-                                <input value="${savedData.trend2 || ''}" style="width:72px;text-align:center;" readonly>
-                                <input value="${savedData.trend3 || ''}" style="width:72px;text-align:center;" readonly>
+                                <div><div class="card-label">D趋势</div><input value="${getSavedValue('D趋势') || savedData.trend1 || ''}" style="width:72px;text-align:center;" readonly></div>
+                                <div><div class="card-label">W趋势</div><input value="${getSavedValue('W趋势') || savedData.trend2 || ''}" style="width:72px;text-align:center;" readonly></div>
+                                <div><div class="card-label">Mo趋势</div><input value="${getSavedValue('Mo趋势') || savedData.trend3 || ''}" style="width:72px;text-align:center;" readonly></div>
                             </div>
                         </div>
                         <div><div class="card-label">${isLong ? '买开均价' : '卖开均价'}</div><input value="${getSavedValue(isLong ? '买开均价' : '卖开均价')}" readonly></div>
@@ -469,7 +470,12 @@
             card.querySelectorAll('input').forEach(input => {
                 const label = input.closest('div').querySelector('.card-label')?.textContent.trim();
                 if (label && label !== '代码') {
-                    data[label.toLowerCase().replace(/ /g,'')] = input.value;
+                    // 特殊处理趋势字段，保存为英文键名
+                    let fieldName = label.toLowerCase().replace(/ /g,'');
+                    if (label === 'D趋势') fieldName = 'trend1';
+                    if (label === 'W趋势') fieldName = 'trend2';
+                    if (label === 'Mo趋势') fieldName = 'trend3';
+                    data[fieldName] = input.value;
                 }
             });
 
