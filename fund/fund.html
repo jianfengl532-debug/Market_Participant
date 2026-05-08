@@ -238,6 +238,8 @@ async function saveAllData() {
             data[`${type}_holdings`] = holdings;
             data[`${type}_totalEquity`] = document.getElementById(`${type}-equity`).textContent || '0.00';
             data[`${type}_totalCost`] = document.getElementById(`${type}-cost`).textContent || '0.00';
+            // 添加可用资金的保存
+            data[`${type}_available`] = document.getElementById(`${type}-available`).value || '0.00';
         });
         await set(fundRef, data);
         alert(`上传成功！\n已保存到 /funds/${phone}`);
