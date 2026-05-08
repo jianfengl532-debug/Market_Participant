@@ -182,7 +182,7 @@
             <h2>Fund</h2>
             <div class="account-row">
                 <input id="fund-broker" placeholder="开户公司" readonly>
-                <input id="fund-account" placeholder="客户号">
+                <input id="fund-account" placeholder="请输入客户号并按回车搜索" style="flex: 2;">
                 <input id="fund-password" type="password" placeholder="登录密码" readonly>
             </div>
             <div class="value-row">
@@ -584,25 +584,89 @@
             if (!allFunds) return alert('funds 节点为空');
 
             let found = null;
+            let foundEntry = null; // 保存完整的entry对象
+            let accountType = null; // 记录找到的账户类型
+
             for (let phone in allFunds) {
                 const entry = allFunds[phone];
                 if (phone === val || entry.client?.phone === val) {
                     found = entry;
+                    foundEntry = entry;
+                    accountType = 'main';
                     break;
                 }
-                if (entry.stock && entry.stock.account === val) { found = entry.stock; break; }
-                if (entry.futures && entry.futures.account === val) { found = entry.futures; break; }
-                if (entry.options && entry.options.account === val) { found = entry.options; break; }
+                if (entry.stock && entry.stock.account === val) {
+                    found = entry.stock;
+                    foundEntry = entry;
+                    accountType = 'stock';
+                    break;
+                }
+                if (entry.futures && entry.futures.account === val) {
+                    found = entry.futures;
+                    foundEntry = entry;
+                    accountType = 'futures';
+                    break;
+                }
+                if (entry.options && entry.options.account === val) {
+                    found = entry.options;
+                    foundEntry = entry;
+                    accountType = 'options';
+                    break;
+                }
             }
 
             if (found) {
-                document.getElementById('fund-broker').value = found.broker || '';
+                console.log('Found fund data:', found); // 调试信息
+                console.log('Found entry:', foundEntry); // 调试信息
+                console.log('Account type:', accountType); // 调试信息
+
+                // 调试：检查所有可能的available字段
+                console.log('=== Available Fields Debug ===');
+                console.log('found.available:', found.available);
+                console.log('foundEntry.stock_available:', foundEntry?.stock_available);
+                console.log('foundEntry.futures_available:', foundEntry?.futures_available);
+                console.log('foundEntry.options_available:', foundEntry?.options_available);
+                console.log('found.stock_available:', found.stock_available);
+                console.log('found.futures_available:', found.futures_available);
+                console.log('found.options_available:', found.options_available);
+
+                // 从完整对象或子对象中获取broker信息
+                document.getElementById('fund-broker').value = foundEntry.broker || found.broker || '';
                 document.getElementById('fund-account').value = found.account || val;
                 document.getElementById('fund-password').value = found.password || '';
 
-                document.getElementById('fund-equity').textContent = found.stock_totalEquity || found.totalEquity || '0.00';
-                document.getElementById('fund-cost').textContent = found.stock_totalCost || found.totalCost || '0.00';
-                document.getElementById('fund-available').value = found.available || '0.00';
+                // 根据账户类型获取对应的资金数据
+                let equityField, costField, availableField;
+
+                if (accountType === 'stock') {
+                    // 通过股票账户搜索，found是entry.stock，字段在found对象中
+                    equityField = found.totalEquity || foundEntry?.stock_totalEquity || '0.00';
+                    costField = found.totalCost || foundEntry?.stock_totalCost || '0.00';
+                    availableField = found.available || foundEntry?.stock_available || '0.00';
+                } else if (accountType === 'futures') {
+                    // 通过期货账户搜索，found是entry.futures，字段在found对象中
+                    equityField = found.totalEquity || foundEntry?.futures_totalEquity || '0.00';
+                    costField = found.totalCost || foundEntry?.futures_totalCost || '0.00';
+                    availableField = found.available || foundEntry?.futures_available || '0.00';
+                } else if (accountType === 'options') {
+                    // 通过期权账户搜索，found是entry.options，字段在found对象中
+                    equityField = found.totalEquity || foundEntry?.options_totalEquity || '0.00';
+                    costField = found.totalCost || foundEntry?.options_totalCost || '0.00';
+                    availableField = found.available || foundEntry?.options_available || '0.00';
+                } else {
+                    // 通过手机号搜索，found是完整的entry
+                    equityField = found.stock_totalEquity || found.totalEquity || '0.00';
+                    costField = found.stock_totalCost || found.totalCost || '0.00';
+                    availableField = found.stock_available || found.available || '0.00';
+                }
+
+                console.log('Setting equity:', equityField);
+                console.log('Setting cost:', costField);
+                console.log('Setting available:', availableField);
+
+                document.getElementById('fund-equity').textContent = equityField;
+                document.getElementById('fund-cost').textContent = costField;
+                document.getElementById('fund-available').value = availableField;
 
                 const container = document.querySelector('#fund-section .holdings-container');
                 container.innerHTML = '';
@@ -610,6 +674,8 @@
                 if (Array.isArray(holdings)) holdings.forEach(h => addHolding('fund-section', h));
 
                 alert('✅ Fund 加载成功');
+                // 保存账户信息供下次使用
+                localStorage.setItem('lastFundAccount', val);
             } else {
                 alert(`❌ 未找到: ${val}`);
             }
@@ -708,7 +774,23 @@
         }
 
         // 页面加载时自动加载数据
-        window.addEventListener('load', loadDeploys);
+        window.addEventListener('load', function() {
+            loadDeploys();
+            // 尝试加载上次使用的账户信息
+            const lastAccount = localStorage.getItem('lastFundAccount');
+            if (lastAccount) {
+                document.getElementById('fund-account').value = lastAccount;
+                // 自动触发搜索
+                const event = new KeyboardEvent('keydown', {
+                    key: 'Enter',
+                    code: 'Enter',
+                    keyCode: 13,
+                    which: 13,
+                    bubbles: true
+                });
+                document.getElementById('fund-account').dispatchEvent(event);
+            }
+        });
     </script>
 </body>
 </html>
