@@ -11,13 +11,15 @@
 <div class="container">  <!-- 块级容器: 内容居中布局 最大宽度210mm -->
 
     <h1>📁 网站项目架构</h1>  <!-- 一级标题: 页面主标题 -->
-    <div class="subhead">最后更新: 2026-06-22</div>  <!-- 块级容器: 副标题/元信息 -->
+    <div class="subhead">最后更新: 2026-06-24</div>  <!-- 块级容器: 副标题/元信息 -->
 
     <hr>  <!-- 水平分割线: 分隔内容段落 -->
 
     <!-- 1. 项目概览 -->
     <h2>1. 项目概览</h2>  <!-- 二级标题: 章节标题 -->
-    <p>本地服务器上的个人投资研究与数据分析平台，包含三个分析模块 + 三个数据模块（价格/个人账户/企业财务）+ 一个订单系统。</p>
+    <p>个人投资研究与数据分析平台，包含三个分析模块 + 三个数据模块（价格/个人账户/企业财务）+ 一个订单系统。</p>
+
+    <p><strong>部署模式：</strong>前端静态文件托管于 GitHub Pages（HTTPS），后端 PHP API 通过 Tailscale Funnel 暴露为 HTTPS，数据留在本地笔记本。远程维护通过 Tailscale SSH。</p>
 
     <p><strong>模块一览：</strong>🌍 GeoEnv（地缘政治分析）、💱 FxCap（汇率利率分析）、🏭 IndBiz（产业分析）、📊 Price（价格数据/斐波那契计算）、💳 PerAcc（个人账户管理）、🏢 FinData（企业财务数据）。</p>  <!-- 段落: 文本内容块 -->
 
@@ -27,18 +29,20 @@
             <tr><th>位置</th><th>路径</th><th>服务</th><th>端口</th></tr>  <!-- tr=表格行 th=表头单元格 -->
         </thead>  <!-- 表格头部结束 -->
         <tbody>  <!-- 表格主体: 数据行 -->
-            <tr><td><strong>位置1</strong> — 展示层</td><td><code>/share/www/</code></td><td>Python HTTP 静态服务</td><td><code>8080</code></td></tr>  <!-- td=普通单元格 strong=加粗强调 code=行内代码 -->
-            <tr><td><strong>位置2</strong> — 数据层</td><td><code>/home/jefflu/api/</code></td><td>PHP 内置服务器</td><td><code>8000</code></td></tr>
+            <tr><td><strong>位置1</strong> — 展示层</td><td><code>/share/www/</code></td><td>Python HTTP 静态服务（本地开发）</td><td><code>8080</code></td></tr>  <!-- td=普通单元格 strong=加粗强调 code=行内代码 -->
+            <tr><td><strong>位置2</strong> — 数据层</td><td><code>/home/jefflu/api/</code></td><td>PHP 内置服务器 + Tailscale Funnel（生产）</td><td><code>8000</code></td></tr>
         </tbody>  <!-- 表格主体结束 -->
     </table>  <!-- 表格结束 -->
 
     <h3>服务架构</h3>  <!-- 三级标题: 子章节标题 -->
     <pre><code>用户浏览器  <!-- pre=预格式化文本 保留空格/换行 code=代码块 -->
     │
-    ├── :8080 ─── Python http.server ─── /share/www/  ─── 静态展示页面
+    ├── GitHub Pages ─── /share/www/ ─── 静态展示页面（生产）
+    │
+    ├── :8080 ─── Python http.server ─── /share/www/  ─── 静态展示页面（开发）
     │                                                   (HTML + CSS + JS)
     │
-    └── :8000 ─── PHP built-in server ── /home/jefflu/api/ ─── 数据录入 + API
+    └── Tailscale Funnel :443 ─── 家笔记本 :8000 ─── PHP ── /home/jefflu/api/ ─── 数据录入 + API
                                                             (PHP + MySQL)
                                                                 │
                                                                 ↓
@@ -57,7 +61,8 @@
 ├── css/
 │   └── style.css                                 ← 主样式
 ├── js/
-│   └── main.js                                   ← 全局脚本
+│   ├── main.js                                   ← 全局脚本（复制命令、搜索等）
+│   └── config.js                                 ← 全局 API 配置（Funnel URL + Key）
 ├── docs/
 │   ├── 数据库架构设计.html                        ← 数据库结构文档
 │   └── 网站项目架构.html                          ← 本文件
@@ -342,13 +347,19 @@
             <tr><td><strong>Price 前端</strong></td><td>不共享 <code>DB.js</code>，数据录入页使用独立的 <code>Price_Data.js</code>（896 行，含斐波那契计算 + CRUD + autocomplete + 代码查询），展示页使用 <code>Finance/Finance.js</code>（392 行）。</td></tr>
             <tr><td><strong>db_config.php</strong></td><td>共享数据库配置，5 个 <code>api.php</code> 统一通过 <code>require_once '../db_config.php'; $pdo = getDB();</code> 获取 PDO 单例。消除 5 处密码硬编码。</td></tr>
             <tr><td><strong>Firebase 基金应用</strong></td><td><code>jefflu/fund.html</code> 使用 Firebase Realtime Database（项目 ID: <code>myposition-5ac17</code>），管理股票/期权/期货持仓，独立于 InvStrat_db。</td></tr>
-            <tr><td><strong>CORS</strong></td><td>所有 API 返回 <code>Access-Control-Allow-Origin: *</code>，允许跨端口调用。</td></tr>
-            <tr><td><strong>展示页 DB 链接</strong></td><td>使用 <code>window.location.hostname</code> 动态解析，避免硬编码 IP。</td></tr>
-            <tr><td><strong>健康检查</strong></td><td><code>ping.php</code> 返回服务器状态和数据库连通性。访问 <code>http://localhost:8000/ping.php</code>。</td></tr>
-            <tr><td><strong>启动脚本</strong></td><td><code>/home/jefflu/start.sh</code> 一键启停前后端服务，支持 <code>start|stop|status</code> 子命令。</td></tr>
+            <tr><td><strong>CORS（安全白名单）</strong></td><td>所有 <code>api.php</code> 通过 <code>db_config.php</code> 中的 <code>setCorsHeaders()</code> 统一设置，只允许白名单域名：GitHub Pages 生产域名 + localhost 开发环境。拒绝未知来源，详见 <code>/home/jefflu/api/db_config.php</code>。</td></tr>
+            <tr><td><strong>API Key 安全层</strong></td><td>所有 API 请求必须在 Header 携带 <code>X-API-Key</code>，密钥定义在 <code>db_config.php</code>（后端）和 <code>js/config.js</code>（前端）。不匹配时返回 401。前端通过 <code>config.js</code> 统一注入，无需手动管理。</td></tr>
+            <tr><td><strong>config.js 环境切换</strong></td><td><code>/share/www/js/config.js</code> 检测 <code>window.location.hostname</code>：本地开发时使用 <code>localhost:8000</code>，生产时使用 Funnel URL <code>https://jefflu.tail9f69ce.ts.net</code>。所有显示页统一引用此文件。</td></tr>
+            <tr><td><strong>展示页 DB 链接</strong></td><td>使用 <code>window.location.hostname</code> 动态解析 + <code>js/config.js</code> 配置覆盖。生产环境指向 Funnel URL：<code>https://jefflu.tail9f69ce.ts.net</code>。</td></tr>
+            <tr><td><strong>健康检查</strong></td><td><code>ping.php</code> 返回服务器状态和数据库连通性。本地访问 <code>http://localhost:8000/ping.php</code>，线上访问 <code>https://jefflu.tail9f69ce.ts.net/ping.php</code>（需带 API Key）。</td></tr>
+            <tr><td><strong>启动脚本（本地开发）</strong></td><td><code>/home/jefflu/start.sh</code> 一键启停前后端服务（Python http.server + PHP），支持 <code>start|stop|status</code> 子命令。</td></tr>
+            <tr><td><strong>Funnel 启动（生产）</strong></td><td>后端通过 Tailscale Funnel 暴露为 HTTPS：<code>tailscale funnel 8000</code>。生产环境只需启动 PHP 后端，前端由 GitHub Pages 提供。</td></tr>
             <tr><td><strong>唯一性迁移脚本</strong></td><td><code>migrate_unique.sql</code> 给已有数据库添加 UNIQUE 约束（代码 + 身份证），自动清理重复数据，不丢记录。</td></tr>
             <tr><td><strong>FinData reports 结构</strong></td><td><code>fin_enterprises.financial_data</code> 以 JSON 存储多周期报告：<code>{"2025-Q4":{period_label, financial_data}, "2026-Q1":{...}}</code>。前端自动对比展示各周期财务数据。</td></tr>
 	            <tr><td><strong>FinData 银行流水（2026-06 新增）</strong></td><td>独立表 <code>fin_bank_flows</code>，通过 uscc 与企业关联。前端展示页同时加载 fin_enterprises 和 fin_bank_flows 数据，自动合并渲染。每条记录标注数据类型（财务报告/银行流水/两者皆有）。导入流程：前端 JSON → PHP 调用 Python → 生成现金流量表 HTML → 存入数据库。</td></tr>
+	            <tr><td><strong>GitHub Pages 访问</strong></td><td>前端生产地址：<code>https://jianfengl532-debug.github.io/Market_Participant/</code>。源码仓库：<code>github.com/jianfengl532-debug/Market_Participant</code>。</td></tr>
+	            <tr><td><strong>Tailscale 远程维护</strong></td><td>SSH：<code>ssh jefflu@100.105.237.93</code> 或 <code>ssh jefflu@jefflu.tail9f69ce.ts.net</code>。Funnel 后端：<code>https://jefflu.tail9f69ce.ts.net/</code>。</td></tr>
+	            <tr><td><strong>.gitignore</strong></td><td><code>/share/www/.gitignore</code>，忽略本地日志和系统文件。</td></tr>
             <tr><td><strong>FinData 社会统一代码唯一性</strong></td><td><code>fin_enterprises.uscc</code> 有 UNIQUE 约束 <code>uk_uscc</code>。支持 <code>save</code>（新建企业）和 <code>add_period</code>（追加周期）两种保存模式。</td></tr>
             <tr><td><strong>FinData 周期管理</strong></td><td>录入时手动输入报告期间（格式 <code>YYYY-QN</code>，如 2025-Q4）。同一企业可分多次导入不同周期的财务数据，自动合并展示。</td></tr>
             <tr><td><strong>字符集</strong></td><td>全部使用 <code>utf8mb4</code>，支持 emoji 和中文。</td></tr>

@@ -11,7 +11,7 @@
 <div class="container">
 
     <h1>🗄️ 数据库架构设计 — InvStrat_db</h1>
-    <div class="subhead">MariaDB 11.4 · 18 张表 · utf8mb4 · InnoDB</div>
+    <div class="subhead">MariaDB 11.4 · 18 张表 · utf8mb4 · InnoDB · 最后更新: 2026-06-24</div>
 
     <!-- 概览 -->
     <h2>概览</h2>
@@ -752,6 +752,26 @@ CREATE TABLE per_account_cash_flows (
             <tr><td><strong>枚举</strong></td><td>模块特有枚举列（<code>event_type</code>、<code>asset_class</code> 等）在各自主表中定义</td></tr>
         </tbody>
     </table>
+
+    <hr>
+
+    <!-- 安全防护 -->
+    <h2>安全防护（2026-06 新增）</h2>
+    <p>数据库不直接暴露在公网上，所有请求经过以下安全层：</p>
+    <table>
+        <thead>
+            <tr><th>层级</th><th>措施</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>① 网络隔离</td><td>数据库监听 127.0.0.1:3306</td><td>仅本地 PHP 进程可连接，拒绝外部直连。</td></tr>
+            <tr><td>② 传输加密</td><td>Tailscale Funnel（HTTPS）</td><td>前端通过 <code>https://jefflu.tail9f69ce.ts.net</code> 访问 API，TLS 在 Tailscale 边缘节点终止。</td></tr>
+            <tr><td>③ API Key 验证</td><td>X-API-Key 请求头校验</td><td>PHP 端统一校验。无 Key 或 Key 错误时返回 401，不执行任何数据库操作。</td></tr>
+            <tr><td>④ CORS 白名单</td><td>仅允许已知前端域名</td><td>GitHub Pages 域名 + localhost，其他来源被 CORS 拦截。</td></tr>
+            <tr><td>⑤ 参数化查询</td><td>PDO prepared statements</td><td>所有 API 使用 <code>PDO::prepare</code> + 参数绑定，防止 SQL 注入。</td></tr>
+        </tbody>
+    </table>
+    <p><strong>后端服务地址：</strong><code>https://jefflu.tail9f69ce.ts.net</code>（生产） / <code>http://localhost:8000</code>（本地开发）<br>
+    <strong>远程维护：</strong><code>ssh jefflu@100.105.237.93</code></p>
 
 </div>
 </body>

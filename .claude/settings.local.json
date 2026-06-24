@@ -163,7 +163,15 @@
       "Bash(php -l /home/jefflu/api/db_config.php)",
       "Bash(/bin/ls /share/www/js/main.js)",
       "Bash(/bin/ls /share/www/Data_Processing_Analysis/InvStrat/)",
-      "Bash(/bin/ls -la /share/www/.git)"
+      "Bash(/bin/ls -la /share/www/.git)",
+      "Bash(/bin/ls /share/www/js/)",
+      "Bash(/bin/ls /share/www/.gitignore)",
+      "Bash(/bin/ls /share/www/PascalOrderSystem/Alpine相关/)",
+      "Bash(/bin/ls /share/www/docs/)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(/bin/cat)",
+      "Bash(/bin/cat /share/www/docs/关键步骤指令.txt)"
     ],
     "additionalDirectories": [
       "/home/jefflu/api",
