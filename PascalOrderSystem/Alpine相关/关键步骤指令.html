@@ -21,14 +21,14 @@
     <h2>⚡ 日常维护速查</h2>
 
     <p><strong>笔记本重启后 → 只需做这两步：</strong></p>
-    <pre><code>cd /home/jefflu && sh start.sh start          # 启动 PHP 后端
-nohup tailscale funnel 8000 > /dev/null 2>&1 & # 启动 Funnel HTTPS</code></pre>
+    <pre><code>cd /home/jefflu && sh start.sh start</code></pre>
+    <pre><code>nohup tailscale funnel 8000 > /dev/null 2>&1 &</code></pre>
 
     <p><strong>修改网页内容后 → 只需做这三步：</strong></p>
-    <pre><code>cd /share/www
-git add .
-git commit -m "改了什么东西"
-git push -f origin master</code></pre>
+    <pre><code>cd /share/www</code></pre>
+    <pre><code>git add .</code></pre>
+    <pre><code>git commit -m "改了什么东西"</code></pre>
+    <pre><code>git push -f origin master</code></pre>
 
     <p>以上两步涵盖了日常所有操作。以下为详细说明。</p>
 
@@ -59,8 +59,7 @@ git push -f origin master</code></pre>
     <pre><code>nohup tailscale funnel 8000 > /dev/null 2>&1 &</code></pre>
 
     <p>3. 验证 Funnel 是否生效：</p>
-    <pre><code>wget -q -O- --header="X-API-Key: mk_jfl_a8f3c9e2b7d4p6q5r1" \
-  "https://jefflu.tail9f69ce.ts.net/ping.php"</code></pre>
+    <pre><code>wget -q -O- --header="X-API-Key: mk_jfl_a8f3c9e2b7d4p6q5r1" "https://jefflu.tail9f69ce.ts.net/ping.php"</code></pre>
 
     <p>4. 前端由 GitHub Pages 提供，无需启动本地前端服务器：<br>
     <a href="https://jianfengl532-debug.github.io/Market_Participant/" target="_blank">https://jianfengl532-debug.github.io/Market_Participant/</a></p>
@@ -73,8 +72,8 @@ git push -f origin master</code></pre>
     <h2>三、修改网页后推送（每次改完都要做）</h2>
 
     <p>查看改了什么文件（可选）：</p>
-    <pre><code>cd /share/www
-git status</code></pre>
+    <pre><code>cd /share/www</code></pre>
+    <pre><code>git status</code></pre>
 
     <p>添加所有改动到待提交列表：</p>
     <pre><code>git add .</code></pre>
@@ -108,8 +107,7 @@ git status</code></pre>
     <pre><code>wget -q -O- "https://jefflu.tail9f69ce.ts.net/GeoEnv_Data/api.php?action=list"</code></pre>
 
     <p>测试 API 连通性（带 Key）：</p>
-    <pre><code>wget -q -O- --header="X-API-Key: mk_jfl_a8f3c9e2b7d4p6q5r1" \
-  "https://jefflu.tail9f69ce.ts.net/GeoEnv_Data/api.php?action=list"</code></pre>
+    <pre><code>wget -q -O- --header="X-API-Key: mk_jfl_a8f3c9e2b7d4p6q5r1" "https://jefflu.tail9f69ce.ts.net/GeoEnv_Data/api.php?action=list"</code></pre>
 
     <hr>
 
