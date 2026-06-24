@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>关键步骤指令 · 项目维护手册</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <script src="../../js/main.js"></script>
+</head>
+<body>
+<div class="container">
+
+    <h1>📋 项目维护 · 关键步骤指令</h1>
+    <div class="subhead">最后更新: 2026-06-24 &nbsp;|&nbsp; 点击 <code>代码块</code> 或 <code>命令</code> 即可自动复制</div>
+
+    <hr>
+
+    <!-- ================================================================
+         日常维护速查
+    ================================================================ -->
+    <h2>⚡ 日常维护速查</h2>
+
+    <p><strong>笔记本重启后 → 只需做这两步：</strong></p>
+    <pre><code>cd /home/jefflu && sh start.sh start          # 启动 PHP 后端
+nohup tailscale funnel 8000 > /dev/null 2>&1 & # 启动 Funnel HTTPS</code></pre>
+
+    <p><strong>修改网页内容后 → 只需做这三步：</strong></p>
+    <pre><code>cd /share/www
+git add .
+git commit -m "改了什么东西"
+git push -f origin master</code></pre>
+
+    <p>以上两步涵盖了日常所有操作。以下为详细说明。</p>
+
+    <hr>
+
+    <!-- ================================================================
+         一、本地开发环境启动
+    ================================================================ -->
+    <h2>一、本地开发环境启动</h2>
+
+    <p>启动 PHP 后端（数据层 <code>:8000</code>）：</p>
+    <pre><code>cd /home/jefflu && sh start.sh start</code></pre>
+
+    <p>启动 Python 前端（展示层 <code>:8080</code>，本地开发用）：</p>
+    <pre><code>python3 -m http.server 8080</code></pre>
+
+    <hr>
+
+    <!-- ================================================================
+         二、生产环境启动（Funnel HTTPS）
+    ================================================================ -->
+    <h2>二、生产环境启动（Funnel HTTPS）</h2>
+
+    <p>1. 确保 PHP 后端在运行：</p>
+    <pre><code>ps aux | grep php</code></pre>
+
+    <p>2. 启动 Tailscale Funnel（持久化后台运行）：</p>
+    <pre><code>nohup tailscale funnel 8000 > /dev/null 2>&1 &</code></pre>
+
+    <p>3. 验证 Funnel 是否生效：</p>
+    <pre><code>wget -q -O- --header="X-API-Key: mk_jfl_a8f3c9e2b7d4p6q5r1" \
+  "https://jefflu.tail9f69ce.ts.net/ping.php"</code></pre>
+
+    <p>4. 前端由 GitHub Pages 提供，无需启动本地前端服务器：<br>
+    <a href="https://jianfengl532-debug.github.io/Market_Participant/" target="_blank">https://jianfengl532-debug.github.io/Market_Participant/</a></p>
+
+    <hr>
+
+    <!-- ================================================================
+         三、修改网页后推送
+    ================================================================ -->
+    <h2>三、修改网页后推送（每次改完都要做）</h2>
+
+    <p>查看改了什么文件（可选）：</p>
+    <pre><code>cd /share/www
+git status</code></pre>
+
+    <p>添加所有改动到待提交列表：</p>
+    <pre><code>git add .</code></pre>
+
+    <p>提交本次改动，附上说明：</p>
+    <pre><code>git commit -m "这里写你改了什么东西"</code></pre>
+
+    <p>推送到 GitHub（覆盖远程仓库）：</p>
+    <pre><code>git push -f origin master</code></pre>
+
+    <p>等 1-2 分钟后刷新页面即可看到更新。</p>
+
+    <hr>
+
+    <!-- ================================================================
+         四、远程维护
+    ================================================================ -->
+    <h2>四、远程维护（从其他设备连回笔记本）</h2>
+
+    <p>通过 Tailscale SSH：</p>
+    <pre><code>ssh jefflu@100.105.237.93</code></pre>
+
+    <hr>
+
+    <!-- ================================================================
+         五、API 测试命令
+    ================================================================ -->
+    <h2>五、API 测试命令</h2>
+
+    <p>测试安全层（无 Key → 应返回 401）：</p>
+    <pre><code>wget -q -O- "https://jefflu.tail9f69ce.ts.net/GeoEnv_Data/api.php?action=list"</code></pre>
+
+    <p>测试 API 连通性（带 Key）：</p>
+    <pre><code>wget -q -O- --header="X-API-Key: mk_jfl_a8f3c9e2b7d4p6q5r1" \
+  "https://jefflu.tail9f69ce.ts.net/GeoEnv_Data/api.php?action=list"</code></pre>
+
+    <hr>
+
+    <!-- ================================================================
+         关键地址速查
+    ================================================================ -->
+    <h2>📍 关键地址速查</h2>
+
+    <table>
+        <thead>
+            <tr><th>用途</th><th>地址</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>🌐 前端页面</td><td><code>https://jianfengl532-debug.github.io/Market_Participant/</code></td></tr>
+            <tr><td>⚙️ 后端 API</td><td><code>https://jefflu.tail9f69ce.ts.net/</code></td></tr>
+            <tr><td>💻 本地开发</td><td><code>http://localhost:8080</code></td></tr>
+            <tr><td>🗄️ 本地 API</td><td><code>http://localhost:8000</code></td></tr>
+            <tr><td>📦 GitHub</td><td><code>https://github.com/jianfengl532-debug/Market_Participant</code></td></tr>
+            <tr><td>🔑 SSH</td><td><code>ssh jefflu@100.105.237.93</code></td></tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>
