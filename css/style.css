@@ -1,0 +1,1154 @@
+/* ============================================================
+   style.css — 全局统一样式表
+   命名空间原则：全局仅放通用排版变量与工具类，
+   页面专有样式一律以 .page-* 或 .app-* 限定。
+   ============================================================ */
+
+/* ==================================================================
+   1. RESET & BASE
+   ================================================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  background-color: #ffffff;
+  color: #111111;
+  line-height: 1.6;
+}
+
+p, li {
+  line-height: 1.7;
+}
+
+hr {
+  border: none;
+  border-top: 2px dashed #9ea2a8;
+  margin: 1.5rem 0;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* ==================================================================
+   2. LAYOUT — 通用容器
+   ================================================================== */
+
+/* 标准 A4 宽度容器 */
+.container {
+  max-width: 210mm;
+  margin: 0 auto;
+  padding: 0 30px;
+}
+
+/* A4 纸张视觉效果（灰底衬托白纸 + 阴影） */
+.a4-body {
+  background-color: #ededed;
+  margin: 0;
+  padding: 40px 0;
+}
+
+.a4-container {
+  width: 210mm;
+  margin: 0 auto;
+  background-color: #ffffff;
+  padding: 20mm;
+  box-sizing: border-box;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ==================================================================
+   3. HOMEPAGE — 首页导航
+   ================================================================== */
+
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.logo {
+  font-size: 60px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  line-height: 2;
+}
+
+.logo .light-meta {
+  font-size: 13px;
+  font-weight: 400;
+  color: #7e7e7e;
+  letter-spacing: 0.3px;
+  display: inline-block;
+  margin-top: 2px;
+}
+
+.mid-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.mid-nav-link {
+  background-color: #f5f5f7;
+  padding: 5px 12px;
+  border-radius: 40px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 500;
+  color: #1e6f3f;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.mid-nav-link:hover {
+  background-color: #1e6f3f;
+  color: #ffffff;
+}
+
+.top-nav nav {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.top-nav nav a {
+  text-decoration: none;
+  color: #333333;
+  font-size: 14px;
+}
+
+/* 主标题 */
+.hero {
+  padding: 60px 0 50px;
+  text-align: center;
+}
+
+.hero h2 {
+  font-size: 36px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+/* 复制成功提示浮窗 */
+.copy-toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #2c7a4d;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-family: inherit;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* 左右两栏布局 */
+.content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  padding-bottom: 80px;
+}
+
+.left-column,
+.right-column {
+  padding-top: 20px;
+}
+
+.right-column {
+  text-align: right;
+}
+
+.left-column h2,
+.right-column h2 {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 28px;
+  color: #222222;
+  letter-spacing: 0.5px;
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.nav-item {
+  display: block;
+  padding: 16px 20px;
+  background-color: #ffffff;
+  font-size: 15.5px;
+  color: #111111;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  border-radius: 12px;
+}
+
+.nav-item:hover {
+  background-color: #1e6f3f;
+  color: #ffffff;
+}
+
+.nav-item:hover .sub-text {
+  color: #ffffff;
+}
+
+.sub-text {
+  font-size: 0.85em;
+  color: #999999;
+  transition: color 0.2s ease;
+}
+
+/* ==================================================================
+   4. COMMANDS FOOTER — 底部命令区
+   ================================================================== */
+
+footer {
+  margin-top: 20px;
+  padding: 40px 0 48px;
+}
+
+.commands-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.commands-header h3 {
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+  color: #1c2e3a;
+}
+
+.commands-sub {
+  margin: 0;
+  font-size: 22px;
+  font-weight: bold;
+  line-height: 1.4;
+  color: #212428;
+  border-bottom: 2px solid #212428;
+  display: inline-block;
+  padding-bottom: 2px;
+  align-self: flex-start;
+  margin-bottom: 12px;
+}
+
+.commands-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+  margin-bottom: 32px;
+}
+
+.command-card {
+  background-color: #fafbfc;
+  padding: 14px 18px;
+  border-radius: 12px;
+  transition: background-color 0.2s ease;
+}
+
+a.card-link {
+  text-decoration: none;
+  color: inherit;
+  flex: 1;
+  min-width: 280px;
+}
+
+a.card-link:hover .command-card {
+  background-color: #1e6f3f;
+}
+
+a.card-link:hover .cmd-line {
+  color: #ffffff;
+}
+
+a.card-link:hover .cmd-desc {
+  color: #ffffff;
+}
+
+.cmd-line code {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  background: #eef2f5;
+  padding: 4px 8px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  color: #1f4f2b;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: all;
+}
+
+.cmd-line code:active {
+  opacity: 0.7;
+}
+
+.cmd-desc {
+  font-size: 13px;
+  color: #4a5b6e;
+  margin-top: 10px;
+  line-height: 1.4;
+}
+
+.command-footer-note {
+  background: #f0f4f9;
+  padding: 14px 20px;
+  border-radius: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: #2c5a2e;
+}
+
+.command-footer-note code {
+  background: #ffffff;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+/* 底部操作手册区块 */
+#Server-Operation {
+  margin-top: 40px;
+  padding: 30px 20px;
+  background-color: #fafbfc;
+  border-radius: 16px;
+  text-align: center;
+}
+#Server-Operation h3 {
+  font-size: 24px;
+  font-weight: 500;
+  color: #1c2e3a;
+  margin-bottom: 10px;
+}
+#Server-Operation .click-hint {
+  font-size: 13px;
+  color: #5f6c7a;
+}
+#Server-Operation a {
+  text-decoration: none;
+  color: #1e6f3f;
+  font-weight: 500;
+}
+#Server-Operation a:hover {
+  text-decoration: underline;
+}
+
+/* ==================================================================
+   5. DOCUMENT — 文档/手册通用工具类
+   用于 市场生存手册、专业术语表 等排版型页面
+   ================================================================== */
+
+/* 标题基础排版（仅字号与间距，无装饰性样式避免污染页面特有设计） */
+h1 {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+  color: #0f172a;
+}
+
+h2 {
+  font-size: 1.6rem;
+  margin: 1.8rem 0 1rem 0;
+  color: #0f172a;
+}
+
+h3 {
+  font-size: 1.2rem;
+  margin: 1.2rem 0 0.6rem 0;
+  color: #1e293b;
+}
+
+.subhead {
+  color: #2c3e66;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+/* 徽章 */
+.badge {
+  background: #0d9488;
+  color: white;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  display: inline-block;
+  margin-left: 0.8rem;
+  vertical-align: middle;
+}
+
+/* 代码 */
+code {
+  background: #f1f5f9;
+  color: #b91c1c;
+  font-family: 'SF Mono', 'Menlo', 'Cascadia Code', monospace;
+  font-size: 0.9rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  word-break: break-word;
+}
+
+pre {
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 1rem;
+  border-radius: 12px;
+  overflow-x: auto;
+  font-family: 'SF Mono', monospace;
+  font-size: 0.85rem;
+  margin: 0.8rem 0 1.2rem;
+}
+
+pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  font-size: 0.85rem;
+}
+
+/* 点击/复制指针（通用） */
+.copyable {
+  cursor: pointer;
+  position: relative;
+}
+
+.copyable:hover {
+  outline: 1px dashed #94a3b8;
+  outline-offset: 2px;
+}
+
+.copy-ssh {
+  cursor: pointer;
+  user-select: all;
+}
+
+.copy-ssh:active {
+  opacity: 0.7;
+}
+
+/* 表格（通用分割线，命名空间内的表格不受影响） */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 0.8rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #d1d5db;
+  vertical-align: top;
+}
+
+thead th {
+  background: #eef2ff;
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-bottom: 2px solid #cbd5e1;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover td {
+  background: #f8fafc;
+}
+
+/* 提示框（通用） */
+.note {
+  background: #fef9e3;
+  border-left: 4px solid #eab308;
+  padding: 0.8rem 1rem;
+  border-radius: 0.8rem;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+
+.tip {
+  background: #e0f2fe;
+  border-left: 4px solid #0284c7;
+  padding: 0.8rem 1rem;
+  border-radius: 0.8rem;
+  margin: 1rem 0;
+}
+
+/* ==================================================================
+   6. SEARCH — 搜索框组件
+   ================================================================== */
+
+.search-box-wrapper {
+  position: relative;
+  max-width: 400px;
+  margin: 16px auto 0;
+}
+
+.category-search {
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.category-search:focus {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+.search-results {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.search-result-item {
+  padding: 10px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #1e293b;
+  transition: background 0.15s;
+}
+
+.search-result-item:hover {
+  background: #f0fdfa;
+  color: #0d9488;
+}
+
+.search-result-item + .search-result-item {
+  border-top: 1px solid #f1f5f9;
+}
+
+/* ==================================================================
+   7. SIDEBAR LAYOUT — 左侧导航 + 右侧 A4 正文
+   ================================================================== */
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 220px;
+  height: 100vh;
+  background: #f8f9fa;
+  border-right: 1px solid #e2e8f0;
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 28px 16px;
+}
+
+.sidebar-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.sidebar .logo {
+  font-size: 14px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-nav-link {
+  display: block;
+  background: #eef0f3;
+  padding: 10px 16px;
+  border-radius: 40px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1e6f3f;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  line-height: 1.3;
+}
+
+.sidebar-nav-link:hover {
+  background-color: #1e6f3f;
+  color: #ffffff;
+}
+
+.sidebar-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-nav-group > .sidebar-nav-link {
+  margin-bottom: 2px;
+}
+
+.sidebar-subnav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-right: 12px;
+  align-items: flex-end;
+}
+
+.sidebar-subnav-link {
+  display: block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 400;
+  color: #4a6a5a;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  line-height: 1.3;
+}
+
+.sidebar-subnav-link:hover {
+  background-color: #d0e4dc;
+  color: #1e6f3f;
+}
+
+/* 右侧正文区域 */
+.main-content {
+  flex: 1;
+  margin-left: 220px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.main-content .container {
+  max-width: 210mm;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 30px;
+}
+
+/* 锚点滚动留白 */
+footer[id] {
+  scroll-margin-top: 30px;
+}
+
+/* 响应式：窄屏折叠 */
+@media (max-width: 794px) {
+  .app-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 16px 20px;
+  }
+
+  .sidebar-inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .sidebar-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .sidebar-nav-group {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .sidebar-nav-link {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  .sidebar-subnav {
+    padding-right: 8px;
+  }
+
+  .sidebar-subnav-link {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+
+  .sidebar .logo {
+    font-size: 13px;
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  .main-content .container {
+    padding: 0 20px;
+  }
+}
+
+/* ==================================================================
+   8. PAGE: ALPINE GUIDE — Alpine Linux 配置指南
+   ================================================================== */
+
+.page-alpine-guide {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fafafa;
+}
+
+.page-alpine-guide h1 {
+  color: #2c3e50;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+}
+
+.page-alpine-guide h3 {
+  color: #2980b9;
+  margin-top: 30px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+
+.page-alpine-guide p {
+  color: #555;
+  font-size: 15px;
+}
+
+.page-alpine-guide hr {
+  border: 0;
+  border-top: 1px solid #eee;
+  margin: 40px 0;
+}
+
+.page-alpine-guide ul {
+  margin: 0.5rem 0 1rem 1.5rem;
+  color: #555;
+  font-size: 15px;
+}
+
+.page-alpine-guide ul li {
+  margin-bottom: 4px;
+}
+
+.command-block {
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+  padding: 15px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 14px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.comment {
+  color: #6a9955;
+}
+
+.command {
+  color: #4fc1ff;
+  font-weight: bold;
+}
+
+.output {
+  color: #cccccc;
+}
+
+.page-alpine-guide .info-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.8rem 0;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.page-alpine-guide .info-table th {
+  background: #eef2ff;
+  color: #1e293b;
+  font-weight: 600;
+  padding: 0.7rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+  width: 30%;
+}
+
+.page-alpine-guide .info-table td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.page-alpine-guide .info-table tr:last-child td {
+  border-bottom: none;
+}
+
+.page-alpine-guide .status-ok {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.page-alpine-guide .note-box {
+  background: #fef9e3;
+  border-left: 4px solid #eab308;
+  padding: 0.8rem 1rem;
+  border-radius: 0.8rem;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.page-alpine-guide .note-box .command-block {
+  margin-top: 0.8rem;
+  margin-bottom: 0;
+}
+
+/* ==================================================================
+   9. PAGE: TRADE METHOD — 交易手法研究
+   ================================================================== */
+
+.page-trade-method {
+  background: #f5f7fc;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', sans-serif;
+  color: #1e293b;
+  line-height: 1.5;
+  padding: 2rem 1rem;
+}
+
+.page-trade-method .container {
+  max-width: 1400px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  padding: 2rem 1.5rem;
+}
+
+.page-trade-method h1 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #0f2b3d, #1e4a6b);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.3px;
+  border-left: 5px solid #2c7da0;
+  padding-left: 1.2rem;
+  border-bottom: none;
+}
+
+.page-trade-method .subhead {
+  color: #475569;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.75rem;
+}
+
+.page-trade-method h2 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin: 1.8rem 0 1rem 0;
+  padding-bottom: 0.4rem;
+  border-bottom: 3px solid #cbd5e1;
+  color: #0f172a;
+  display: block;
+}
+
+.page-trade-method h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.8rem 0;
+  color: #1e3a5f;
+  display: inline-block;
+  background: #eef2ff;
+  padding: 0.2rem 0.8rem;
+  border-radius: 20px;
+  border-bottom: none;
+}
+
+.page-trade-method h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 1rem 0 0.3rem 0;
+  color: #2c3e66;
+}
+
+.page-trade-method .card-note {
+  background: #f8fafc;
+  border-left: 4px solid #3b82f6;
+  padding: 0.8rem 1.2rem;
+  border-radius: 0.8rem;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+  color: #2d3a4b;
+}
+
+.page-trade-method table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2rem 0;
+  font-size: 0.9rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.page-trade-method th {
+  background-color: #1e3a5f;
+  color: white;
+  font-weight: 600;
+  padding: 12px 10px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.page-trade-method td {
+  border: 1px solid #e2e8f0;
+  padding: 10px 8px;
+  vertical-align: top;
+  background-color: #ffffff;
+}
+
+.page-trade-method tr:nth-child(even) td {
+  background-color: #f9fafc;
+}
+
+.page-trade-method .badge-left {
+  background: #fee2e2;
+  color: #b91c1c;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  display: inline-block;
+  text-align: center;
+}
+
+.page-trade-method .badge-right {
+  background: #dcfce7;
+  color: #15803d;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+}
+
+.page-trade-method .badge-neutral {
+  background: #e6f0fa;
+  color: #2563eb;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+}
+
+.page-trade-method .method-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.page-trade-method .method-item {
+  background: #ffffff;
+  border: 1px solid #e9eef3;
+  border-radius: 1rem;
+  padding: 1rem 1.2rem;
+  transition: all 0.1s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.page-trade-method .method-item:hover {
+  border-color: #b9d0f0;
+  background: #fefefe;
+}
+
+.page-trade-method .method-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f3b5c;
+  margin-bottom: 0.4rem;
+  border-left: 3px solid #2c7da0;
+  padding-left: 12px;
+}
+
+.page-trade-method .method-desc {
+  margin-top: 6px;
+  color: #2d3a4b;
+  font-size: 0.9rem;
+}
+
+.page-trade-method .method-desc p {
+  margin: 0.3rem 0;
+}
+
+.page-trade-method .flex-badge {
+  display: inline-block;
+  margin-left: 10px;
+  font-weight: normal;
+}
+
+.page-trade-method hr {
+  margin: 1.8rem 0;
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, #e2e8f0, transparent);
+}
+
+.page-trade-method .footnote {
+  font-size: 0.8rem;
+  color: #5b6e8c;
+  margin-top: 0.4rem;
+  border-top: 1px dashed #e2e8f0;
+  padding-top: 0.6rem;
+}
+
+.page-trade-method .emoji-check {
+  font-size: 1.1rem;
+}
+
+.page-trade-method .trade-footer {
+  font-size: 0.75rem;
+  text-align: center;
+  color: #6c86a3;
+  padding-top: 1rem;
+  margin-top: 0;
+}
+
+/* 响应式 */
+@media (max-width: 780px) {
+  .page-trade-method .container {
+    padding: 1rem;
+  }
+  .page-trade-method th,
+  .page-trade-method td {
+    padding: 6px 4px;
+    font-size: 0.8rem;
+  }
+  .page-trade-method h1 {
+    font-size: 1.5rem;
+  }
+  .page-trade-method h2 {
+    font-size: 1.35rem;
+  }
+}
+
+/* ==================================================================
+   10. HOMEPAGE RESPONSIVE — 首页窄屏适配
+   ================================================================== */
+
+@media (max-width: 794px) {
+  .content {
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+  .hero h2 {
+    font-size: 30px;
+  }
+  .top-nav {
+    padding: 18px 0;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .top-nav nav {
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .mid-nav {
+    align-self: center;
+    margin: 8px 0;
+  }
+  .container {
+    padding: 0 20px;
+  }
+  .commands-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 手册页面窄屏适配 */
+@media (max-width: 640px) {
+  .container {
+    padding: 1.2rem;
+  }
+}
+
+/* ==================================================================
+   11. PRINT — 打印样式
+   ================================================================== */
+
+@media print {
+  * {
+    background: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  body {
+    color: #000;
+  }
+  .nav-item {
+    page-break-inside: avoid;
+  }
+  .mid-nav-link {
+    background: none;
+  }
+  .cmd-line code {
+    cursor: default;
+    user-select: text;
+  }
+}

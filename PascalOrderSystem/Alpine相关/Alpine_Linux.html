@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Alpine Linux 常用命令参考手册</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+    <script src="../../../js/main.js"></script>
+</head>
+<body>
+<div class="container a4">
+    <h1>🐧 Alpine Linux 命令速查手册</h1>
+    <div class="subhead">轻量 · 安全 · 高效的日常运维命令参考 —— 适用于 OpenRC + apk 环境</div>
+
+    <!-- 1. 开关机基础 -->
+    <h2>⚡ 开关机与基础操作</h2>
+    <table>
+        <thead>
+            <tr><th>操作</th><th>命令</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>重启系统</td><td><code>reboot</code></td><td>立即重启</td></tr>
+            <tr><td>关机 (halt)</td><td><code>halt</code></td><td>停止系统，不切断电源（部分环境适用）</td></tr>
+            <tr><td>关机 (poweroff)</td><td><code>poweroff</code></td><td><strong>推荐</strong>，安全关机并切断电源</td></tr>
+            <tr><td>清屏</td><td><code>clear</code> 或 <kbd>Ctrl+L</kbd></td><td>清除终端屏幕内容</td></tr>
+        </tbody>
+    </table>
+
+    <!-- 2. 包管理 apk (核心) -->
+    <h2>📦 包管理 — apk <span class="badge">Alpine Package Keeper</span></h2>
+    <table>
+        <thead><tr><th>操作</th><th>命令示例</th><th>备注</th></tr></thead>
+        <tbody>
+            <tr><td>更新仓库索引</td><td><code>apk update</code></td><td>安装前建议执行</td></tr>
+            <tr><td>搜索软件包</td><td><code>apk search &lt;关键词&gt;</code></td><td>如 <code>apk search python</code></td></tr>
+            <tr><td>安装软件包</td><td><code>apk add &lt;包名&gt;</code></td><td>可多个: <code>apk add vim curl</code></td></tr>
+            <tr><td>安装（不缓存）</td><td><code>apk add --no-cache &lt;包名&gt;</code></td><td>适合容器，减小体积</td></tr>
+            <tr><td>卸载软件包</td><td><code>apk del &lt;包名&gt;</code></td><td>删除已安装包</td></tr>
+            <tr><td>升级所有包</td><td><code>apk upgrade</code></td><td>全局升级已安装软件</td></tr>
+            <tr><td>升级单个包</td><td><code>apk upgrade &lt;包名&gt;</code></td><td>只升级特定包</td></tr>
+            <tr><td>列出已安装包</td><td><code>apk info</code></td><td>查看所有已装软件</td></tr>
+            <tr><td>查看包详情</td><td><code>apk info -a &lt;包名&gt;</code></td><td>版本、依赖、描述</td></tr>
+            <tr><td>查询文件归属</td><td><code>apk info --who-owns &lt;文件路径&gt;</code></td><td>例: <code>apk info --who-owns /sbin/reboot</code></td></tr>
+            <tr><td>下载apk文件</td><td><code>apk fetch &lt;包名&gt;</code></td><td>仅下载不安装</td></tr>
+        </tbody>
+    </table>
+
+    <!-- 3. 服务管理 OpenRC -->
+    <h2>🔧 服务管理 — OpenRC</h2>
+    <table>
+        <thead><tr><th>操作</th><th>命令</th><th>说明</th></tr></thead>
+        <tbody>
+            <tr><td>启动服务</td><td><code>rc-service &lt;服务名&gt; start</code></td><td>例: <code>rc-service nginx start</code></td></tr>
+            <tr><td>停止服务</td><td><code>rc-service &lt;服务名&gt; stop</code></td><td></td></tr>
+            <tr><td>重启服务</td><td><code>rc-service &lt;服务名&gt; restart</code></td><td></td></tr>
+            <tr><td>查看状态</td><td><code>rc-service &lt;服务名&gt; status</code></td><td></td></tr>
+            <tr><td>重载配置</td><td><code>rc-service &lt;服务名&gt; reload</code></td><td>优雅重载 (支持的服务)</td></tr>
+            <tr><td>列出所有服务</td><td><code>rc-service --list</code></td><td>显示所有可用服务</td></tr>
+            <tr><td>添加开机自启</td><td><code>rc-update add &lt;服务名&gt; default</code></td><td>加入默认运行级别</td></tr>
+            <tr><td>移除开机自启</td><td><code>rc-update del &lt;服务名&gt; default</code></td><td></td></tr>
+            <tr><td>查看运行状态</td><td><code>rc-status</code></td><td>显示当前级别服务状态</td></tr>
+            <tr><td>查看所有运行级别</td><td><code>rc-status -l</code></td><td>列出可用级别(boot/default/shutdown等)</td></tr>
+        </tbody>
+    </table>
+    <div class="tip">📌 常用运行级别：<code>default</code> (日常运行)、<code>boot</code> (系统启动核心)、<code>shutdown</code> (关机时动作)。通常服务加入 default 即可。</div>
+
+    <!-- 4. 网络配置 -->
+    <h2>🌐 网络配置与常用命令</h2>
+    <table>
+        <thead><tr><th>操作/说明</th><th>命令 / 配置</th></tr></thead>
+        <tbody>
+            <tr><td>查看所有网卡信息</td><td><code>ip a</code> 或 <code>ip addr show</code></td></tr>
+            <tr><td>测试连通性</td><td><code>ping &lt;IP/域名&gt;</code> (按 Ctrl+C 停止)</td></tr>
+            <tr><td>查看路由表</td><td><code>ip route show</code> 或 <code>route -n</code></td></tr>
+            <tr><td>配置静态IP</td><td>编辑 <code>/etc/network/interfaces</code></td></tr>
+            <tr><td>重启网络服务</td><td><code>rc-service networking restart</code></td></tr>
+        </tbody>
+    </table>
+    <pre><code># 静态IP配置示例（/etc/network/interfaces）
+auto eth0
+iface eth0 inet static
+    address 192.168.1.150
+    netmask 255.255.255.0
+    gateway 192.168.1.1
+    dns-nameservers 8.8.8.8</code></pre>
+
+    <!-- 5. 文件与文本操作 -->
+    <h2>📝 文件与文本操作</h2>
+    <table>
+        <thead><tr><th>操作</th><th>命令</th><th>备注</th></tr></thead>
+        <tbody>
+            <tr><td>查看文件内容</td><td><code>cat &lt;文件路径&gt;</code></td><td>或者 <code>less</code> (需安装 less)</td></tr>
+            <tr><td>编辑文件(推荐nano)</td><td><code>nano &lt;文件&gt;</code></td><td>默认自带，轻量易用</td></tr>
+            <tr><td>查找文件</td><td><code>find / -name &lt;文件名&gt; 2>/dev/null</code></td><td>全盘搜索跳过错误</td></tr>
+            <tr><td>列出目录</td><td><code>ls -la</code></td><td>显示隐藏文件及详情</td></tr>
+            <tr><td>复制文件/目录</td><td><code>cp -r 源 目标</code></td><td>-r 递归复制目录</td></tr>
+            <tr><td>移动/重命名</td><td><code>mv 源 目标</code></td><td></td></tr>
+            <tr><td>删除文件/目录</td><td><code>rm -rf 路径</code></td><td>⚠️ 谨慎使用</td></tr>
+        </tbody>
+    </table>
+    <div class="note">💡 Alpine 默认不含 vim，若习惯 vim 可执行 <code>apk add vim</code>。内置 <code>nano</code> 足够日常编辑。</div>
+
+    <!-- 6. 用户管理 -->
+    <h2>👥 用户管理</h2>
+    <table>
+        <thead><tr><th>操作</th><th>命令</th><th>说明</th></tr></thead>
+        <tbody>
+            <tr><td>添加普通用户</td><td><code>adduser &lt;用户名&gt;</code></td><td>交互式设置密码</td></tr>
+            <tr><td>删除用户</td><td><code>deluser &lt;用户名&gt;</code></td><td>保留家目录加 <code>-r</code> 可删除家目录</td></tr>
+            <tr><td>修改用户密码</td><td><code>passwd &lt;用户名&gt;</code></td><td>root 可修改任意用户</td></tr>
+            <tr><td>创建系统用户(无家目录)</td><td><code>adduser -D -H &lt;用户名&gt;</code></td><td>常用于服务账户</td></tr>
+            <tr><td>查看用户信息</td><td><code>id &lt;用户名&gt;</code></td><td></td></tr>
+        </tbody>
+    </table>
+
+    <!-- 7. 系统信息 -->
+    <h2>📊 系统信息查看</h2>
+    <table>
+        <thead><tr><th>查看内容</th><th>命令</th></tr></thead>
+        <tbody>
+            <tr><td>Alpine 版本</td><td><code>cat /etc/alpine-release</code> 或 <code>cat /etc/issue</code></td></tr>
+            <tr><td>内核版本</td><td><code>uname -a</code></td></tr>
+            <tr><td>当前时间/日期</td><td><code>date</code></td></tr>
+            <tr><td>磁盘使用情况</td><td><code>df -h</code></td></tr>
+            <tr><td>内存与交换分区</td><td><code>free -h</code></td></tr>
+            <tr><td>系统运行时间</td><td><code>uptime</code></td></tr>
+            <tr><td>查看CPU信息</td><td><code>cat /proc/cpuinfo</code></td></tr>
+        </tbody>
+    </table>
+
+    <!-- 8. 配置持久化 (lbu) — Alpine特色 -->
+    <h2>💾 配置持久化 (无盘模式 / lbu) <span class="badge">local backup</span></h2>
+    <div class="note">⚠️ Alpine Linux 默认无盘模式（如安装到USB或运行在RAM）不会自动保存修改。以下命令使配置重启后仍然生效。</div>
+    <table>
+        <thead><tr><th>操作</th><th>命令</th><th>说明</th></tr></thead>
+        <tbody>
+            <tr><td>将文件/目录加入备份列表</td><td><code>lbu add &lt;文件/目录&gt;</code></td><td>例如: <code>lbu add /etc/network/interfaces</code></td></tr>
+            <tr><td>提交备份(.apkovl)</td><td><code>lbu commit</code></td><td>生成 overlay 文件，存储到引导介质</td></tr>
+            <tr><td>查看当前备份文件列表</td><td><code>lbu list</code></td><td>显示待备份的内容</td></tr>
+            <tr><td>查看备份状态/差异</td><td><code>lbu status</code></td><td>显示哪些文件变更但未加入备份</td></tr>
+            <tr><td>删除备份中的某个文件</td><td><code>lbu delete &lt;路径&gt;</code></td><td>不再备份该文件</td></tr>
+            <tr><td>指定备份存储设备</td><td><code>lbu commit &lt;设备或目录&gt;</code></td><td>例: <code>lbu commit /media/usb</code></td></tr>
+        </tbody>
+    </table>
+    <div class="tip">📌 典型持久化流程：修改配置 → <code>lbu add 修改过的文件或目录</code> → <code>lbu commit</code> → 重启后配置保留。</div>
+
+    <!-- 9. 其他常用命令 -->
+    <h2>⚙️ 其他实用命令</h2>
+    <table>
+        <thead><tr><th>用途</th><th>命令示例</th></tr></thead>
+        <tbody>
+            <tr><td>查看命令帮助</td><td><code>apk --help</code> , <code>rc-service --help</code></td></tr>
+            <tr><td>查看历史命令</td><td><code>history</code></td></tr>
+            <tr><td>实时查看系统日志</td><td><code>cat /var/log/messages</code> 或 <code>logread</code> (需开启 busybox 日志)</td></tr>
+            <tr><td>显示当前运行级别</td><td><code>rc-runlevel</code></td></tr>
+            <tr><td>切换运行级别</td><td><code>openrc &lt;级别&gt;</code></td></tr>
+            <tr><td>重启网络(旧方式)</td><td><code>/etc/init.d/networking restart</code></td></tr>
+        </tbody>
+    </table>
+
+    <!-- 附：简单开机自启快速指引 -->
+    <h2>📌 快速配置案例</h2>
+    <pre><code># 1. 安装并自动启用 ssh 服务
+apk add openssh
+rc-update add sshd default
+rc-service sshd start
+
+# 2. 设置 hostname
+echo "my-alpine" > /etc/hostname
+hostname my-alpine
+
+# 3. 配置 apk 国内镜像加速（可选）
+sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+apk update</code></pre>
+
+    <div class="tip">🧰 说明：Alpine 不同于 systemd 发行版，使用 OpenRC + rc-service 管理服务，轻巧且稳定。大部分命令与其他 Linux 通用（ls, cd, grep, ps 等均可用）。</div>
+
+    <footer>
+        📖 参考文档：Alpine Linux Wiki — 命令基于 Alpine 3.18+ 测试。使用 <code>apk add man man-pages</code> 可获得离线手册。<br>
+        🕹️ 生成时间：2025 / 持续更新 · 方便日常运维
+    </footer>
+</div>
+</body>
+</html>

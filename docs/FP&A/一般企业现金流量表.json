@@ -1,0 +1,247 @@
+{
+  "template_info": {
+    "template_name": "一般企业现金流量表",
+    "template_type": "标准模板",
+    "version": "1.0",
+    "created_date": "2026-05-19",
+    "description": "适用于一般企业的标准现金流量表模板"
+  },
+  "report_structure": {
+    "header": {
+      "title": "一般企业现金流量表",
+      "company_placeholder": "[公司名称]",
+      "period_placeholder": "[报告期间]",
+      "currency_placeholder": "[货币单位]"
+    },
+    "sections": [
+      {
+        "section_id": "operating_activities",
+        "title": "一、经营活动产生的现金流量",
+        "subsections": [
+          {
+            "subsection_id": "operating_inflows",
+            "title": "流入项目",
+            "items": [
+              {
+                "item_id": "sales_goods_services",
+                "name": "销售商品、提供劳务收到的现金",
+                "description": "企业主营业务产生的现金流入",
+                "placeholder": "[金额]"
+              },
+              {
+                "item_id": "tax_refunds",
+                "name": "收到的税费返还",
+                "description": "各类税费返还收入",
+                "placeholder": "[金额]"
+              },
+              {
+                "item_id": "other_operating_inflows",
+                "name": "收到其他与经营活动有关的现金",
+                "description": "其他经营相关的现金流入",
+                "placeholder": "[金额]"
+              }
+            ]
+          },
+          {
+            "subsection_id": "operating_outflows",
+            "title": "流出项目",
+            "items": [
+              {
+                "item_id": "purchase_goods_services",
+                "name": "购买商品、接受劳务支付的现金",
+                "description": "采购和外包服务支出",
+                "placeholder": "[金额]"
+              },
+              {
+                "item_id": "employee_payments",
+                "name": "支付给职工以及为职工支付的现金",
+                "description": "工资、社保等人力成本支出",
+                "placeholder": "[金额]"
+              },
+              {
+                "item_id": "tax_payments",
+                "name": "支付的各项税费",
+                "description": "各类税费支出",
+                "placeholder": "[金额]"
+              },
+              {
+                "item_id": "other_operating_outflows",
+                "name": "支付其他与经营活动有关的现金",
+                "description": "其他经营相关的现金支出",
+                "placeholder": "[金额]"
+              }
+            ]
+          },
+          {
+            "subsection_id": "operating_net",
+            "title": "经营活动产生的现金流量净额",
+            "calculation": "流入小计 - 流出小计",
+            "placeholder": "[金额]"
+          }
+        ]
+      },
+      {
+        "section_id": "investing_activities",
+        "title": "二、投资活动产生的现金流量",
+        "subsections": [
+          {
+            "subsection_id": "investing_inflows",
+            "title": "流入项目",
+            "items": [
+              {
+                "item_id": "investment_recovery",
+                "name": "收回投资收到的现金",
+                "description": "投资本金回收",
+                "placeholder": "[金额]"
+              },
+              {
+                "item_id": "investment_income",
+                "name": "取得投资收益收到的现金",
+                "description": "投资收益分配",
+                "placeholder": "[金额]"
+              },
+              {
+                "item_id": "asset_disposal",
+                "name": "处置固定资产、无形资产和其他长期资产收回的现金净额",
+                "description": "长期资产处置收入",
+                "placeholder": "[金额]"
+              }
+            ]
+          },
+          {
+            "subsection_id": "investing_outflows",
+            "title": "流出项目",
+            "items": [
+              {
+                "item_id": "fixed_asset_purchase",
+                "name": "购建固定资产、无形资产和其他长期资产支付的现金",
+                "description": "长期资产投资支出",
+                "placeholder": "[金额]"
+              },
+              {
+                "item_id": "investment_payments",
+                "name": "投资支付的现金",
+                "description": "对外投资支出",
+                "placeholder": "[金额]"
+              }
+            ]
+          },
+          {
+            "subsection_id": "investing_net",
+            "title": "投资活动产生的现金流量净额",
+            "calculation": "流入小计 - 流出小计",
+            "placeholder": "[金额]"
+          }
+        ]
+      },
+      {
+        "section_id": "financing_activities",
+        "title": "三、筹资活动产生的现金流量",
+        "subsections": [
+          {
+            "subsection_id": "financing_inflows",
+            "title": "流入项目",
+            "items": [
+              {
+                "item_id": "equity_investment",
+                "name": "吸收投资收到的现金",
+                "description": "股权融资收入",
+                "placeholder": "[金额]"
+              },
+              {
+                "item_id": "debt_borrowing",
+                "name": "取得借款收到的现金",
+                "description": "债务融资收入",
+                "placeholder": "[金额]"
+              }
+            ]
+          },
+          {
+            "subsection_id": "financing_outflows",
+            "title": "流出项目",
+            "items": [
+              {
+                "item_id": "debt_repayment",
+                "name": "偿还债务支付的现金",
+                "description": "债务偿还支出",
+                "placeholder": "[金额]"
+              },
+              {
+                "item_id": "dividend_interest_payments",
+                "name": "分配股利、利润或偿付利息支付的现金",
+                "description": "分红和利息支出",
+                "placeholder": "[金额]"
+              }
+            ]
+          },
+          {
+            "subsection_id": "financing_net",
+            "title": "筹资活动产生的现金流量净额",
+            "calculation": "流入小计 - 流出小计",
+            "placeholder": "[金额]"
+          }
+        ]
+      },
+      {
+        "section_id": "cash_summary",
+        "title": "四、现金及现金等价物净增加额",
+        "calculation": "经营活动净额 + 投资活动净额 + 筹资活动净额",
+        "placeholder": "[计算结果]"
+      },
+      {
+        "section_id": "ending_balance",
+        "title": "五、期末现金及现金等价物余额",
+        "calculation": "期初余额 + 净增加额",
+        "placeholder": "[计算结果]"
+      }
+    ]
+  },
+  "field_definitions": {
+    "amount_fields": [
+      "sales_goods_services",
+      "tax_refunds",
+      "other_operating_inflows",
+      "purchase_goods_services",
+      "employee_payments",
+      "tax_payments",
+      "other_operating_outflows",
+      "investment_recovery",
+      "investment_income",
+      "asset_disposal",
+      "fixed_asset_purchase",
+      "investment_payments",
+      "equity_investment",
+      "debt_borrowing",
+      "debt_repayment",
+      "dividend_interest_payments"
+    ],
+    "calculated_fields": [
+      "operating_activities_net",
+      "investing_activities_net",
+      "financing_activities_net",
+      "cash_net_increase",
+      "ending_cash_balance"
+    ]
+  },
+  "validation_rules": {
+    "required_fields": [
+      "company_name",
+      "report_period",
+      "currency_unit"
+    ],
+    "calculation_rules": {
+      "operating_net": "SUM(operating_inflows) - SUM(operating_outflows)",
+      "investing_net": "SUM(investing_inflows) - SUM(investing_outflows)",
+      "financing_net": "SUM(financing_inflows) - SUM(financing_outflows)",
+      "cash_net_increase": "operating_net + investing_net + financing_net",
+      "ending_balance": "opening_balance + cash_net_increase"
+    }
+  },
+  "usage_notes": [
+    "本模板适用于一般企业的现金流量表编制",
+    "所有金额项目需填写具体数值，单位为指定货币",
+    "计算项目由系统自动计算，无需手动填写",
+    "请确保期初余额与上期期末余额一致",
+    "现金流量分类需符合企业会计准则要求"
+  ]
+}

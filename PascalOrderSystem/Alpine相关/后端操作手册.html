@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>后端操作手册</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+    <script src="../../js/main.js"></script>
+</head>
+<body data-no-copy>
+<div class="container a4">
+
+<h1>后端操作手册</h1>
+<p>本手册记录了从零开始配置服务器、数据库、后端API、前端页面，并完成数据提交与验证的全过程。所有命令均基于 <strong>Alpine Linux</strong> 系统（MariaDB 11.4.11, PHP 8.4.21）。请根据您的实际环境调整路径、IP和密码。</p>
+
+<hr>
+
+<h2>一、服务器环境准备</h2>
+<h3>1.1 确认 MariaDB 监听地址（允许远程连接）</h3>
+<pre><code>netstat -tlnp | grep 3306</code></pre>
+<p>期望输出包含 <code>0.0.0.0:3306</code>。若只监听 <code>127.0.0.1</code>，需修改配置文件：</p>
+<pre><code>vi /etc/my.cnf.d/mariadb-server.cnf
+# 在 [mysqld] 部分添加或修改：
+bind-address = 0.0.0.0</code></pre>
+<p>重启 MariaDB：</p>
+<pre><code>rc-service mariadb restart</code></pre>
+
+<h3>1.2 登录 MariaDB 并创建数据库及用户</h3>
+<pre><code>mariadb -u root -p --skip-ssl   # 如果root无密码，直接回车</code></pre>
+<p>在 MariaDB 提示符下依次执行：</p>
+<pre><code>-- 创建数据库（使用 utf8mb4 字符集）
+CREATE DATABASE IF NOT EXISTS InvStrat_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- 创建远程用户（允许任何IP连接，密码请修改）
+CREATE USER 'jefflu'@'%' IDENTIFIED BY '780503';
+
+-- 授权
+GRANT ALL PRIVILEGES ON InvStrat_db.* TO 'jefflu'@'%';
+
+-- 刷新权限
+FLUSH PRIVILEGES;
+
+-- 退出
+EXIT;</code></pre>
+
+<h3>1.3 创建数据表（三张表）</h3>
+<pre><code>mariadb -u jefflu -p --skip-ssl   # 密码 780503</code></pre>
+<pre><code>USE InvStrat_db;
+
+CREATE TABLE geo_env_events (
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT UNSIGNED NOT NULL,
+    event_time DATETIME NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    source VARCHAR(100) DEFAULT NULL,
+    region VARCHAR(100) DEFAULT NULL,
+    country_involved VARCHAR(255) DEFAULT NULL,
+    event_type ENUM('conflict','diplomacy','health','economy','security','other') NOT NULL DEFAULT 'other',
+    severity_level TINYINT UNSIGNED NOT NULL DEFAULT 1,
+    description TEXT DEFAULT NULL,
+    impact_summary TEXT DEFAULT NULL,
+    risk_score DECIMAL(5,2) DEFAULT NULL,
+    tags VARCHAR(255) DEFAULT NULL,
+    raw_content MEDIUMTEXT DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE geo_impact_assessments (
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    event_id BIGINT UNSIGNED NOT NULL,
+    asset_class ENUM('oil','stock','currency','commodity','bond','other') DEFAULT NULL,
+    industry VARCHAR(100) DEFAULT NULL,
+    impact_direction ENUM('positive','negative','neutral','mixed') DEFAULT NULL,
+    impact_level TINYINT UNSIGNED DEFAULT NULL,
+    expected_duration ENUM('short','medium','long') DEFAULT NULL,
+    description TEXT DEFAULT NULL,
+    FOREIGN KEY (event_id) REFERENCES geo_env_events(id) ON DELETE CASCADE
+);
+
+CREATE TABLE geo_event_sources (
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    event_id BIGINT UNSIGNED NOT NULL,
+    source_name VARCHAR(100) DEFAULT NULL,
+    source_url VARCHAR(500) DEFAULT NULL,
+    author VARCHAR(100) DEFAULT NULL,
+    publish_time DATETIME DEFAULT NULL,
+    excerpt TEXT DEFAULT NULL,
+    FOREIGN KEY (event_id) REFERENCES geo_env_events(id) ON DELETE CASCADE
+);
+
+EXIT;</code></pre>
+
+<hr>
+
+<h2>二、后端 API 搭建</h2>
+<h3>2.1 安装 PHP 及扩展</h3>
+<pre><code>apk update
+apk add php php-pdo_mysql php-json php-common
+php -v   # 验证安装</code></pre>
+
+<h3>2.2 创建工作目录和 API 文件</h3>
+<pre><code>mkdir -p /home/jefflu/api
+cd /home/jefflu/api</code></pre>
+<p>创建 submit.php（直接使用 cat 命令写入，避免格式错误）：</p>
+<pre><code>cat > submit.php << 'EOF'
+<?php
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+    http_response_code(204);
+    exit;
+}
+
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Content-Type');
+
+$db_host = '127.0.0.1';
+$db_port = '3306';
+$db_name = 'InvStrat_db';
+$db_user = 'jefflu';
+$db_pass = '780503';
+
+try {
+    $input = json_decode(file_get_contents('php://input'), true);
+    if (!$input || !isset($input['event'])) {
+        throw new Exception('无效的请求数据');
+    }
+
+    $pdo = new PDO("mysql:host=$db_host;port=$db_port;dbname=$db_name;charset=utf8mb4", $db_user, $db_pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->beginTransaction();
+
+    $event = $input['event'];
+    $sqlEvent = "INSERT INTO geo_env_events 
+        (user_id, event_time, title, source, region, country_involved, event_type, 
+         severity_level, description, impact_summary, risk_score, tags, raw_content, created_at)
+        VALUES 
+        (:user_id, :event_time, :title, :source, :region, :country_involved, :event_type,
+         :severity_level, :description, :impact_summary, :risk_score, :tags, :raw_content, NOW())";
+    $stmt = $pdo->prepare($sqlEvent);
+    $stmt->execute([
+        ':user_id' => $event['user_id'] ?? 1,
+        ':event_time' => $event['event_time'],
+        ':title' => $event['title'],
+        ':source' => $event['source'] ?? null,
+        ':region' => $event['region'] ?? null,
+        ':country_involved' => is_array($event['country_involved']) ? implode(',', $event['country_involved']) : $event['country_involved'],
+        ':event_type' => $event['event_type'],
+        ':severity_level' => $event['severity_level'] ?? 3,
+        ':description' => $event['description'] ?? null,
+        ':impact_summary' => $event['impact_summary'] ?? null,
+        ':risk_score' => $event['risk_score'] ?? null,
+        ':tags' => is_array($event['tags']) ? implode(',', $event['tags']) : $event['tags'],
+        ':raw_content' => $event['raw_content'] ?? null
+    ]);
+    $eventId = $pdo->lastInsertId();
+
+    if (!empty($input['impact_assessments'])) {
+        $sqlImpact = "INSERT INTO geo_impact_assessments 
+            (event_id, asset_class, industry, impact_direction, impact_level, expected_duration, description)
+            VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $stmtImpact = $pdo->prepare($sqlImpact);
+        foreach ($input['impact_assessments'] as $imp) {
+            $stmtImpact->execute([
+                $eventId,
+                $imp['asset_class'] ?? null,
+                $imp['industry'] ?? null,
+                $imp['impact_direction'] ?? null,
+                $imp['impact_level'] ?? 3,
+                $imp['expected_duration'] ?? 'short',
+                $imp['description'] ?? null
+            ]);
+        }
+    }
+
+    if (!empty($input['sources'])) {
+        $sqlSource = "INSERT INTO geo_event_sources 
+            (event_id, source_name, source_url, author, publish_time, excerpt)
+            VALUES (?, ?, ?, ?, ?, ?)";
+        $stmtSource = $pdo->prepare($sqlSource);
+        foreach ($input['sources'] as $src) {
+            $stmtSource->execute([
+                $eventId,
+                $src['source_name'] ?? null,
+                $src['source_url'] ?? null,
+                $src['author'] ?? null,
+                $src['publish_time'] ?? null,
+                $src['excerpt'] ?? null
+            ]);
+        }
+    }
+
+    $pdo->commit();
+    echo json_encode(['success' => true, 'event_id' => $eventId]);
+} catch (Exception $e) {
+    if (isset($pdo)) $pdo->rollBack();
+    http_response_code(500);
+    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+}
+EOF</code></pre>
+
+<h3>2.3 启动 PHP 内置服务器</h3>
+<pre><code>cd /home/jefflu/api
+php -S 0.0.0.0:8000</code></pre>
+<p><strong>保持此终端窗口运行</strong>（按 Ctrl+C 可停止）。</p>
+
+<hr>
+
+<h2>三、前端页面部署与修改</h2>
+<h3>3.1 复制前端文件夹到 API 目录</h3>
+<p>假设您的前端文件位于 /share/www/InvStrat/GeoEnv/（包含 GeoEnv.html 和 assets 子目录）：</p>
+<pre><code>cp -r /share/www/InvStrat/GeoEnv /home/jefflu/api/</code></pre>
+<p>验证复制结果：</p>
+<pre><code>ls /home/jefflu/api/GeoEnv/
+# 应显示 GeoEnv.html 和 assets 目录</code></pre>
+
+<h3>3.2 修改前端 JS 中的 API 地址</h3>
+<pre><code>vi /home/jefflu/api/GeoEnv/assets/js/geoenv.js</code></pre>
+<p>找到 submitData 函数中的 API_URL，将其改为：</p>
+<pre><code>const API_URL = '/submit.php';</code></pre>
+<p>保存退出。</p>
+
+<h3>3.3 通过浏览器访问前端页面</h3>
+<p>地址：<code>http://192.168.0.106:8000/GeoEnv/GeoEnv.html</code></p>
+
+<hr>
+
+<h2>四、提交数据测试</h2>
+<ol>
+    <li>在页面中粘贴或直接使用示例新闻。</li>
+    <li>点击「智能解析并填充表单」。</li>
+    <li>检查表单内容无误后，点击「提交数据（模拟）」。</li>
+    <li>成功时前端显示 ✅ 提交成功！事件ID: 1，PHP 终端显示 [200]: POST /submit.php。</li>
+</ol>
+
+<hr>
+
+<h2>五、验证数据库并删除测试数据</h2>
+<h3>5.1 查询刚插入的数据</h3>
+<pre><code>mariadb -u jefflu -p --skip-ssl</code></pre>
+<pre><code>USE InvStrat_db;
+SELECT * FROM geo_env_events\G</code></pre>
+
+<h3>5.2 删除指定 ID 的数据</h3>
+<pre><code>DELETE FROM geo_env_events WHERE id = 1;</code></pre>
+<p>由于外键级联删除，关联的子表记录也会自动删除。验证：</p>
+<pre><code>SELECT * FROM geo_env_events WHERE id = 1;
+-- 应返回 Empty set
+EXIT;</code></pre>
+
+<hr>
+
+<h2>六、常见问题及解决</h2>
+<table>
+    <tr><th>问题</th><th>解决方法</th></tr>
+    <tr><td>连接数据库时 SSL required</td><td>在 mysql 命令后加 --skip-ssl</td></tr>
+    <tr><td>前端提交返回 Unexpected token</td><td>检查 submit.php 开头是否有 &lt;?php，且无 BOM 头；确保文件未被输出额外内容</td></tr>
+    <tr><td>提交后出现约束错误 CONSTRAINT ... tags failed</td><td>删除旧表重建（参考 1.3 节）</td></tr>
+    <tr><td>跨域错误（CORS）</td><td>确保 submit.php 中已处理 OPTIONS 请求且设置了 Access-Control-Allow-Origin: *</td></tr>
+    <tr><td>PHP 服务器启动后无法访问</td><td>检查防火墙（Alpine 默认无防火墙），确保端口 8000 开放；使用 curl http://127.0.0.1:8000/submit.php 测试</td></tr>
+</table>
+
+<hr>
+
+<h2>七、附录：常用命令速查</h2>
+<pre><code># MariaDB 登录（跳过 SSL）
+mariadb -u jefflu -p --skip-ssl
+
+# 查看表结构
+DESCRIBE geo_env_events;
+
+# 清空整张表（重置自增ID）
+TRUNCATE TABLE geo_env_events;
+
+# 导出数据库备份
+mysqldump -u jefflu -p InvStrat_db > backup.sql
+
+# 导入备份
+mariadb -u jefflu -p InvStrat_db < backup.sql
+
+# 停止 PHP 服务器
+Ctrl+C
+
+# 重新启动 PHP 服务器
+cd /home/jefflu/api && php -S 0.0.0.0:8000</code></pre>
+
+<h2>创建 OpenRC 服务，PHP开机自启动</h2>
+<pre><code># 打开脚本文件
+vi /etc/init.d/geoen-php</code></pre>
+<p>以下是文件内容：</p>
+<pre><code>#!/sbin/openrc-run
+
+name="GeoEnv PHP Service"
+description="PHP Built-in Server for GeoEnv Application"
+
+command="/usr/bin/php"
+command_args="-S 0.0.0.0:8000 -t /home/jefflu/api"
+command_user="jefflu"
+pidfile="/run/${RC_SVCNAME}.pid"
+command_background=true
+
+depend() {
+    need net
+    after firewall
+}</code></pre>
+<p>按 i 进入编辑模式,按 Esc，输入 :wq 保存退出。</p>
+<p>设置权限并加入开机自启</p>
+<pre><code>chmod +x /etc/init.d/geoen-php
+rc-update add geoen-php default
+rc-service geoen-php start</code></pre>
+<p>管理服务</p>
+<pre><code>rc-service geoen-php start      # 启动
+rc-service geoen-php stop       # 停止
+rc-service geoen-php restart    # 重启
+rc-service geoen-php status     # 查看状态</code></pre>
+
+<hr>
+<p style="text-align:center; margin-top:30px;"><strong>手册到此结束</strong></p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>  <!-- 文档类型声明: HTML5 -->
+<html lang="zh-CN">  <!-- HTML根标签 语言设置为简体中文 -->
+<head>  <!-- 文档头部: 放置元数据/样式/脚本等 -->
+    <meta charset="UTF-8">  <!-- 元数据: 字符编码为UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">  <!-- 元数据: 视口设置 适配移动端 -->
+    <title>网站项目架构</title>  <!-- 页面标题: 显示在浏览器标签页 -->
+    <link rel="stylesheet" href="../css/style.css">  <!-- 外部资源: 引用项目级样式表 -->
+    <script src="../js/main.js"></script>  <!-- 脚本引用: 引入全局JavaScript功能 -->
+</head>  <!-- 头部结束 -->
+<body>  <!-- 文档主体: 页面可见内容 -->
+<div class="container">  <!-- 块级容器: 内容居中布局 最大宽度210mm -->
+
+    <h1>📁 网站项目架构</h1>  <!-- 一级标题: 页面主标题 -->
+    <div class="subhead">最后更新: 2026-06-22</div>  <!-- 块级容器: 副标题/元信息 -->
+
+    <hr>  <!-- 水平分割线: 分隔内容段落 -->
+
+    <!-- 1. 项目概览 -->
+    <h2>1. 项目概览</h2>  <!-- 二级标题: 章节标题 -->
+    <p>本地服务器上的个人投资研究与数据分析平台，包含三个分析模块 + 三个数据模块（价格/个人账户/企业财务）+ 一个订单系统。</p>
+
+    <p><strong>模块一览：</strong>🌍 GeoEnv（地缘政治分析）、💱 FxCap（汇率利率分析）、🏭 IndBiz（产业分析）、📊 Price（价格数据/斐波那契计算）、💳 PerAcc（个人账户管理）、🏢 FinData（企业财务数据）。</p>  <!-- 段落: 文本内容块 -->
+
+    <h3>文件位置</h3>  <!-- 三级标题: 子章节标题 -->
+    <table>  <!-- 表格: 展示结构化数据 -->
+        <thead>  <!-- 表格头部: 列标题行 -->
+            <tr><th>位置</th><th>路径</th><th>服务</th><th>端口</th></tr>  <!-- tr=表格行 th=表头单元格 -->
+        </thead>  <!-- 表格头部结束 -->
+        <tbody>  <!-- 表格主体: 数据行 -->
+            <tr><td><strong>位置1</strong> — 展示层</td><td><code>/share/www/</code></td><td>Python HTTP 静态服务</td><td><code>8080</code></td></tr>  <!-- td=普通单元格 strong=加粗强调 code=行内代码 -->
+            <tr><td><strong>位置2</strong> — 数据层</td><td><code>/home/jefflu/api/</code></td><td>PHP 内置服务器</td><td><code>8000</code></td></tr>
+        </tbody>  <!-- 表格主体结束 -->
+    </table>  <!-- 表格结束 -->
+
+    <h3>服务架构</h3>  <!-- 三级标题: 子章节标题 -->
+    <pre><code>用户浏览器  <!-- pre=预格式化文本 保留空格/换行 code=代码块 -->
+    │
+    ├── :8080 ─── Python http.server ─── /share/www/  ─── 静态展示页面
+    │                                                   (HTML + CSS + JS)
+    │
+    └── :8000 ─── PHP built-in server ── /home/jefflu/api/ ─── 数据录入 + API
+                                                            (PHP + MySQL)
+                                                                │
+                                                                ↓
+                                                         MariaDB (MySQL)
+                                                         InvStrat_db
+                                                         18 张表 (含 PerAcc 4 表 + FinData 1 表)</code></pre>  <!-- 代码块结束 -->
+
+    <hr>  <!-- 水平分割线: 分隔内容段落 -->
+
+    <!-- 2. 目录结构 -->
+    <h2>2. 目录结构</h2>  <!-- 二级标题: 章节标题 -->
+
+    <h3>2.1 展示层 <code>/share/www/</code></h3>  <!-- 三级标题: 子章节标题 -->
+    <pre><code>/share/www/  <!-- pre=预格式化文本 code=代码块 -->
+├── index.html                                    ← 主仪表板（入口页面）
+├── css/
+│   └── style.css                                 ← 主样式
+├── js/
+│   └── main.js                                   ← 全局脚本
+├── docs/
+│   ├── 数据库架构设计.html                        ← 数据库结构文档
+│   └── 网站项目架构.html                          ← 本文件
+│
+├── Data_Processing_Analysis/                     ← 数据分析模块
+│   ├── InvStrat/                                 ← 投资战略
+│   │   ├── InvStrat.css                          ← 模块共享样式
+│   │   ├── InvStrat.js                           ← 模块共享脚本（旧版）
+│   │   │
+│   │   ├── GeoEnv/
+│   │   │   └── GeoEnv.html                       ← 🌍 地缘政治分析展示页
+│   │   ├── FxCap/
+│   │   │   ├── FxCap.html                        ← 💱 汇率利率分析展示页
+│   │   │   ├── Equity_Bond/
+│   │   │   │   └── 神农集团605296vs 巨星农牧603477.html
+│   │   │   └── FX_Rates/
+│   │   │       └── 20260615_当前重点监控的系统性脆弱点.html
+│   │   └── IndBiz/
+│   │       ├── IndBiz.html                       ← 🏭 产业分析展示页
+│   │       └── IndBiz_Report/
+│   │           └── yzy.html
+│   │
+│   └── Finance/                                  ← 💰 财务/账户管理模块
+│       ├── Finance.css                           ← 模块样式（琥珀金主题）
+│       ├── Finance.js                            ← 模块脚本（斐波那契计算 + CRUD）
+│       ├── Price/
+│       │   └── Price.html                        ← 📊 价格数据查询 + 斐波那契计算
+│       ├── PerAcc/
+│       │   └── PerAcc.html                       ← 💳 个人账户管理（查询展示页）
+│       └── FinData/
+│           └── FinData.html                      ← 🏢 企业财务数据查询（多周期对比）
+├── PascalOrderSystem/                            ← 帕斯卡下单系统
+│   ├── Alpine相关/
+│   │   ├── Alpine_Linux.html
+│   │   ├── Alpine_Linux家庭服务器配置.html
+│   │   └── 后端操作手册.html
+│   └── Trader/
+│       └── 交易手法研究.html
+│
+├── jefflu/                                       ← 个人文件
+│   ├── jefflu.html
+│   ├── fund.html
+│   └── Finance_Knowhow_Docs/
+│       ├── 专业术语表.html
+│       └── 市场生存手册-老甲鱼六维价格框架（完整版）.html
+│
+├── lucifer/
+│   └── lucifer.html
+│
+└── assets/images/
+    └── AMi-LOGO.jpg</code></pre>  <!-- 代码块结束 -->
+
+    <h3>2.2 数据层 <code>/home/jefflu/api/</code></h3>  <!-- 三级标题: 子章节标题 -->
+    <pre><code>/home/jefflu/api/  <!-- pre=预格式化文本 code=代码块 -->
+├── db_config.php                                 ← 共享数据库连接（单例 PDO，所有模块共用）
+├── DB.js                                         ← 统一数据录入引擎（核心），三个分析模块共享
+├── parsers.js                                    ← 文本解析器（GeoEnv / FxCap / IndBiz / Price）
+├── DB.css                                        ← 数据录入页面样式（含 CSS 设计令牌）
+├── submit.php                                    ← [已弃用] 旧版 GeoEnv 提交接口
+├── ping.php                                      ← 健康检查端点
+├── schema.sql                                    ← 完整数据库 DDL（18 张表）
+├── migrate_unique.sql                            ← 唯一性约束迁移脚本（代码/身份证去重）
+│
+├── GeoEnv_Data/                                  ← 🌍 地缘政治 - 数据录入
+│   ├── GeoEnv_Data.html                          ← 录入页面
+│   └── api.php                                   ← CRUD API
+│
+├── FxCap_Data/                                   ← 💱 汇率利率 - 数据录入
+│   ├── FxCap_Data.html                           ← 录入页面
+│   └── api.php                                   ← CRUD API
+│
+├── IndBiz_Data/                                  ← 🏭 产业分析 - 数据录入
+│   ├── IndBiz_Data.html                          ← 录入页面
+│   └── api.php                                   ← CRUD API
+│
+├── PerAcc_Data/                                  ← 💳 个人账户管理 - 数据录入（独立于 DB.js）
+│   ├── PerAcc_Data.html                          ← 录入页面
+│   ├── PerAcc_Data.js                            ← 内联 JS 外化（二级 CRUD + 搜索）
+│   └── api.php                                   ← CRUD + 搜索 API（人员/账户/持仓/出入金）
+│
+├── Price_Data/                                   ← 📊 价格数据 - 数据录入（独立于 DB.js）
+│   ├── Price_Data.html                           ← 录入页面
+│   ├── Price_Data.js                             ← 内联 JS 外化（斐波那契计算 + CRUD）
+│   └── api.php                                   ← CRUD + 计算 API
+│
+└── FinData_Data/                                 ← 🏢 企业财务 - 数据录入（独立于 DB.js）
+    ├── FinData_Data.html                         ← 财务报告录入页面
+    ├── Bank_Flows/
+    │   ├── Bank_Flows.html                       ← 💳 银行流水数据录入页面
+    │   ├── bank_flow_generator.py                ← Python 生成现金流量表 HTML
+    │   └── Bank_Statement/                       ← 生成的现金流量表 HTML 文件
+    └── api.php                                   ← CRUD + add_period + reports + bank_flows</code></pre>  <!-- 代码块结束 -->
+    <hr>  <!-- 水平分割线: 分隔内容段落 -->
+
+    <!-- 3. 模块导航 -->
+    <h2>3. 模块导航</h2>  <!-- 二级标题: 章节标题 -->
+
+    <h3>3.1 投资战略 + 价格/账户/财务 — 六大模块</h3>  <!-- 三级标题: 子章节标题 -->
+    <table>  <!-- 表格: 展示三个分析模块的路径对应关系 -->
+        <thead>  <!-- 表格头部: 列标题行 -->
+            <tr><th>模块</th><th>展示页（:8080）</th><th>数据录入（:8000）</th><th>API</th><th>数据库表</th></tr>
+        </thead>  <!-- 表格头部结束 -->
+        <tbody>  <!-- 表格主体: 数据行 -->
+            <tr><td>🌍 GeoEnv</td><td><code>InvStrat/GeoEnv/GeoEnv.html</code></td><td><code>GeoEnv_Data/GeoEnv_Data.html</code></td><td><code>GeoEnv_Data/api.php</code></td><td><code>geo_env_events</code> + 子表</td></tr>
+            <tr><td>💱 FxCap</td><td><code>InvStrat/FxCap/FxCap.html</code></td><td><code>FxCap_Data/FxCap_Data.html</code></td><td><code>FxCap_Data/api.php</code></td><td><code>currency_interest_events</code> + 子表</td></tr>
+            <tr><td>🏭 IndBiz</td><td><code>InvStrat/IndBiz/IndBiz.html</code></td><td><code>IndBiz_Data/IndBiz_Data.html</code></td><td><code>IndBiz_Data/api.php</code></td><td><code>industry_business_events</code> + 子表</td></tr>
+            <tr><td>📊 Price</td><td><code>Finance/Price/Price.html</code></td><td><code>Price_Data/Price_Data.html</code></td><td><code>Price_Data/api.php</code></td><td><code>price_spot_data</code> + <code>price_calc_records</code></td></tr>
+            <tr><td>💳 PerAcc</td><td><code>Finance/PerAcc/PerAcc.html</code></td><td><code>PerAcc_Data/PerAcc_Data.html</code></td><td><code>PerAcc_Data/api.php</code></td><td><code>per_accounts</code> + 3 子表</td></tr>
+            <tr><td>🏢 FinData</td><td><code>Finance/FinData/FinData.html</code></td><td><code>FinData_Data/FinData_Data.html</code><br><code>Bank_Flows/Bank_Flows.html</code></td><td><code>FinData_Data/api.php</code></td><td><code>fin_enterprises</code>（JSON reports）<br><code>fin_bank_flows</code>（银行流水独立表）</td></tr>
+        </tbody>  <!-- 表格主体结束 -->
+    </table>  <!-- 表格结束 -->
+
+    <h3>3.2 每个分析模块的页面结构</h3>  <!-- 三级标题: 子章节标题 -->
+    <pre><code>展示页（:8080）                   数据录入页（:8000）  <!-- 页面结构示意图 -->
+┌─────────────────────┐           ┌───────────────────────────┐
+│ 主标题 + DB 链接     │           │ 模块切换栏                 │
+├─────────────────────┤           ├───────────────────────────┤
+│ 📌 分析报告区域      │           │ 📝 信息录入 (黏贴+解析)    │
+│    （报告链接集）     │           │   左: 黏贴区              │
+├─────────────────────┤           │   右: 解析结果            │
+│ 🗄️ DB 登録情報      │           │ 💾 存储至数据库            │
+│   （数据库记录自动加载）│          ├───────────────────────────┤
+├─────────────────────┤           │ 📚 已录入信息（列表+搜索）  │
+│ フッター             │           └───────────────────────────┘
+└─────────────────────┘</code></pre>  <!-- 代码块结束 -->
+    <p><strong>📊 Price 模块页面结构有别：</strong>Price 使用双面板布局（代码搜索 + 结果详情），集成了斐波那契计算器，不共享 DB.js，使用独立内联 JS。详见 <code>Finance/Price/Price.html</code> 和 <code>Finance/Finance.js</code>。</p>
+    <p><strong>🏢 FinData / 💳 PerAcc 页面结构有别：</strong>PerAcc 和 FinData 展示页共享 <code>Finance.css</code> + <code>Finance.js</code>（仅引用 PF.toggle），不调用 <code>PF.init()</code>，使用各自的内联脚本加载数据。FinData 额外支持多周期财务数据对比展示。</p>
+    <p><strong>💳 银行流水子模块（2026-06 新增）：</strong>在 <code>Bank_Flows/Bank_Flows.html</code> 独立页面中操作，通过 FinData_Data.html 的标签页跳转进入。JSON 导入后通过 PHP 调用 Python 脚本 <code>bank_flow_generator.py</code> 自动生成一般企业现金流量表 HTML，存储在 <code>Bank_Statement/</code> 目录。数据存入独立表 <code>fin_bank_flows</code>，展示页同时加载两份数据源并自动分组展示。</p>
+
+    <h3>3.3 导航流程</h3>  <!-- 三级标题: 子章节标题 -->
+	    <pre><code>index.html  <!-- 导航流程示意图 从首页到各模块的数据流向 -->
+│
+├── GeoEnv 展示页 ──→ 🗄️ DB 接続 ──→ GeoEnv 数据录入页
+│                                          │
+│                                          ↓
+│                                    GeoEnv_Data/api.php
+│                                          │
+│                                          ↓
+│                                    MySQL (geo_env_events...)
+│
+├── FxCap 展示页  ──→ 🗄️ DB 接続 ──→ FxCap 数据录入页
+│                                          │
+│                                          ↓
+│                                    FxCap_Data/api.php
+│                                          │
+│                                          ↓
+│                                    MySQL (currency_interest_events...)
+│
+├── IndBiz 展示页 ──→ 🗄️ DB 接続 ──→ IndBiz 数据录入页
+│                                          │
+│                                          ↓
+│                                    IndBiz_Data/api.php
+│                                          │
+│                                          ↓
+│                                    MySQL (industry_business_events...)
+│
+├── Price 查询页  ──→ 🗄️ 数据查询 ──→ Price 数据录入页
+│                                          │
+│                                          ↓
+│                                    Price_Data/api.php
+│                                          │
+│                                          ↓
+│                                    MySQL (price_spot_data + price_calc_records)
+│
+├── PerAcc 查询页 ──→ 🗄️ 数据查询 ──→ PerAcc 数据录入页
+│                                          │
+│                                          ↓
+│                                    PerAcc_Data/api.php
+│                                          │
+│                                          ↓
+│                                    MySQL (per_accounts + 3 子表)
+│
+└── FinData 查询页 ──→ 🗄️ 数据查询 ──→ FinData 数据录入页（财务报告）
+                      │                          │
+                      │                          ↓
+                      │                    FinData_Data/api.php
+                      │                          │
+                      │                          ↓
+                      │                    MySQL (fin_enterprises)
+                      │
+                      └── 💳 银行流水 ──→ Bank_Flows/Bank_Flows.html（银行流水）
+                                                 │
+                                                 ↓
+                                           FinData_Data/api.php
+                                                 │
+                                                 ↓
+                                           MySQL (fin_bank_flows)</code></pre>  <!-- 代码块结束 -->
+
+    <hr>  <!-- 水平分割线: 分隔内容段落 -->
+
+    <!-- 4. 数据流 -->
+    <h2>4. 数据流</h2>  <!-- 二级标题: 章节标题 -->
+    <pre><code>用户操作 → 数据录入页 (DB.js)  <!-- 数据流示意图 从用户操作到数据库的完整链路 -->
+              │
+              │ POST ../xxx_Data/api.php?action=save
+              ▼
+         api.php (PHP)
+              │
+              │ PDO::prepare / execute
+              ▼
+         MariaDB (InvStrat_db)
+              │
+              │ 写入主表 + 子表（事务包裹）
+              ▼
+         { success: true, id: N }
+              │
+              │ 前端刷新列表
+              ▼
+         数据录入页显示已录入信息
+
+  ─── 展示页自动读取 ───
+         展示页加载时
+              │
+              │ fetch('http://host:8000/xxx_Data/api.php?action=list')
+              ▼
+         展示页底部 🗄️ DB 登録情報 区域</code></pre>  <!-- 代码块结束 -->
+
+    <h3>Price 模块数据流</h3>  <!-- 三级标题: 子章节标题 -->
+    <p>Price 模块（📊 价格数据）使用独立脚本 <code>Finance.js</code>，不依赖 <code>DB.js</code>。API 多出 <code>calc_save</code> / <code>calc_list</code> 用于斐波那契计算结果的存取。</p>
+    <pre><code>用户操作 → Price 数据录入页 (内联 JS)  <!-- Price 特有的数据流 -->
+              │
+              ├── 现货价格：POST api.php?action=save/update/delete
+              ├── 查询：     GET  api.php?action=query&code=XXX
+              └── 斐波那契： POST api.php?action=calc_save / calc_list
+                            │
+                            ▼
+                       api.php (PHP)
+                            │
+                            │ PDO::prepare / execute
+                            ▼
+                       MariaDB (InvStrat_db)
+                            │
+                            ├── price_spot_data（现货价格）
+                            └── price_calc_records（斐波那契计算结果）</code></pre>  <!-- 代码块结束 -->
+
+    <h3>失败降级</h3>  <!-- 三级标题: 子章节标题 -->
+    <p>当 API 不可达时，<code>DB.js</code>（三个分析模块）或 <code>Finance.js</code>（Price 模块）自动降级到浏览器 <strong>localStorage</strong>：</p>  <!-- 段落: 降级策略说明 strong=强调 -->
+    <ul>  <!-- 无序列表: 列表展示 -->
+        <li>InvStrat 模块键名规则：<code>db_{模块名}_records</code> — <code>db_geoenv_records</code>、<code>db_fxcap_records</code>、<code>db_indbiz_records</code></li>
+        <li>Price 模块键名规则：<code>finance_price_records</code></li>
+    </ul>  <!-- 无序列表结束 -->
+
+    <hr>  <!-- 水平分割线: 分隔内容段落 -->
+
+    <!-- 5. 数据库 -->
+    <h2>5. 数据库</h2>  <!-- 二级标题: 章节标题 -->
+    <p>详见 <a href="数据库架构设计.html">数据库架构设计</a></p>  <!-- 段落: a=超链接跳转到数据库架构页面 -->
+    <table>  <!-- 表格: 三个模块的表数量统计 -->
+        <thead>  <!-- 表格头部: 列标题行 -->
+            <tr><th>模块</th><th>主表</th><th>子表数</th><th>合计</th></tr>
+        </thead>  <!-- 表格头部结束 -->
+        <tbody>  <!-- 表格主体: 数据行 -->
+            <tr><td>🌍 GeoEnv</td><td><code>geo_env_events</code></td><td>2（影响评估 + 来源）</td><td>3 表</td></tr>
+            <tr><td>💱 FxCap</td><td><code>currency_interest_events</code></td><td>3（汇率 + 利率 + 来源）</td><td>4 表</td></tr>
+            <tr><td>🏭 IndBiz</td><td><code>industry_business_events</code></td><td>3（产业影响 + 指标 + 来源）</td><td>4 表</td></tr>
+            <tr><td>📊 Price</td><td><code>price_spot_data</code></td><td>1（斐波那契计算结果，独立表，无子表 FK）</td><td>2 表</td></tr>
+            <tr><td>💳 PerAcc</td><td><code>per_accounts</code></td><td>3（券商账户 + 持仓 + 出入金，四级 FK 链）</td><td>4 表</td></tr>
+        </tbody>  <!-- 表格主体结束 -->
+        <tfoot>
+            <tr><td colspan="3"><strong>合计</strong></td><td><strong>19 表</strong></td></tr>
+        </tfoot>
+    </table>  <!-- 表格结束 -->
+    <p>InvStrat 三个分析模块的子表通过 <code>event_id</code> 外键关联到主表，<code>ON DELETE CASCADE</code>。<strong>Price 模块</strong>的两张表相互独立，无外键约束。<strong>PerAcc 模块</strong>使用四级 FK 链（per_accounts → per_account_brokers → per_account_positions / per_account_cash_flows），全部 ON DELETE CASCADE。<strong>PerAcc 模块</strong>使用四级 FK 链（per_accounts → per_account_brokers → per_account_positions / per_account_cash_flows），全部 ON DELETE CASCADE。</p>  <!-- 段落: 外键说明 + Price 特例 -->
+
+    <hr>  <!-- 水平分割线: 分隔内容段落 -->
+
+    <!-- 6. 关键技术细节 -->
+    <h2>6. 关键技术细节</h2>  <!-- 二级标题: 章节标题 -->
+    <table>  <!-- 表格: 关键技术点说明 -->
+        <thead>  <!-- 表格头部: 列标题行 -->
+            <tr><th>项目</th><th>说明</th></tr>
+        </thead>  <!-- 表格头部结束 -->
+        <tbody>  <!-- 表格主体: 数据行 -->
+            <tr><td><strong>DB.js</strong></td><td>核心引擎（992 行），提供表单渲染、API 调用、localStorage 降级。GeoEnv / FxCap / IndBiz 三个模块共享，通过 <code>DB.init(&#39;模块名&#39;)</code> 切换。解析器已拆分到独立的 <code>parsers.js</code>（504 行）。</td></tr>
+            <tr><td><strong>parsers.js</strong></td><td>独立的文本解析器文件，包含 <code>GeoEnvParser</code>、<code>FxCapParser</code>、<code>IndBizParser</code>、<code>PriceParser</code> 四个解析函数，解析黏贴文本为结构化 JSON。由 <code>DB.js</code> 在解析时调用。</td></tr>
+            <tr><td><strong>API（分析模块）</strong></td><td>GeoEnv / FxCap / IndBiz 各自独立的 <code>api.php</code>，支持 <code>list</code>（GET）、<code>save</code>（POST）、<code>update</code>（POST）、<code>delete</code>（POST）。</td></tr>
+            <tr><td><strong>API（Price 模块）</strong></td><td><code>Price_Data/api.php</code> 额外支持 <code>query</code>（按代码查询）、<code>calc_save</code>（保存斐波那契结果）、<code>calc_list</code>（列出计算结果）、<code>autocomplete</code>（代码模糊搜索 + 自动填充）。</td></tr>
+            <tr><td><strong>Price 代码唯一性</strong></td><td><code>save</code> 接口采用 upsert 逻辑：同一代码已存在则更新价格，不存在则插入。数据库 <code>price_spot_data.code</code> 有 UNIQUE 约束 <code>uk_price_code</code>。前端 autocomplete 输入"cu"即弹出匹配代码供选择。</td></tr>
+            <tr><td><strong>PerAcc 身份证唯一性</strong></td><td><code>save</code> 和 <code>update</code> 接口在写入前检查 <code>id_number</code> 是否重复。数据库 <code>per_accounts.id_number</code> 有 UNIQUE 约束 <code>uk_id_number</code>。检测到重复时返回错误"身份证号已存在：XXX（记录 #N）"，前端显示错误不清空表单。</td></tr>
+            <tr><td><strong>API（PerAcc 模块）</strong></td><td><code>PerAcc_Data/api.php</code> 额外支持 <code>search</code>（姓名/身份证/手机号搜索）和 <code>detail</code>（单条完整记录含账户/持仓/出入金）。</td></tr>
+            <tr><td><strong>PerAcc 前端</strong></td><td>展示页 <code>Finance/PerAcc/PerAcc.html</code> 使用 <code>Finance.js</code> 中的 <code>PF</code> 命名空间（调用 <code>PF.init</code>），数据录入页使用独立的 <code>PerAcc_Data.js</code>（793 行），不共享 <code>DB.js</code>。</td></tr>
+            <tr><td><strong>Price 前端</strong></td><td>不共享 <code>DB.js</code>，数据录入页使用独立的 <code>Price_Data.js</code>（896 行，含斐波那契计算 + CRUD + autocomplete + 代码查询），展示页使用 <code>Finance/Finance.js</code>（392 行）。</td></tr>
+            <tr><td><strong>db_config.php</strong></td><td>共享数据库配置，5 个 <code>api.php</code> 统一通过 <code>require_once '../db_config.php'; $pdo = getDB();</code> 获取 PDO 单例。消除 5 处密码硬编码。</td></tr>
+            <tr><td><strong>Firebase 基金应用</strong></td><td><code>jefflu/fund.html</code> 使用 Firebase Realtime Database（项目 ID: <code>myposition-5ac17</code>），管理股票/期权/期货持仓，独立于 InvStrat_db。</td></tr>
+            <tr><td><strong>CORS</strong></td><td>所有 API 返回 <code>Access-Control-Allow-Origin: *</code>，允许跨端口调用。</td></tr>
+            <tr><td><strong>展示页 DB 链接</strong></td><td>使用 <code>window.location.hostname</code> 动态解析，避免硬编码 IP。</td></tr>
+            <tr><td><strong>健康检查</strong></td><td><code>ping.php</code> 返回服务器状态和数据库连通性。访问 <code>http://localhost:8000/ping.php</code>。</td></tr>
+            <tr><td><strong>启动脚本</strong></td><td><code>/home/jefflu/start.sh</code> 一键启停前后端服务，支持 <code>start|stop|status</code> 子命令。</td></tr>
+            <tr><td><strong>唯一性迁移脚本</strong></td><td><code>migrate_unique.sql</code> 给已有数据库添加 UNIQUE 约束（代码 + 身份证），自动清理重复数据，不丢记录。</td></tr>
+            <tr><td><strong>FinData reports 结构</strong></td><td><code>fin_enterprises.financial_data</code> 以 JSON 存储多周期报告：<code>{"2025-Q4":{period_label, financial_data}, "2026-Q1":{...}}</code>。前端自动对比展示各周期财务数据。</td></tr>
+	            <tr><td><strong>FinData 银行流水（2026-06 新增）</strong></td><td>独立表 <code>fin_bank_flows</code>，通过 uscc 与企业关联。前端展示页同时加载 fin_enterprises 和 fin_bank_flows 数据，自动合并渲染。每条记录标注数据类型（财务报告/银行流水/两者皆有）。导入流程：前端 JSON → PHP 调用 Python → 生成现金流量表 HTML → 存入数据库。</td></tr>
+            <tr><td><strong>FinData 社会统一代码唯一性</strong></td><td><code>fin_enterprises.uscc</code> 有 UNIQUE 约束 <code>uk_uscc</code>。支持 <code>save</code>（新建企业）和 <code>add_period</code>（追加周期）两种保存模式。</td></tr>
+            <tr><td><strong>FinData 周期管理</strong></td><td>录入时手动输入报告期间（格式 <code>YYYY-QN</code>，如 2025-Q4）。同一企业可分多次导入不同周期的财务数据，自动合并展示。</td></tr>
+            <tr><td><strong>字符集</strong></td><td>全部使用 <code>utf8mb4</code>，支持 emoji 和中文。</td></tr>
+        </tbody>  <!-- 表格主体结束 -->
+    </table>  <!-- 表格结束 -->
+
+</div>  <!-- 容器结束 -->
+</body>  <!-- 文档主体结束 -->
+</html>  <!-- HTML根标签结束 -->

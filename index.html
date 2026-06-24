@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>待处理事项 · 投资与财务仪表板</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-layout">
+
+        <!-- ====================== 左侧导航栏 ====================== -->
+        <aside class="sidebar">
+            <div class="sidebar-inner">
+                <div class="logo">
+                    Alpine_Linux_JeffLu<br>
+                    <a href="docs/网站项目架构.html" target="_blank" class="light-meta">E8-6A-64-4A-AB-D3</a><br>
+                    <span class="light-meta copy-ssh">ssh jefflu@192.168.0.105</span><br>
+                    <span class="light-meta copy-ssh">ssh jefflu@192.168.0.106</span><br>
+                    <span class="light-meta copy-ssh">ssh jefflu@100.105.237.93</span>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="#page-top" class="sidebar-nav-link">💹 データ整理・分析</a>
+                    <div class="sidebar-nav-group">
+                        <a href="#alpine-commands" class="sidebar-nav-link">💻 Pascal Order System</a>
+                        <div class="sidebar-subnav">
+                            <a href="#cat-alpine" class="sidebar-subnav-link">Alpine相关[服务器]</a>
+                            <a href="#pascal-trader" class="sidebar-subnav-link">Pascal Order Trader[终端]</a>
+                            <a href="#pascal-exec" class="sidebar-subnav-link">Pascal Order Exec[中/后端]</a>
+                        </div>
+                    </div>
+                    <a href="#リク ケンホウ-commands" class="sidebar-nav-link">💼リク ケンホウ</a>
+                    <a href="#リク ショウカン-commands" class="sidebar-nav-link">💼リク ショウカン</a>
+                    <a href="#ショウ シャク-commands" class="sidebar-nav-link">💼ショウ シャク</a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- ====================== 右侧正文（A4 打印尺寸） ====================== -->
+        <main class="main-content" id="page-top">
+            <div class="container">
+
+                <!-- ====================== 主标题 ====================== -->
+                <div class="hero">
+                    <h2>💹 データ整理・分析</h2>
+                    <h4>数据整理·分析</h4>
+                </div>
+
+                <!-- ====================== 左右两栏 ====================== -->
+                <div class="content">
+
+                    <!-- 左栏：投资策略 -->
+                    <div class="left-column">
+                        <h2>投資戦略<br>(InvStrat)</h2>
+                        <div class="nav-list">
+                            <a href="Data_Processing_Analysis/InvStrat/GeoEnv/GeoEnv.html" target="_blank" class="nav-item">
+                                🌐 地政環境分析 (GeoEnv)
+                                <br><span class="sub-text">国際地政・資源・地域リスク、市場環境分析</span>
+                            </a>
+                            <a href="Data_Processing_Analysis/InvStrat/FxCap/FxCap.html" target="_blank" class="nav-item">
+                                💱 為替・資本市場分析（FxCap）
+                                <br><span class="sub-text">為替レート、金利、株債等資本市場分析</span>
+                            </a>
+                            <a href="Data_Processing_Analysis/InvStrat/IndBiz/IndBiz.html" target="_blank" class="nav-item">
+                                💹 産業景気分析（IndBiz）
+                                <br><span class="sub-text">産業周期・サプライチェーン・業界景気</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- 右栏：财务 -->
+                    <div class="right-column">
+                        <h2>財   務<br>(Finance)</h2>
+                        <div class="nav-list">
+                            <a href="Data_Processing_Analysis/Finance/Price/Price.html" target="_blank" class="nav-item">
+                                💰️ 相場価格情報（Price）
+                                <br><span class="sub-text">市場価格・商品/銘柄相場・取引時価</span>
+                            </a>
+                            <a href="Data_Processing_Analysis/Finance/PerAcc/PerAcc.html" target="_blank" class="nav-item">
+                                💳️ 個人口座管理（PerAcc）
+                                <br><span class="sub-text">個人口座明細・入出金・個人税務申告</span>
+                            </a>
+                            <a href="Data_Processing_Analysis/Finance/FinData/FinData.html" target="_blank" class="nav-item">
+                                📄 財務諸数値（FinData）
+                                <br><span class="sub-text">各種決算・財務指標、損益・BS データ</span>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+                <hr>
+                <!-- ====================== Pascal Order System ====================== -->
+                <footer id="alpine-commands">
+                    <div class="commands-header">
+                        <h2>💻 Pascal Order System</h2>
+                        <h4>帕斯卡下单系统</h4>
+                        <p class="cmd-desc">点击任意目录，打开相关文件</p>
+
+                        <!-- 搜索框 -->
+                        <div class="search-box-wrapper">
+                            <input type="text" id="category-search-1" class="category-search" placeholder="🔍 搜索分类名称..." autocomplete="off">
+                            <div id="search-results-1" class="search-results"></div>
+                        </div>
+                    </div>
+
+                    <div class="commands-grid" style="display: flex; flex-direction: column; gap: 12px;">
+
+                        <!-- Alpine 相关（服务器端） -->
+                        <p id="cat-alpine" class="commands-sub">Alpine相关[服务器]</p>
+
+                        <!-- 卡片行 -->
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <a href="PascalOrderSystem/Alpine相关/Alpine_Linux.html" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">Alpine_Linux 命令集</div>
+                                    <div class="cmd-desc">点击查看-阿尔派系统命令集</div>
+                                </div>
+                            </a>
+
+                            <a href="docs/网站项目架构.html" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">项目架构</div>
+                                    <div class="cmd-desc">点击查看--此网站项目架构详情</div>
+                                </div>
+                            </a>
+
+                            <a href="docs/数据库架构设计.html" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">InvStrat_db 数据库架构</div>
+                                    <div class="cmd-desc">点击查看--此项目数据库架构详情</div>
+                                </div>
+                            </a>
+
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">空文档</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- 帕斯卡下单系统Trader相关 -->
+                        <p id="pascal-trader" class="commands-sub">Pascal Order Trader[终端]</p>
+
+                        <!-- 卡片行 -->
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <a href="PascalOrderSystem/Trader/交易手法研究.html" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">交易手法研究</div>
+                                    <div class="cmd-desc">点击查看--左/右侧交易 · 中性策略 | 盈利退出机制解析</div>
+                                </div>
+                            </a>
+
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">个人量化下单部署</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+
+                            <a href="InvStrat/GeoEnv/GeoEnv.html" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">Trader-1</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">Trader-2</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- 帕斯卡下单系统Exec相关 -->
+                        <p id="pascal-exec" class="commands-sub">Pascal Order Exec[中/后端]</p>
+
+                        <!-- 卡片行 -->
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">价格分析及原理</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">趋势分析及原理</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">Exec-1</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">Exec-2</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+                        </div>
+
+                    </div>
+                </footer>
+                <hr>
+                <!-- ====================== 陸剣峰文件目录 ====================== -->
+                <footer id="リク ケンホウ-commands">
+                    <div class="commands-header">
+                        <h2>💼 リク ケンホウ 陸剣峰</h2>
+                        <h4>常用文件目录</h4>
+                        <p class="cmd-desc">点击任意目录，打开相关文件</p>
+
+                        <!-- 搜索框 -->
+                        <div class="search-box-wrapper">
+                            <input type="text" id="category-search-2" class="category-search" placeholder="🔍 搜索分类名称..." autocomplete="off">
+                            <div id="search-results-2" class="search-results"></div>
+                        </div>
+                    </div>
+
+                    <div class="commands-grid" style="display: flex; flex-direction: column; gap: 12px;">
+
+                        <!-- 待命名相关 -->
+                        <p class="commands-sub">Finance_Knowhow_Docs [金融相关知识]</p>
+
+                        <!-- 卡片行 -->
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <a href="jefflu/Finance_Knowhow_Docs/专业术语表.html" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">专业术语表</div>
+                                    <div class="cmd-desc">点击查看--交易市场底层术语表</div>
+                                </div>
+                            </a>
+
+                            <a href="jefflu/Finance_Knowhow_Docs/市场生存手册-老甲鱼六维价格框架（完整版）.html" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">市场生存手册</div>
+                                    <div class="cmd-desc">点击查看--老甲鱼六维价格框架（完整版）</div>
+                                </div>
+                            </a>
+
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">空文档</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">空文档</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- 待命名相关 -->
+                        <p class="commands-sub">待命名相关</p>
+
+                        <!-- 卡片行 -->
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">空文档</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">空文档</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+                        </div>
+
+                    </div>
+                </footer>
+                <hr>
+                <!-- ====================== 陸荘寒文件目录 ====================== -->
+                <footer id="リク ショウカン-commands">
+                    <div class="commands-header">
+                        <h2>💼 リク ショウカン 陸荘寒</h2>
+                        <h4>常用文件目录</h4>
+                        <p class="commands-sub">点击任意目录，打开相关文件</p>
+
+                        <!-- 搜索框 -->
+                        <div class="search-box-wrapper">
+                            <input type="text" id="category-search-3" class="category-search" placeholder="🔍 搜索分类名称..." autocomplete="off">
+                            <div id="search-results-3" class="search-results"></div>
+                        </div>
+                    </div>
+
+                    <div class="commands-grid" style="display: flex; flex-direction: column; gap: 12px;">
+
+                        <!-- 待命名相关 -->
+                        <p class="commands-sub">待命名相关</p>
+
+                        <!-- 卡片行 -->
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">456</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">空文档</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">空文档</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">空文档</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- 待命名相关 -->
+                        <p class="commands-sub">待命名相关</p>
+
+                        <!-- 卡片行 -->
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">空文档</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">空文档</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+                        </div>
+
+                    </div>
+                </footer>
+                <hr>
+                <!-- ====================== 荘鑠文件目录 ====================== -->
+                <footer id="ショウ シャク-commands">
+                    <div class="commands-header">
+                        <h2>💼 ショウ シャク 荘鑠</h2>
+                        <h4>常用文件目录</h4>
+                        <p class="commands-sub">点击任意目录，打开相关文件</p>
+
+                        <!-- 搜索框 -->
+                        <div class="search-box-wrapper">
+                            <input type="text" id="category-search-4" class="category-search" placeholder="🔍 搜索分类名称..." autocomplete="off">
+                            <div id="search-results-4" class="search-results"></div>
+                        </div>
+                    </div>
+
+                    <div class="commands-grid" style="display: flex; flex-direction: column; gap: 12px;">
+
+                        <!-- 待命名相关 -->
+                        <p class="commands-sub">待命名相关</p>
+
+                        <!-- 卡片行 -->
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">abc</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">空文档</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">空文档</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">空文档</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- 待命名相关 -->
+                        <p class="commands-sub">待命名相关</p>
+
+                        <!-- 卡片行 -->
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">空文档</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+
+                            <a href="#" target="_blank" class="card-link">
+                                <div class="command-card">
+                                    <div class="cmd-line">空文档</div>
+                                    <div class="cmd-desc">点击查看--</div>
+                                </div>
+                            </a>
+                        </div>
+
+                    </div>
+                </footer>
+
+            </div>
+        </main>
+
+    </div>
+
+    <!-- 全局复制功能（由 js/main.js 提供） -->
+    <script src="js/main.js"></script>
+</body>
+</html>

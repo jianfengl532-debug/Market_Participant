@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>数据库架构设计 — InvStrat_db</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/main.js"></script>
+</head>
+<body>
+<div class="container">
+
+    <h1>🗄️ 数据库架构设计 — InvStrat_db</h1>
+    <div class="subhead">MariaDB 11.4 · 18 张表 · utf8mb4 · InnoDB</div>
+
+    <!-- 概览 -->
+    <h2>概览</h2>
+    <p>数据库 <code>InvStrat_db</code>（MariaDB 11.4）服务于五个分析/数据模块，共 <strong>18 张表</strong>。</p>
+    <pre><code>InvStrat_db
+├── 🌍 GeoEnv（地缘政治分析）    3 表
+│   ├── geo_env_events          主表
+│   ├── geo_impact_assessments  影响评估
+│   └── geo_event_sources       来源引用
+│
+├── 💱 FxCap（汇率利率分析）     4 表
+│   ├── currency_interest_events   主表
+│   ├── currency_exchange_rates    汇率波动
+│   ├── currency_interest_changes  利率变动
+│   └── currency_event_sources     来源引用
+│
+├── 🏭 IndBiz（产业分析）        4 表
+│   ├── industry_business_events   主表
+│   ├── industry_impacts           产业影响
+│   ├── industry_data_points       数据指标
+│   └── industry_event_sources     来源引用
+│
+├── 📊 Price（价格数据）         2 表
+│   ├── price_spot_data            现货价格
+│   └── price_calc_records         斐波那契计算结果
+│
+├── 💳 PerAcc（个人账户管理）    4 表
+│   ├── per_accounts               人员主表
+│   ├── per_account_brokers        券商账户
+│   ├── per_account_positions      持仓明细
+│   └── per_account_cash_flows     出入金记录
+│
+└── 🏢 FinData（企业财务数据）  2 表
+    ├── fin_enterprises            企业主表（JSON reports 存储多周期财务数据）
+    └── fin_bank_flows             银行流水数据表</code></pre>
+
+    <hr>
+
+    <!-- ER 关系图 -->
+    <h2>ER 关系图</h2>
+
+    <h3>分析模块（GeoEnv / FxCap / IndBiz）— 主-子表模式</h3>
+    <pre><code>           ┌──────────────────────────────────────┐
+           │          geo_env_events              │
+           │  (PK) id  ◄── FK (event_id) ───┐    │
+           └──────────────────────────────────┘    │
+                                                  │
+           ┌──────────┬──────────┐               │
+           │          │          │               │
+           ▼          ▼          ▼               │
+   ┌──────────────┐ ┌──────────┐ ┌──────────┐    │
+   │geo_impact_   │ │geo_event_│ │(同模式   │    │
+   │assessments   │ │sources   │ │ 重复)    │    │
+   └──────────────┘ └──────────┘ └──────────┘    │
+                                                  │
+   （FxCap: 3 子表 / IndBiz: 3 子表，结构相同）
+   所有子表通过 event_id 外键关联到主表，ON DELETE CASCADE</code></pre>
+
+    <h3>Price 模块 — 独立表（无外键）</h3>
+    <pre><code>   price_spot_data        price_calc_records
+   ┌──────────────────┐   ┌──────────────────┐
+   │ (PK) id          │   │ (PK) id          │
+   │ code / variety   │   │ code / variety   │
+   │ price / model    │   │ price1~price5    │
+   │ ...              │   │ result_json      │
+   └──────────────────┘   └──────────────────┘
+   （两张表各自独立，无外键约束）</code></pre>
+
+    <h3>PerAcc 模块 — 三级嵌套 FK 链</h3>
+    <pre><code>   per_accounts (人员主表)
+   ┌──────────────────────────┐
+   │ (PK) id                 │──┐
+   │ name / id_number / phone│  │ FK (person_id)
+   │ ...                     │  │
+   └──────────────────────────┘  │
+                                 │
+          per_account_brokers (券商账户)
+          ┌──────────────────────────┐    │
+          │ (PK) id                 │◄───┘
+          │ person_id (FK)          │──┐
+          │ broker_name / account_no│  │ FK (broker_id)
+          │ available_amount        │  │
+          └──────────────────────────┘  │
+                                        │
+     ┌────────────────┬────────────────┐│
+     │                │                ││
+     ▼                ▼                ▼│
+per_account_    per_account_     per_account_
+positions       cash_flows      (预留)
+┌────────────┐  ┌────────────┐
+│broker_id   │  │broker_id   │
+│variety/code│  │flow_date   │
+│quantity    │  │amount      │
+│cost/mkt_pr │  └────────────┘
+│leverage    │
+└────────────┘
+
+   ON DELETE CASCADE 链：per_accounts → per_account_brokers → per_account_positions / per_account_cash_flows</code></pre>
+
+    <hr>
+
+    <!-- GeoEnv 地缘政治分析 -->
+    <h2>🌍 GeoEnv — 地缘政治分析</h2>
+
+    <h3><code>geo_env_events</code> — 主表</h3>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>约束</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED</td><td>PK AUTO_INCREMENT</td><td>自增主键</td></tr>
+            <tr><td><code>user_id</code></td><td>BIGINT UNSIGNED</td><td>NOT NULL</td><td>用户 ID</td></tr>
+            <tr><td><code>event_time</code></td><td>DATETIME</td><td>NOT NULL</td><td>事件发生/报道时间</td></tr>
+            <tr><td><code>title</code></td><td>VARCHAR(255)</td><td>NOT NULL</td><td>事件标题</td></tr>
+            <tr><td><code>source</code></td><td>VARCHAR(100)</td><td>NULL</td><td>来源（新华社、路透社等）</td></tr>
+            <tr><td><code>region</code></td><td>VARCHAR(100)</td><td>NULL</td><td>地区（中东、欧洲、亚太等）</td></tr>
+            <tr><td><code>country_involved</code></td><td>VARCHAR(255)</td><td>NULL</td><td>涉及国家（逗号分隔）</td></tr>
+            <tr><td><code>event_type</code></td><td>ENUM</td><td>NOT NULL DEFAULT 'other'</td><td><code>conflict</code> 冲突 / <code>diplomacy</code> 外交 / <code>health</code> 卫生 / <code>economy</code> 经济 / <code>security</code> 安全 / <code>other</code> 其他</td></tr>
+            <tr><td><code>severity_level</code></td><td>TINYINT UNSIGNED</td><td>NOT NULL DEFAULT 1</td><td>严重程度 1-5</td></tr>
+            <tr><td><code>description</code></td><td>TEXT</td><td>NULL</td><td>事件详细描述</td></tr>
+            <tr><td><code>impact_summary</code></td><td>TEXT</td><td>NULL</td><td>对市场/投资的影响总结</td></tr>
+            <tr><td><code>risk_score</code></td><td>DECIMAL(5,2)</td><td>NULL</td><td>综合风险评分 0-100</td></tr>
+            <tr><td><code>tags</code></td><td>VARCHAR(255)</td><td>NULL</td><td>标签（逗号分隔）</td></tr>
+            <tr><td><code>raw_content</code></td><td>MEDIUMTEXT</td><td>NULL</td><td>原始完整报道内容</td></tr>
+            <tr><td><code>created_at</code></td><td>DATETIME</td><td>DEFAULT CURRENT_TIMESTAMP</td><td>创建时间</td></tr>
+            <tr><td><code>updated_at</code></td><td>DATETIME</td><td>DEFAULT CURRENT_TIMESTAMP ON UPDATE</td><td>更新时间</td></tr>
+        </tbody>
+    </table>
+
+    <h3><code>geo_impact_assessments</code> — 影响评估子表</h3>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>event_id</code></td><td>BIGINT UNSIGNED FK</td><td>→ <code>geo_env_events.id</code>（CASCADE 级联删除）</td></tr>
+            <tr><td><code>asset_class</code></td><td>ENUM</td><td>资产类别：<code>oil</code> 石油 / <code>stock</code> 股票 / <code>currency</code> 货币 / <code>commodity</code> 大宗商品 / <code>bond</code> 债券 / <code>other</code> 其他</td></tr>
+            <tr><td><code>industry</code></td><td>VARCHAR(100)</td><td>受影响行业</td></tr>
+            <tr><td><code>impact_direction</code></td><td>ENUM</td><td>方向：<code>positive</code> / <code>negative</code> / <code>neutral</code> / <code>mixed</code></td></tr>
+            <tr><td><code>impact_level</code></td><td>TINYINT UNSIGNED</td><td>影响程度 1-5</td></tr>
+            <tr><td><code>expected_duration</code></td><td>ENUM</td><td>持续时间：<code>short</code> 短期 / <code>medium</code> 中期 / <code>long</code> 长期</td></tr>
+            <tr><td><code>description</code></td><td>TEXT</td><td>具体影响描述</td></tr>
+        </tbody>
+    </table>
+
+    <h3><code>geo_event_sources</code> — 来源引用子表</h3>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>event_id</code></td><td>BIGINT UNSIGNED FK</td><td>→ <code>geo_env_events.id</code>（CASCADE）</td></tr>
+            <tr><td><code>source_name</code></td><td>VARCHAR(100)</td><td>来源名称</td></tr>
+            <tr><td><code>source_url</code></td><td>VARCHAR(500)</td><td>原始链接</td></tr>
+            <tr><td><code>author</code></td><td>VARCHAR(100)</td><td>作者/发布者</td></tr>
+            <tr><td><code>publish_time</code></td><td>DATETIME</td><td>发布时间</td></tr>
+            <tr><td><code>excerpt</code></td><td>TEXT</td><td>关键摘录</td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- FxCap 汇率利率分析 -->
+    <h2>💱 FxCap — 汇率利率分析</h2>
+
+    <h3><code>currency_interest_events</code> — 主表</h3>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>event_type</code></td><td>ENUM</td><td><code>rate_hike</code> 加息 / <code>rate_cut</code> 降息 / <code>rate_hold</code> 利率不变 / <code>fx_appreciation</code> 升值 / <code>fx_depreciation</code> 贬值 / <code>fx_volatility</code> 波动 / <code>monetary_policy</code> 货币政策 / <code>inflation</code> 通胀 / <code>other</code> 其他</td></tr>
+        </tbody>
+    </table>
+    <p>其余字段（<code>id</code>, <code>user_id</code>, <code>event_time</code>, <code>title</code>, <code>source</code>, <code>region</code>, <code>country_involved</code>, <code>severity_level</code>, <code>description</code>, <code>impact_summary</code>, <code>risk_score</code>, <code>tags</code>, <code>raw_content</code>, <code>created_at</code>, <code>updated_at</code>）与 <code>geo_env_events</code> 结构一致。</p>
+
+    <h3><code>currency_exchange_rates</code> — 汇率波动子表</h3>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>event_id</code></td><td>BIGINT UNSIGNED FK</td><td>→ <code>currency_interest_events.id</code>（CASCADE）</td></tr>
+            <tr><td><code>currency_pair</code></td><td>VARCHAR(20)</td><td>货币对（如 USD/CNY, EUR/JPY）</td></tr>
+            <tr><td><code>rate_before</code></td><td>DECIMAL(12,4)</td><td>变动前汇率</td></tr>
+            <tr><td><code>rate_after</code></td><td>DECIMAL(12,4)</td><td>变动后汇率</td></tr>
+            <tr><td><code>change_percent</code></td><td>DECIMAL(6,2)</td><td>变动幅度（%）</td></tr>
+            <tr><td><code>direction</code></td><td>VARCHAR(20)</td><td>方向（appreciation / depreciation / stable）</td></tr>
+            <tr><td><code>note</code></td><td>TEXT</td><td>备注</td></tr>
+        </tbody>
+    </table>
+
+    <h3><code>currency_interest_changes</code> — 利率变动子表</h3>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>event_id</code></td><td>BIGINT UNSIGNED FK</td><td>→ <code>currency_interest_events.id</code>（CASCADE）</td></tr>
+            <tr><td><code>country</code></td><td>VARCHAR(100)</td><td>国家/地区</td></tr>
+            <tr><td><code>rate_type</code></td><td>VARCHAR(100)</td><td>利率类型（基准利率、政策利率等）</td></tr>
+            <tr><td><code>rate_before</code></td><td>DECIMAL(6,2)</td><td>变动前（%）</td></tr>
+            <tr><td><code>rate_after</code></td><td>DECIMAL(6,2)</td><td>变动后（%）</td></tr>
+            <tr><td><code>bps_change</code></td><td>DECIMAL(6,1)</td><td>基点变动</td></tr>
+            <tr><td><code>direction</code></td><td>VARCHAR(20)</td><td>方向（hike / cut / hold）</td></tr>
+        </tbody>
+    </table>
+
+    <h3><code>currency_event_sources</code> — 来源引用子表</h3>
+    <p>结构同 <code>geo_event_sources</code>，通过 <code>event_id</code> 外键关联到 <code>currency_interest_events</code>。</p>
+
+    <hr>
+
+    <!-- IndBiz 产业分析 -->
+    <h2>🏭 IndBiz — 产业分析</h2>
+
+    <h3><code>industry_business_events</code> — 主表</h3>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>industry_sector</code></td><td>VARCHAR(100) NULL</td><td>产业领域（GeoEnv/FxCap 无此字段）</td></tr>
+            <tr><td><code>event_type</code></td><td>ENUM</td><td><code>policy</code> 政策 / <code>market</code> 市场 / <code>supply_chain</code> 供应链 / <code>technology</code> 技术 / <code>regulation</code> 监管 / <code>competition</code> 竞争 / <code>other</code> 其他</td></tr>
+        </tbody>
+    </table>
+    <p>其余字段（<code>id</code>, <code>user_id</code>, <code>event_time</code>, <code>title</code>, <code>source</code>, <code>region</code>, <code>country_involved</code>, <code>severity_level</code>, <code>description</code>, <code>impact_summary</code>, <code>risk_score</code>, <code>tags</code>, <code>raw_content</code>, <code>created_at</code>, <code>updated_at</code>）与 <code>geo_env_events</code> 结构一致。</p>
+
+    <h3><code>industry_impacts</code> — 产业影响子表</h3>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>event_id</code></td><td>BIGINT UNSIGNED FK</td><td>→ <code>industry_business_events.id</code>（CASCADE）</td></tr>
+            <tr><td><code>impacted_sector</code></td><td>VARCHAR(100)</td><td>受影响产业</td></tr>
+            <tr><td><code>impact_direction</code></td><td>VARCHAR(20)</td><td>方向（positive / negative / neutral）</td></tr>
+            <tr><td><code>impact_level</code></td><td>TINYINT UNSIGNED</td><td>影响程度 1-5</td></tr>
+            <tr><td><code>expected_duration</code></td><td>VARCHAR(20)</td><td>持续时间（short / medium / long）</td></tr>
+            <tr><td><code>description</code></td><td>TEXT</td><td>描述</td></tr>
+        </tbody>
+    </table>
+
+    <h3><code>industry_data_points</code> — 数据指标子表</h3>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>event_id</code></td><td>BIGINT UNSIGNED FK</td><td>→ <code>industry_business_events.id</code>（CASCADE）</td></tr>
+            <tr><td><code>indicator_name</code></td><td>VARCHAR(100)</td><td>指标名称（如"新能源汽车产量"）</td></tr>
+            <tr><td><code>indicator_value</code></td><td>DECIMAL(15,4)</td><td>指标数值</td></tr>
+            <tr><td><code>unit</code></td><td>VARCHAR(50)</td><td>单位（万辆、%、亿元等）</td></tr>
+            <tr><td><code>change_percent</code></td><td>DECIMAL(6,2)</td><td>同比/环比变动 %</td></tr>
+            <tr><td><code>time_period</code></td><td>VARCHAR(50)</td><td>数据时间周期（2026-05）</td></tr>
+            <tr><td><code>note</code></td><td>TEXT</td><td>备注</td></tr>
+        </tbody>
+    </table>
+
+    <h3><code>industry_event_sources</code> — 来源引用子表</h3>
+    <p>结构同 <code>geo_event_sources</code>。</p>
+
+    <hr>
+
+    <!-- Price 价格数据 -->
+    <h2>📊 Price — 价格数据</h2>
+    <p>价格数据模块独立于三个分析模块，用于记录大宗商品现货价格和斐波那契计算结果。数据录入页使用独立内联 JS（不共享 <code>DB.js</code>）。</p>
+
+    <h3><code>price_spot_data</code> — 现货价格表</h3>
+    <p><strong>唯一约束：</strong><code>UNIQUE KEY uk_price_code (code)</code> — 每个代码只允许一条记录，新增同代码自动更新价格。</p>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>user_id</code></td><td>BIGINT UNSIGNED</td><td>用户 ID（默认 1）</td></tr>
+            <tr><td><code>code</code></td><td>VARCHAR(50) UNIQUE</td><td>品种代码（CU、AL、RB 等，唯一）</td></tr>
+            <tr><td><code>variety</code></td><td>VARCHAR(100)</td><td>品种名称（沪铜、沪铝等）</td></tr>
+            <tr><td><code>model</code></td><td>VARCHAR(100)</td><td>型号（1#电解铜等）</td></tr>
+            <tr><td><code>spec</code></td><td>VARCHAR(100)</td><td>规格</td></tr>
+            <tr><td><code>quality</code></td><td>VARCHAR(100)</td><td>质量标准</td></tr>
+            <tr><td><code>price</code></td><td>DECIMAL(12,2)</td><td>价格</td></tr>
+            <tr><td><code>created_at</code></td><td>DATETIME</td><td>创建时间</td></tr>
+            <tr><td><code>updated_at</code></td><td>DATETIME</td><td>更新时间</td></tr>
+        </tbody>
+    </table>
+
+    <h3><code>price_calc_records</code> — 斐波那契计算结果表</h3>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>user_id</code></td><td>BIGINT UNSIGNED</td><td>用户 ID（默认 1）</td></tr>
+            <tr><td><code>code</code></td><td>VARCHAR(50)</td><td>品种代码</td></tr>
+            <tr><td><code>variety</code></td><td>VARCHAR(100)</td><td>品种名称</td></tr>
+            <tr><td><code>price1</code> ~ <code>price5</code></td><td>DECIMAL(12,2)</td><td>最多 5 个输入价格</td></tr>
+            <tr><td><code>result_json</code></td><td>TEXT</td><td>完整计算结果（JSON 编码）</td></tr>
+            <tr><td><code>created_at</code></td><td>DATETIME</td><td>创建时间</td></tr>
+        </tbody>
+    </table>
+    <p>注意：<code>price_calc_records</code> 没有 <code>updated_at</code> 字段，计算结果保存后不可修改。无外键约束，独立于分析模块表。</p>
+
+    <hr>
+
+    <!-- PerAcc 个人账户管理 -->
+    <h2>💳 PerAcc — 个人账户管理</h2>
+    <p>个人账户管理模块用于管理人员信息、券商账户、持仓明细和出入金记录。使用四级嵌套 FK 链（人员 → 券商账户 → 持仓 / 出入金）。数据录入页使用独立内联 JS，不共享 <code>DB.js</code>。</p>
+
+    <h3><code>per_accounts</code> — 人员主表</h3>
+    <p><strong>唯一约束：</strong><code>UNIQUE KEY uk_id_number (id_number)</code> — 每人只允许录入一次，重复身份证号被拒绝。</p>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>user_id</code></td><td>BIGINT UNSIGNED</td><td>用户 ID（默认 1）</td></tr>
+            <tr><td><code>name</code></td><td>VARCHAR(100)</td><td>姓名</td></tr>
+            <tr><td><code>id_number</code></td><td>VARCHAR(50) UNIQUE</td><td>身份证号（唯一）</td></tr>
+            <tr><td><code>phone</code></td><td>VARCHAR(50)</td><td>手机号</td></tr>
+            <tr><td><code>backup_phone</code></td><td>VARCHAR(50)</td><td>备用电话</td></tr>
+            <tr><td><code>notes</code></td><td>TEXT</td><td>备注</td></tr>
+            <tr><td><code>created_at</code></td><td>DATETIME</td><td>创建时间</td></tr>
+        </tbody>
+    </table>
+
+    <h3><code>per_account_brokers</code> — 券商账户子表</h3>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>person_id</code></td><td>BIGINT UNSIGNED FK</td><td>→ <code>per_accounts.id</code>（CASCADE 级联删除）</td></tr>
+            <tr><td><code>broker_name</code></td><td>VARCHAR(100)</td><td>券商名称（如中信证券、华泰证券）</td></tr>
+            <tr><td><code>account_no</code></td><td>VARCHAR(100)</td><td>账号</td></tr>
+            <tr><td><code>available_amount</code></td><td>DECIMAL(15,2)</td><td>可用资金</td></tr>
+        </tbody>
+    </table>
+
+    <h3><code>per_account_positions</code> — 持仓明细子表</h3>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>broker_id</code></td><td>BIGINT UNSIGNED FK</td><td>→ <code>per_account_brokers.id</code>（CASCADE）</td></tr>
+            <tr><td><code>variety</code></td><td>VARCHAR(100)</td><td>品种名称</td></tr>
+            <tr><td><code>code</code></td><td>VARCHAR(50)</td><td>品种代码</td></tr>
+            <tr><td><code>quantity</code></td><td>DECIMAL(15,2)</td><td>持仓数量</td></tr>
+            <tr><td><code>cost_price</code></td><td>DECIMAL(12,2)</td><td>成本价</td></tr>
+            <tr><td><code>market_price</code></td><td>DECIMAL(12,2)</td><td>市价（可为 NULL）</td></tr>
+            <tr><td><code>leverage</code></td><td>DECIMAL(6,2)</td><td>杠杆倍数（默认 1）</td></tr>
+            <tr><td><code>margin_rate</code></td><td>DECIMAL(6,4)</td><td>保证金率（默认 1）</td></tr>
+        </tbody>
+    </table>
+
+    <h3><code>per_account_cash_flows</code> — 出入金记录子表</h3>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>broker_id</code></td><td>BIGINT UNSIGNED FK</td><td>→ <code>per_account_brokers.id</code>（CASCADE）</td></tr>
+            <tr><td><code>flow_date</code></td><td>DATE</td><td>出入金日期</td></tr>
+            <tr><td><code>amount</code></td><td>DECIMAL(15,2)</td><td>金额（正=入金，负=出金）</td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- 建表 SQL -->
+    <h2>建表 SQL</h2>
+    <p>数据库名：<code>InvStrat_db</code>，字符集 <code>utf8mb4</code>，引擎 <code>InnoDB</code>。</p>
+
+    <h3>🌍 GeoEnv — DDL</h3>
+    <pre><code>CREATE TABLE geo_env_events (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id           BIGINT UNSIGNED NOT NULL DEFAULT 1,
+    event_time        DATETIME NOT NULL,
+    title             VARCHAR(255) NOT NULL,
+    source            VARCHAR(100) DEFAULT NULL,
+    region            VARCHAR(100) DEFAULT NULL,
+    country_involved  VARCHAR(255) DEFAULT NULL,
+    event_type        ENUM('conflict','diplomacy','health','economy','security','other') NOT NULL DEFAULT 'other',
+    severity_level    TINYINT UNSIGNED NOT NULL DEFAULT 1,
+    description       TEXT DEFAULT NULL,
+    impact_summary    TEXT DEFAULT NULL,
+    risk_score        DECIMAL(5,2) DEFAULT NULL,
+    tags              VARCHAR(255) DEFAULT NULL,
+    raw_content       MEDIUMTEXT DEFAULT NULL,
+    created_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at        DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE geo_impact_assessments (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    event_id          BIGINT UNSIGNED NOT NULL,
+    asset_class       ENUM('oil','stock','currency','commodity','bond','other') DEFAULT NULL,
+    industry          VARCHAR(100) DEFAULT NULL,
+    impact_direction  ENUM('positive','negative','neutral','mixed') DEFAULT NULL,
+    impact_level      TINYINT UNSIGNED DEFAULT NULL,
+    expected_duration ENUM('short','medium','long') DEFAULT NULL,
+    description       TEXT DEFAULT NULL,
+    FOREIGN KEY (event_id) REFERENCES geo_env_events(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE geo_event_sources (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    event_id          BIGINT UNSIGNED NOT NULL,
+    source_name       VARCHAR(100) DEFAULT NULL,
+    source_url        VARCHAR(500) DEFAULT NULL,
+    author            VARCHAR(100) DEFAULT NULL,
+    publish_time      DATETIME DEFAULT NULL,
+    excerpt           TEXT DEFAULT NULL,
+    FOREIGN KEY (event_id) REFERENCES geo_env_events(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+    <h3>💱 FxCap — DDL</h3>
+    <pre><code>CREATE TABLE currency_interest_events (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id           BIGINT UNSIGNED NOT NULL DEFAULT 1,
+    event_time        DATETIME NOT NULL,
+    title             VARCHAR(255) NOT NULL,
+    source            VARCHAR(100) DEFAULT NULL,
+    region            VARCHAR(100) DEFAULT NULL,
+    country_involved  VARCHAR(255) DEFAULT NULL,
+    event_type        ENUM('rate_hike','rate_cut','rate_hold','fx_appreciation','fx_depreciation','fx_volatility','monetary_policy','inflation','other') NOT NULL DEFAULT 'other',
+    severity_level    TINYINT UNSIGNED NOT NULL DEFAULT 1,
+    description       TEXT DEFAULT NULL,
+    impact_summary    TEXT DEFAULT NULL,
+    risk_score        DECIMAL(5,2) DEFAULT NULL,
+    tags              VARCHAR(255) DEFAULT NULL,
+    raw_content       MEDIUMTEXT DEFAULT NULL,
+    created_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at        DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE currency_exchange_rates (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    event_id          BIGINT UNSIGNED NOT NULL,
+    currency_pair     VARCHAR(20) DEFAULT NULL,
+    rate_before       DECIMAL(12,4) DEFAULT NULL,
+    rate_after        DECIMAL(12,4) DEFAULT NULL,
+    change_percent    DECIMAL(6,2) DEFAULT NULL,
+    direction         VARCHAR(20) DEFAULT NULL,
+    note              TEXT DEFAULT NULL,
+    FOREIGN KEY (event_id) REFERENCES currency_interest_events(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE currency_interest_changes (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    event_id          BIGINT UNSIGNED NOT NULL,
+    country           VARCHAR(100) DEFAULT NULL,
+    rate_type         VARCHAR(100) DEFAULT NULL,
+    rate_before       DECIMAL(6,2) DEFAULT NULL,
+    rate_after        DECIMAL(6,2) DEFAULT NULL,
+    bps_change        DECIMAL(6,1) DEFAULT NULL,
+    direction         VARCHAR(20) DEFAULT NULL,
+    FOREIGN KEY (event_id) REFERENCES currency_interest_events(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE currency_event_sources (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    event_id          BIGINT UNSIGNED NOT NULL,
+    source_name       VARCHAR(100) DEFAULT NULL,
+    source_url        VARCHAR(500) DEFAULT NULL,
+    author            VARCHAR(100) DEFAULT NULL,
+    publish_time      DATETIME DEFAULT NULL,
+    excerpt           TEXT DEFAULT NULL,
+    FOREIGN KEY (event_id) REFERENCES currency_interest_events(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+    <h3>🏭 IndBiz — DDL</h3>
+    <pre><code>CREATE TABLE industry_business_events (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id           BIGINT UNSIGNED NOT NULL DEFAULT 1,
+    event_time        DATETIME NOT NULL,
+    title             VARCHAR(255) NOT NULL,
+    source            VARCHAR(100) DEFAULT NULL,
+    region            VARCHAR(100) DEFAULT NULL,
+    country_involved  VARCHAR(255) DEFAULT NULL,
+    industry_sector   VARCHAR(100) DEFAULT NULL,
+    event_type        ENUM('policy','market','supply_chain','technology','regulation','competition','other') NOT NULL DEFAULT 'other',
+    severity_level    TINYINT UNSIGNED NOT NULL DEFAULT 1,
+    description       TEXT DEFAULT NULL,
+    impact_summary    TEXT DEFAULT NULL,
+    risk_score        DECIMAL(5,2) DEFAULT NULL,
+    tags              VARCHAR(255) DEFAULT NULL,
+    raw_content       MEDIUMTEXT DEFAULT NULL,
+    created_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at        DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE industry_impacts (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    event_id          BIGINT UNSIGNED NOT NULL,
+    impacted_sector   VARCHAR(100) DEFAULT NULL,
+    impact_direction  VARCHAR(20) DEFAULT NULL,
+    impact_level      TINYINT UNSIGNED DEFAULT NULL,
+    expected_duration VARCHAR(20) DEFAULT NULL,
+    description       TEXT DEFAULT NULL,
+    FOREIGN KEY (event_id) REFERENCES industry_business_events(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE industry_data_points (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    event_id          BIGINT UNSIGNED NOT NULL,
+    indicator_name    VARCHAR(100) DEFAULT NULL,
+    indicator_value   DECIMAL(15,4) DEFAULT NULL,
+    unit              VARCHAR(50) DEFAULT NULL,
+    change_percent    DECIMAL(6,2) DEFAULT NULL,
+    time_period       VARCHAR(50) DEFAULT NULL,
+    note              TEXT DEFAULT NULL,
+    FOREIGN KEY (event_id) REFERENCES industry_business_events(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE industry_event_sources (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    event_id          BIGINT UNSIGNED NOT NULL,
+    source_name       VARCHAR(100) DEFAULT NULL,
+    source_url        VARCHAR(500) DEFAULT NULL,
+    author            VARCHAR(100) DEFAULT NULL,
+    publish_time      DATETIME DEFAULT NULL,
+    excerpt           TEXT DEFAULT NULL,
+    FOREIGN KEY (event_id) REFERENCES industry_business_events(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+    <h3>📊 Price — DDL</h3>
+    <pre><code>CREATE TABLE price_spot_data (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id           BIGINT UNSIGNED NOT NULL DEFAULT 1,
+    code              VARCHAR(50) DEFAULT NULL,
+    variety           VARCHAR(100) DEFAULT NULL,
+    model             VARCHAR(100) DEFAULT NULL,
+    spec              VARCHAR(100) DEFAULT NULL,
+    quality           VARCHAR(100) DEFAULT NULL,
+    price             DECIMAL(12,2) DEFAULT NULL,
+    created_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at        DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_price_code (code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE price_calc_records (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id           BIGINT UNSIGNED NOT NULL DEFAULT 1,
+    code              VARCHAR(50) DEFAULT NULL,
+    variety           VARCHAR(100) DEFAULT NULL,
+    price1            DECIMAL(12,2) DEFAULT NULL,
+    price2            DECIMAL(12,2) DEFAULT NULL,
+    price3            DECIMAL(12,2) DEFAULT NULL,
+    price4            DECIMAL(12,2) DEFAULT NULL,
+    price5            DECIMAL(12,2) DEFAULT NULL,
+    result_json       TEXT DEFAULT NULL,
+    created_at        DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+    <h3>💳 PerAcc — DDL</h3>
+    <pre><code>CREATE TABLE per_accounts (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id           BIGINT UNSIGNED NOT NULL DEFAULT 1,
+    name              VARCHAR(100) NOT NULL DEFAULT '',
+    id_number         VARCHAR(50) NOT NULL DEFAULT '',
+    phone             VARCHAR(50) NOT NULL DEFAULT '',
+    backup_phone      VARCHAR(50) DEFAULT NULL,
+    notes             TEXT DEFAULT NULL,
+    created_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_id_number (id_number)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE per_account_brokers (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    person_id         BIGINT UNSIGNED NOT NULL,
+    broker_name       VARCHAR(100) NOT NULL DEFAULT '',
+    account_no        VARCHAR(100) NOT NULL DEFAULT '',
+    available_amount  DECIMAL(15,2) NOT NULL DEFAULT 0,
+    FOREIGN KEY (person_id) REFERENCES per_accounts(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE per_account_positions (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    broker_id         BIGINT UNSIGNED NOT NULL,
+    variety           VARCHAR(100) NOT NULL DEFAULT '',
+    code              VARCHAR(50) NOT NULL DEFAULT '',
+    quantity          DECIMAL(15,2) NOT NULL DEFAULT 0,
+    cost_price        DECIMAL(12,2) NOT NULL DEFAULT 0,
+    market_price      DECIMAL(12,2) DEFAULT NULL,
+    leverage          DECIMAL(6,2) NOT NULL DEFAULT 1,
+    margin_rate       DECIMAL(6,4) NOT NULL DEFAULT 1,
+    FOREIGN KEY (broker_id) REFERENCES per_account_brokers(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE per_account_cash_flows (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    broker_id         BIGINT UNSIGNED NOT NULL,
+    flow_date         DATE DEFAULT NULL,
+    amount            DECIMAL(15,2) NOT NULL DEFAULT 0,
+    FOREIGN KEY (broker_id) REFERENCES per_account_brokers(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+    <hr>
+
+
+    <hr>
+
+    <!-- FinData 企业财务数据 -->
+    <h2>🏢 FinData — 企业财务数据</h2>
+    <p>企业财务数据模块用于管理企业的多周期财务报表数据。使用 JSON LONGTEXT 存储多周期报告，支持横向对比展示。</p>
+
+    <h3><code>fin_enterprises</code> — 企业主表</h3>
+    <p><strong>唯一约束：</strong><code>UNIQUE KEY uk_uscc (uscc)</code> — 社会统一代码唯一，同一企业可添加多个报告周期。</p>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>user_id</code></td><td>BIGINT UNSIGNED</td><td>用户 ID（默认 1）</td></tr>
+            <tr><td><code>company_name</code></td><td>VARCHAR(200)</td><td>企业名称</td></tr>
+            <tr><td><code>uscc</code></td><td>VARCHAR(30) UNIQUE</td><td>社会统一代码（唯一）</td></tr>
+            <tr><td><code>stock_code</code></td><td>VARCHAR(30)</td><td>上市股票代码（如 600666.SH）</td></tr>
+            <tr><td><code>legal_person</code></td><td>VARCHAR(100)</td><td>法人姓名</td></tr>
+            <tr><td><code>contact</code></td><td>VARCHAR(100)</td><td>联系方式</td></tr>
+            <tr><td><code>financial_data</code></td><td>LONGTEXT</td><td>JSON 多周期报告数据：<code>{"2025-Q4":{period_label,financial_data}}</code></td></tr>
+            <tr><td><code>created_at</code></td><td>DATETIME</td><td>创建时间</td></tr>
+            <tr><td><code>updated_at</code></td><td>DATETIME</td><td>更新时间</td></tr>
+        </tbody>
+    </table>
+
+    <h4>financial_data JSON 结构</h4>
+    <pre><code>{
+  "2025-Q4": {
+    "period": "2025-Q4",
+    "period_label": "2025年报",
+    "financial_data": {
+      "current_assets": {
+        "total": 1532178150.27,      // 子项之和
+        "reported_total": 1532000000, // 报表中的流动资产合计（可选）
+        "items": [
+          {"name": "货币资金", "amount": 320520104.35},
+          {"name": "应收账款", "amount": 18186346.76}
+        ]
+      },
+      "liabilities": { ... },
+      "fixed_assets": { ... }
+    }
+  },
+  "2026-Q1": { ... }
+}</code></pre>
+    <p>每个周期独立存储，前端按周期横向对比展示。<code>total</code> 为自动计算的子项之和，<code>reported_total</code> 为报表中提取的合计值（如有）。</p>
+
+    <h3>DDL</h3>
+    <pre><code>CREATE TABLE fin_enterprises (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id           BIGINT UNSIGNED NOT NULL DEFAULT 1,
+    company_name      VARCHAR(200) NOT NULL,
+    uscc              VARCHAR(30) NOT NULL DEFAULT '',
+    stock_code        VARCHAR(30) DEFAULT NULL COMMENT '上市股票代码，如 600666.SH',
+    legal_person      VARCHAR(100) DEFAULT NULL,
+    contact           VARCHAR(100) DEFAULT NULL,
+    financial_data    LONGTEXT DEFAULT NULL COMMENT 'JSON: {period: {period_label, financial_data}}',
+    created_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at        DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_uscc (uscc)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+    <h3><code>fin_bank_flows</code> — 银行流水数据表</h3>
+    <p>企业银行流水数据独立表，与企业主表通过 <code>uscc</code> 关联。支持按月份存储收支汇总数据，<strong>唯一约束</strong>：<code>UNIQUE KEY uk_company_month (uscc, report_month)</code> — 同一企业同一月份只保留一条记录，重复导入自动更新（upsert）。</p>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>user_id</code></td><td>BIGINT UNSIGNED</td><td>用户 ID（默认 1）</td></tr>
+            <tr><td><code>company_name</code></td><td>VARCHAR(200)</td><td>企业名称</td></tr>
+            <tr><td><code>uscc</code></td><td>VARCHAR(30)</td><td>社会统一代码（与 fin_enterprises 关联）</td></tr>
+            <tr><td><code>report_month</code></td><td>VARCHAR(20)</td><td>报告月份，如 <code>2026-05</code></td></tr>
+            <tr><td><code>cash_inflow</code></td><td>DECIMAL(15,2)</td><td>现金流入小计</td></tr>
+            <tr><td><code>cash_outflow</code></td><td>DECIMAL(15,2)</td><td>现金流出小计</td></tr>
+            <tr><td><code>net_cash_flow</code></td><td>DECIMAL(15,2)</td><td>净现金流量</td></tr>
+            <tr><td><code>transaction_count</code></td><td>INT UNSIGNED</td><td>交易笔数</td></tr>
+            <tr><td><code>beginning_balance</code></td><td>DECIMAL(15,2)</td><td>期初余额</td></tr>
+            <tr><td><code>ending_balance</code></td><td>DECIMAL(15,2)</td><td>期末余额</td></tr>
+            <tr><td><code>raw_data</code></td><td>LONGTEXT</td><td>原始 JSON 数据</td></tr>
+            <tr><td><code>report_html_path</code></td><td>VARCHAR(500)</td><td>生成的现金流量表 HTML 文件路径</td></tr>
+            <tr><td><code>created_at</code></td><td>DATETIME</td><td>创建时间</td></tr>
+            <tr><td><code>updated_at</code></td><td>DATETIME</td><td>更新时间</td></tr>
+        </tbody>
+    </table>
+
+    <h4>DDL</h4>
+    <pre><code>CREATE TABLE fin_bank_flows (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id           BIGINT UNSIGNED NOT NULL DEFAULT 1,
+    company_name      VARCHAR(200) NOT NULL DEFAULT '',
+    uscc              VARCHAR(30) NOT NULL DEFAULT '',
+    report_month      VARCHAR(20) NOT NULL DEFAULT '' COMMENT '报告月份，如 2026-05',
+    cash_inflow       DECIMAL(15,2) NOT NULL DEFAULT 0 COMMENT '现金流入小计',
+    cash_outflow      DECIMAL(15,2) NOT NULL DEFAULT 0 COMMENT '现金流出小计',
+    net_cash_flow     DECIMAL(15,2) NOT NULL DEFAULT 0 COMMENT '净现金流量',
+    transaction_count INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '交易笔数',
+    beginning_balance DECIMAL(15,2) NOT NULL DEFAULT 0 COMMENT '期初余额',
+    ending_balance    DECIMAL(15,2) NOT NULL DEFAULT 0 COMMENT '期末余额',
+    raw_data          LONGTEXT DEFAULT NULL COMMENT '原始 JSON 数据',
+    report_html_path  VARCHAR(500) DEFAULT NULL COMMENT '生成的 HTML 报表路径',
+    created_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at        DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_company_month (uscc, report_month)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+    <!-- 命名规范 -->
+    <h2>命名规范</h2>
+    <table>
+        <thead>
+            <tr><th>项目</th><th>约定</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><strong>数据库</strong></td><td><code>InvStrat_db</code></td></tr>
+            <tr><td><strong>字符集</strong></td><td><code>utf8mb4</code> / <code>utf8mb4_unicode_ci</code></td></tr>
+            <tr><td><strong>引擎</strong></td><td><code>InnoDB</code></td></tr>
+            <tr><td><strong>主键</strong></td><td><code>id</code> — <code>BIGINT UNSIGNED AUTO_INCREMENT</code></td></tr>
+            <tr><td><strong>唯一约束</strong></td><td><code>price_spot_data.code</code> → <code>uk_price_code</code>，<code>per_accounts.id_number</code> → <code>uk_id_number</code>。API 层先于数据库层做检查，返回友好错误信息。</td></tr>
+            <tr><td><strong>外键</strong></td><td><code>event_id</code>（分析模块） / <code>person_id</code> + <code>broker_id</code>（PerAcc） — 关联主表 <code>id</code>，<code>ON DELETE CASCADE</code></td></tr>
+            <tr><td><strong>时间字段</strong></td><td><code>created_at</code> / <code>updated_at</code> — 自动维护（部分表无 updated_at）</td></tr>
+            <tr><td><strong>表名</strong></td><td><code>{模块}_{业务}</code> — <code>geo_env_events</code>, <code>currency_exchange_rates</code>, <code>per_account_brokers</code></td></tr>
+            <tr><td><strong>枚举</strong></td><td>模块特有枚举列（<code>event_type</code>、<code>asset_class</code> 等）在各自主表中定义</td></tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>

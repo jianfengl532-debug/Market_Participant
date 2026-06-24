@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>交易策略全览：左侧·右侧·中性 & 盈利退出系统</title>
+    <link rel="stylesheet" href="../../../../css/style.css">
+</head>
+<body>
+<div class="container">
+
+    <!-- ===== 标题区（统一 badge + h1 + sub 风格） ===== -->
+    <div class="badge">⚔️ 老甲鱼交易工具箱 · 降本与退出</div>
+    <h1>📐 交易降本与退出系统</h1>
+    <div class="sub">左侧交易 · 右侧交易 · 中性策略 | 盈利退出机制全解析</div>
+
+    <hr>
+
+    <!-- 核心定义 -->
+    <div class="note">
+        <strong>🎯 左侧交易</strong>：逆势、预判反转，下跌中买入/加仓 → 博极限低成本<br>
+        <strong>⚡ 右侧交易</strong>：顺势、确认趋势后进场 → 博高效率与低痛苦<br>
+        <strong>🔄 中性/混合型</strong>：可左可右或不依赖方向，含仓位管理、对冲、套利等
+    </div>
+
+    <!-- ========= 一、左侧交易手法 ========= -->
+    <h2>📉 左侧交易手法（逆势降本）</h2>
+    <p>核心：下跌途中主动买入/加仓，赌价格低估或反转。高风险高潜在回报。</p>
+    <table>
+        <thead>
+            <tr><th>编号</th><th>手法</th><th>英文</th><th>左侧逻辑</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>1</td><td>低位买入</td><td>Buy low</td><td>判断当前已是相对低位，直接买入，不等待趋势确认</td></tr>
+            <tr><td>3</td><td>下跌加仓摊薄</td><td>Averaging down</td><td>持仓浮亏后在更低价格加仓，典型左侧补仓</td></tr>
+            <tr><td>4</td><td>金字塔加仓</td><td>Pyramid buying</td><td>越跌越买且加仓量递增，需深跌后反转才能奏效</td></tr>
+        </tbody>
+    </table>
+    <p style="font-size: 0.9rem; color: #475569;">📌 注：<strong>Batch buying（分批建仓）</strong>若采用"价格越低买越多"也属左侧；若固定时间定额则属中性。</p>
+
+    <hr>
+
+    <!-- ========= 二、右侧交易手法 ========= -->
+    <h2>📈 右侧交易手法（顺势降本）</h2>
+    <p>核心：上升趋势确认后利用回调或回踩进场，胜率高，浮亏时间短。</p>
+    <table>
+        <thead><tr><th>编号</th><th>手法</th><th>英文</th><th>右侧逻辑</th></tr></thead>
+        <tbody>
+            <tr><td>2</td><td>逢低吸纳</td><td>Dip buying</td><td>上升趋势出现短期下跌时买入，顺大势逆小势</td></tr>
+            <tr><td>5</td><td>回踩进场</td><td>Pullback entry</td><td>回踩关键支撑（均线、趋势线）并企稳后买入</td></tr>
+            <tr><td>8</td><td>分批建仓（趋势跟随型）</td><td>Batch buying</td><td>每突破一个平台加仓或使用移动平均线分批买入</td></tr>
+            <tr><td>9</td><td>高抛低吸做T（买入端）</td><td>Sell high &amp; buy back low</td><td>"买回"动作在回调低位执行，右侧买点</td></tr>
+            <tr><td>10</td><td>区间波段来回做T（买入端）</td><td>Range swing trading</td><td>区间下沿买入，支撑确认后买入属右侧</td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- ========= 三、中性手法 ========= -->
+    <h2>⚖️ 中性 / 混合型手法</h2>
+    <p>同时包含左右元素或仓位管理/对冲策略，不直接依赖方向预测。</p>
+    <table>
+        <thead><tr><th>编号</th><th>手法</th><th>英文</th><th>中性原因</th></tr></thead>
+        <tbody>
+            <tr><td>6</td><td>仓位调换</td><td>Swap position</td><td>卖出高位弱势，买入低位强势，左右定义不固定</td></tr>
+            <tr><td>7</td><td>持仓轮动</td><td>Position rotation</td><td>根据宏观或板块强弱切换，策略性操作</td></tr>
+            <tr><td>11</td><td>空头对冲</td><td>Short hedge</td><td>风险管理工具，锁定亏损幅度，变相降本</td></tr>
+            <tr><td>12</td><td>看跌期权对冲</td><td>Put option hedge</td><td>保险策略，不直接产生低成本买入</td></tr>
+            <tr><td>13</td><td>备兑开仓</td><td>Covered call</td><td>持有股票卖出看涨期权收取权利金，收益增强</td></tr>
+            <tr><td>14</td><td>配对交易</td><td>Pair trading</td><td>同时做多一股做空另一股，市场中性赚取价差</td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- ========= 四、快速对照表 ========= -->
+    <h2>📋 快速对照表（左/右/中性）</h2>
+    <table>
+        <thead><tr><th>手法</th><th style="text-align:center">左侧</th><th style="text-align:center">右侧</th><th style="text-align:center">中性</th></tr></thead>
+        <tbody>
+            <tr><td>Buy low</td><td style="text-align:center">✅</td><td style="text-align:center"></td><td style="text-align:center"></td></tr>
+            <tr><td>Dip buying</td><td style="text-align:center"></td><td style="text-align:center">✅</td><td style="text-align:center"></td></tr>
+            <tr><td>Averaging down</td><td style="text-align:center">✅</td><td style="text-align:center"></td><td style="text-align:center"></td></tr>
+            <tr><td>Pyramid buying</td><td style="text-align:center">✅</td><td style="text-align:center"></td><td style="text-align:center"></td></tr>
+            <tr><td>Pullback entry</td><td style="text-align:center"></td><td style="text-align:center">✅</td><td style="text-align:center"></td></tr>
+            <tr><td>Swap position</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center">✅</td></tr>
+            <tr><td>Position rotation</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center">✅</td></tr>
+            <tr><td>Batch buying</td><td style="text-align:center">可左</td><td style="text-align:center">可右</td><td style="text-align:center">基准中性</td></tr>
+            <tr><td>Sell high &amp; buy back low (买回端)</td><td style="text-align:center"></td><td style="text-align:center">✅</td><td style="text-align:center"></td></tr>
+            <tr><td>Range swing trading (买入端)</td><td style="text-align:center"></td><td style="text-align:center">✅</td><td style="text-align:center"></td></tr>
+            <tr><td>Short hedge</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center">✅</td></tr>
+            <tr><td>Put option hedge</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center">✅</td></tr>
+            <tr><td>Covered call</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center">✅</td></tr>
+            <tr><td>Pair trading</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center">✅</td></tr>
+        </tbody>
+    </table>
+
+    <div class="note">
+        💡 <strong>实战建议</strong><br>
+        ✅ 左侧手法适合：资金量大、能承受深幅浮亏、深度研究品种（指数/核心资产）。<br>
+        ✅ 右侧手法适合：追求高胜率、止损清晰、心理承受力一般者（杠杆或小资金更宜）。<br>
+        ✅ 中性手法：用于辅助降本（对冲、备兑）或优化持仓结构，不单独作为主要进场策略。<br>
+        <strong>🎯 最终原则：左侧博取极限低成本，右侧博取高效率与低痛苦。专业交易者常以右侧为主，左侧为辅（左侧打底仓，右侧加主力仓）。</strong>
+    </div>
+
+    <hr>
+
+    <!-- ================= 盈利退出部分 ================= -->
+    <h2>💰 盈利退出 | Take Profit / Exit Profits</h2>
+    <div class="note" style="background: #eef2ff; border-left-color: #6366f1;">
+        <strong>🔑 核心逻辑</strong>："会买是徒弟，会卖是师父。" 盈利退出的目标不是卖在最高点，而是在控制回撤下将账面利润转化为实际收益，并让利润奔跑。
+    </div>
+
+    <h3>📌 退出时机分类：左侧退出 vs 右侧退出</h3>
+    <table>
+        <thead><tr><th>类型</th><th>别名</th><th>核心逻辑</th><th>对应手法</th></tr></thead>
+        <tbody>
+            <tr><td><strong style="color:#b91c1c;">左侧退出</strong></td><td>逆势止盈、猜顶</td><td>上涨途中提前卖出，预判见顶回落</td><td>目标止盈、压力位卖出、分批左侧减仓</td></tr>
+            <tr><td><strong style="color:#15803d;">右侧退出</strong></td><td>顺势止盈、确认反转后卖出</td><td>等待趋势反转（破位/死叉）再平仓</td><td>跟踪止损、移动止盈、均线破位离场</td></tr>
+        </tbody>
+    </table>
+
+    <h3>🏆 最常用的获利了结专业手法（实战排序）</h3>
+
+    <!-- 方法 1 -->
+    <div style="margin: 0.6rem 0; padding: 0.8rem 1rem; background: #f8fafc; border-radius: 0.8rem;">
+        <strong style="font-size: 1rem; color: #0f172a;">1. Target Profit / Price Target（目标止盈）</strong>
+        <p style="margin: 0.3rem 0 0; font-size: 0.9rem; color: #334155;">
+            <strong>定义</strong>：预设盈利目标价位（阻力位/整数关口/斐波那契扩展），到达即平仓。<br>
+            <strong>优点</strong>：纪律性强，避免贪婪；适合震荡市。<br>
+            <strong>缺点</strong>：趋势中可能过早下车。<br>
+            <strong>适用</strong>：箱体交易、事件驱动、短线波段。
+        </p>
+    </div>
+
+    <!-- 方法 2 -->
+    <div style="margin: 0.6rem 0; padding: 0.8rem 1rem; background: #f8fafc; border-radius: 0.8rem;">
+        <strong style="font-size: 1rem; color: #0f172a;">2. Trailing Stop（跟踪止损 / 移动止损）</strong>
+        <p style="margin: 0.3rem 0 0; font-size: 0.9rem; color: #334155;">
+            <strong>定义</strong>：止损线随价格上涨自动上移，常见百分比跟踪、ATR跟踪、均线跟踪。<br>
+            <strong>优点</strong>：让利润奔跑，保护已得利润，右侧退出。<br>
+            <strong>缺点</strong>：剧烈回调可能触发离场。<br>
+            <strong>适用</strong>：趋势跟踪、中线持仓。
+        </p>
+    </div>
+
+    <!-- 方法 3 -->
+    <div style="margin: 0.6rem 0; padding: 0.8rem 1rem; background: #f8fafc; border-radius: 0.8rem;">
+        <strong style="font-size: 1rem; color: #0f172a;">3. Scaling Out / Partial Profit Taking（分批止盈）</strong>
+        <p style="margin: 0.3rem 0 0; font-size: 0.9rem; color: #334155;">
+            <strong>定义</strong>：将持仓分成多份，在不同价位或条件下分批次卖出（固定比例或技术位）。<br>
+            <strong>优点</strong>：平衡"卖太早"与"卖太晚"的矛盾。<br>
+            <strong>缺点</strong>：若仅到第一目标就反转，剩余仓位利润回吐。<br>
+            <strong>适用</strong>：几乎所有交易类型，尤其不确定性较高行情。
+        </p>
+    </div>
+
+    <!-- 方法 4 -->
+    <div style="margin: 0.6rem 0; padding: 0.8rem 1rem; background: #f8fafc; border-radius: 0.8rem;">
+        <strong style="font-size: 1rem; color: #0f172a;">4. Moving Average Exit（均线离场）</strong>
+        <p style="margin: 0.3rem 0 0; font-size: 0.9rem; color: #334155;">
+            <strong>定义</strong>：以某条移动平均线（如20/60日）作为动态止盈线，收盘跌破则清仓。<br>
+            <strong>优点</strong>：右侧确认，跟随趋势。<br>
+            <strong>缺点</strong>：震荡市中频繁被触碰导致小亏。<br>
+            <strong>适用</strong>：中长线趋势交易。
+        </p>
+    </div>
+
+    <!-- 方法 5 -->
+    <div style="margin: 0.6rem 0; padding: 0.8rem 1rem; background: #f8fafc; border-radius: 0.8rem;">
+        <strong style="font-size: 1rem; color: #0f172a;">5. Break of Trendline / Structure（趋势线或结构破位离场）</strong>
+        <p style="margin: 0.3rem 0 0; font-size: 0.9rem; color: #334155;">
+            <strong>定义</strong>：上升趋势线或关键支撑结构被有效跌破即平仓。<br>
+            <strong>优点</strong>：符合道氏理论，反转信号明确。<br>
+            <strong>缺点</strong>：假突破可能导致误判。<br>
+            <strong>适用</strong>：技术分析主导的波段交易。
+        </p>
+    </div>
+
+    <!-- 方法 6 -->
+    <div style="margin: 0.6rem 0; padding: 0.8rem 1rem; background: #f8fafc; border-radius: 0.8rem;">
+        <strong style="font-size: 1rem; color: #0f172a;">6. RSI / Overbought Exit（超买区止盈）</strong>
+        <p style="margin: 0.3rem 0 0; font-size: 0.9rem; color: #334155;">
+            <strong>定义</strong>：RSI进入超买区（&gt;70或&gt;80）且出现顶背离时卖出，左侧退出。<br>
+            <strong>优点</strong>：常能卖在短期高点附近。<br>
+            <strong>缺点</strong>：强势趋势中RSI长期超买，过早下车。<br>
+            <strong>适用</strong>：震荡市或区间反弹，不适用单边牛市。
+        </p>
+    </div>
+
+    <!-- 方法 7 -->
+    <div style="margin: 0.6rem 0; padding: 0.8rem 1rem; background: #f8fafc; border-radius: 0.8rem;">
+        <strong style="font-size: 1rem; color: #0f172a;">7. Fibonacci Extension Exit（斐波那契扩展止盈）</strong>
+        <p style="margin: 0.3rem 0 0; font-size: 0.9rem; color: #334155;">
+            <strong>定义</strong>：利用斐波那契扩展位（127.2%、161.8%等）预设目标，到达后平仓。<br>
+            <strong>优点</strong>：统计意义上阻力位，机构常用。<br>
+            <strong>缺点</strong>：仍可能被突破。<br>
+            <strong>适用</strong>：波浪理论或结构测量交易者。
+        </p>
+    </div>
+
+    <!-- 方法 8 -->
+    <div style="margin: 0.6rem 0; padding: 0.8rem 1rem; background: #f8fafc; border-radius: 0.8rem;">
+        <strong style="font-size: 1rem; color: #0f172a;">8. Time Stop（时间止损 — 盈利保护）</strong>
+        <p style="margin: 0.3rem 0 0; font-size: 0.9rem; color: #334155;">
+            <strong>定义</strong>：持仓在一定时间内无法继续创出新高或达到更高目标则主动平仓，属于时间效率止盈。<br>
+            <strong>优点</strong>：释放资金，避免盘整消耗时间价值。<br>
+            <strong>缺点</strong>：可能刚卖出行情启动。<br>
+            <strong>适用</strong>：短线交易、动量策略。
+        </p>
+    </div>
+
+    <!-- 方法 9 -->
+    <div style="margin: 0.6rem 0; padding: 0.8rem 1rem; background: #f8fafc; border-radius: 0.8rem;">
+        <strong style="font-size: 1rem; color: #0f172a;">9. Hedged Profit Lock（对冲锁利）</strong>
+        <p style="margin: 0.3rem 0 0; font-size: 0.9rem; color: #334155;">
+            <strong>定义</strong>：大幅浮盈但不愿平仓，通过开立反向仓位（做空或买入认沽期权）锁定利润。<br>
+            <strong>优点</strong>：保留上行可能，锁定下限。<br>
+            <strong>缺点</strong>：对冲成本侵蚀部分利润。<br>
+            <strong>适用</strong>：大资金、期权交易者，不愿直接平仓场景。
+        </p>
+    </div>
+
+    <!-- 方法 10 -->
+    <div style="margin: 0.6rem 0; padding: 0.8rem 1rem; background: #f8fafc; border-radius: 0.8rem;">
+        <strong style="font-size: 1rem; color: #0f172a;">10. Volatility Based Exit（波动率止盈）</strong>
+        <p style="margin: 0.3rem 0 0; font-size: 0.9rem; color: #334155;">
+            <strong>定义</strong>：当价格波动率急剧放大（布林带宽度/ATR）并出现反转形态（上影线/吞没）时离场。<br>
+            <strong>优点</strong>：捕捉情绪高潮后退潮点。<br>
+            <strong>缺点</strong>：结合价格行为，偏主观。<br>
+            <strong>适用</strong>：短线波动交易。
+        </p>
+    </div>
+
+    <h3>🔄 左/右侧退出对比表</h3>
+    <table>
+        <thead><tr><th>手法</th><th style="text-align:center">左侧（猜顶）</th><th style="text-align:center">右侧（确认反转）</th><th>说明</th></tr></thead>
+        <tbody>
+            <tr><td>Target Profit（固定目标）</td><td style="text-align:center">✅</td><td style="text-align:center"></td><td>预设位置，不论趋势是否延续</td></tr>
+            <tr><td>Trailing Stop</td><td style="text-align:center"></td><td style="text-align:center">✅</td><td>随价格移动，不回撤不离场</td></tr>
+            <tr><td>Scaling Out（分批）</td><td style="text-align:center">混合</td><td style="text-align:center">混合</td><td>前几批左侧，最后一批右侧</td></tr>
+            <tr><td>Moving Average Exit</td><td style="text-align:center"></td><td style="text-align:center">✅</td><td>跌破均线才离场</td></tr>
+            <tr><td>Break of Trendline</td><td style="text-align:center"></td><td style="text-align:center">✅</td><td>结构破坏离场</td></tr>
+            <tr><td>RSI Overbought</td><td style="text-align:center">✅</td><td style="text-align:center"></td><td>超买信号出现即卖</td></tr>
+            <tr><td>Fibonacci Extension</td><td style="text-align:center">✅</td><td style="text-align:center"></td><td>到达扩展位即卖</td></tr>
+            <tr><td>Time Stop</td><td style="text-align:center" colspan="2">中性</td><td>取决于时间而非价格</td></tr>
+            <tr><td>Hedged Profit Lock</td><td style="text-align:center" colspan="2">中性</td><td>对冲锁定，非直接平仓</td></tr>
+            <tr><td>Volatility Based Exit</td><td style="text-align:center" colspan="2">偏左侧</td><td>通常在波动率高峰反转时卖出</td></tr>
+        </tbody>
+    </table>
+
+    <div class="note">
+        📌 <strong>小结</strong>：左侧退出讲究预判顶部、纪律执行；右侧退出强调等待趋势反转信号，追求更高的确定性。专业交易常将两者结合，使用分批止盈（部分左侧锁定利润，部分右侧让利润奔跑）来实现稳健的收益曲线。
+    </div>
+
+    <hr>
+
+    <footer>交易有风险，决策需谨慎。本内容仅为方法论归纳，不构成投资建议。</footer>
+</div>
+<script src="../../js/main.js"></script>
+</body>
+</html>

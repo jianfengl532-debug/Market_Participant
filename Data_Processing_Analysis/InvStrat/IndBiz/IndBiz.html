@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>産業景気分析 | IndBiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../InvStrat.css">
+    <script src="../../../js/config.js"></script>
+</head>
+<body class="indbiz-page">
+<div class="dashboard-container">
+
+    <!-- ========== 主标题 ========== -->
+    <div class="main-header">
+        <h1>🏭 産業景気分析 <span style="font-weight:400;font-size:1.1rem;color:#4b6a8b;letter-spacing:0;">(IndBiz)</span></h1>
+        <p>
+            <span class="update-time"><span class="emoji">📊</span> データクレンジング・整備</span>
+            <span class="update-time"><span class="emoji">🕒</span> 更新: 2026年6月16日</span>
+            <span class="market-badge"><a href="http://192.168.0.105:8000/IndBiz_Data/IndBiz_Data.html" class="db-link" target="_blank" rel="noopener noreferrer"><span class="emoji">🗄️</span> DB 接続・データ読み込み</a></span>
+        </p>
+    </div>
+
+
+    <!-- ========== 産業景気分析报告 ========== -->
+    <div class="section-card">
+        <div class="section-title">
+            <span class="emoji">📌</span>
+            <span>産業景気分析报告</span>
+        </div>
+        <div class="sub-block">
+            <ul class="link-list">
+                <li>
+                    <div class="link-icon">📄</div>
+                    <div>
+                        <a href="IndBiz_Report/yzy.html" class="link-title" target="_blank">养殖业行业分析</a>
+                        <span class="link-meta">2026-06-16 • 業界分析</span>
+                    </div>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    <!-- ===== DB 登録情報（自动从数据库读取，置于下方避免干扰浏览） ===== -->
+    <div class="section-card" id="dbRecordsCard" style="margin-bottom:1.8rem;display:none;">
+        <div class="section-title">
+            <span class="emoji">🗄️</span>
+            <span>DB 登録情報</span>
+            <span class="extra-note" style="margin-left:auto;font-size:0.8rem;" id="dbRecordsCount"></span>
+        </div>
+        <div class="sub-block" id="dbRecordsList">
+            <div style="padding:1rem;text-align:center;color:#8ba0b8;">🔄 読み込み中…</div>
+        </div>
+    </div>
+
+    <!-- ========== フッター ========== -->
+    <footer>
+        <span class="emoji">📊</span> 産業景気分析ダッシュボード • 各業種の動向をワンストップで
+        <span style="margin-left:0.5rem;">表示リンクは分析用資料を示します</span>
+    </footer>
+</div>
+
+<script>
+(function() {
+  var links = document.querySelectorAll('.db-link');
+  var cfg = window.API_CONFIG || { baseUrl: 'http://' + (window.location.hostname || 'localhost') + ':8000', apiKey: '' };
+  var apiBase = cfg.baseUrl.replace(/\/+$/, '');
+  var apiKey = cfg.apiKey;
+  links.forEach(function(a) {
+    a.href = a.href.replace(/http:\/\/[^:]+:8000\//, apiBase + '/');
+  });
+
+  // ── DB データ取得 ──
+  fetch(apiBase + '/IndBiz_Data/api.php?action=list', { headers: { 'X-API-Key': apiKey } })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var records = data.records || data.data || [];
+      if (!records.length) return;
+
+      var card = document.getElementById('dbRecordsCard');
+      var list = document.getElementById('dbRecordsList');
+      var count = document.getElementById('dbRecordsCount');
+      if (!card || !list) return;
+
+      card.style.display = 'block';
+      count.textContent = records.length + ' 件';
+
+      var html = '<ul class="event-list" style="margin:0;">';
+      records.forEach(function(r) {
+        var d = r.data || r;
+        var title = d.title || '(無題)';
+        var time = (d.event_time || '').slice(0, 10);
+        var source = d.source || '';
+        var region = d.region || '';
+        var sector = d.industry_sector || '';
+        var tags = d.tags || '';
+        var desc = d.description || d.raw_content || '';
+        var descShort = desc.length > 120 ? desc.slice(0, 120) + '…' : desc;
+
+        // 産業影響
+        var impactsHtml = '';
+        var imp = d.industry_impacts || [];
+        if (imp.length) {
+          impactsHtml = '<div style="margin-top:4px;font-size:0.8rem;color:#4b6a8b;">';
+          imp.forEach(function(ii) {
+            impactsHtml += '🏭 ' + (ii.impacted_sector || '') + ' · '
+              + (ii.impact_direction || '') + ' · 程度' + (ii.impact_level || '')
+              + '<br>';
+          });
+          impactsHtml += '</div>';
+        }
+
+        // データ指標
+        var dataHtml = '';
+        var dps = d.data_points || [];
+        if (dps.length) {
+          dataHtml = '<div style="margin-top:4px;font-size:0.8rem;color:#4b6a8b;">';
+          dps.forEach(function(dp) {
+            dataHtml += '📊 ' + (dp.indicator_name || '') + ': '
+              + (dp.indicator_value != null ? dp.indicator_value : '')
+              + (dp.unit || '') + (dp.change_percent != null ? ' (' + dp.change_percent + '%)' : '')
+              + '<br>';
+          });
+          dataHtml += '</div>';
+        }
+
+        html += '<li style="padding:10px 0;">'
+          + '<div class="event-icon">📄</div>'
+          + '<div class="event-content">'
+          + '<div class="event-title" style="cursor:default;">' + escapeHtml(title) + '</div>'
+          + '<span class="event-date">'
+          + (time ? '📅 ' + time + ' • ' : '')
+          + (source ? '📰 ' + escapeHtml(source) + ' • ' : '')
+          + (region ? '📍 ' + escapeHtml(region) + ' • ' : '')
+          + (sector ? '🏭 ' + escapeHtml(sector) : '')
+          + '</span>'
+          + '<div style="font-size:0.8rem;color:#475569;margin-top:4px;">' + escapeHtml(descShort) + '</div>'
+          + impactsHtml + dataHtml
+          + (tags ? '<div style="margin-top:4px;">' + tags.split(',').map(function(t) {
+              return '<span class="summary-tag" style="font-size:0.7rem;padding:1px 6px;margin:1px 2px;">#' + escapeHtml(t.trim()) + '</span>';
+            }).join('') + '</div>' : '')
+          + '</div></li>';
+      });
+      html += '</ul>';
+      list.innerHTML = html;
+    })
+    .catch(function(err) { console.log('DB fetch skipped:', err); });
+
+  function escapeHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+})();
+</script>
+</body>
+</html>

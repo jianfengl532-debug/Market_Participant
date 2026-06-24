@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>六维市场生存框架 · 专业术语表</title>
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+<div class="container">
+    <div class="badge">⚔️ 老甲鱼生存物理 · 六维框架</div>
+    <h1>市场底层术语表</h1>
+    <div class="sub">筹码 · 流动性 · 偏见 · 定价权 · 对手盘能量 · 系统脆弱性 — 按名称首字母排序</div>
+    
+    <table>
+        <thead>
+            <tr><th>术语 (Term)</th><th>定义 (Definition)</th><th>实战意义 (Tactical Edge)</th></tr>
+        </thead>
+        <tbody>
+            <!-- 按名称首字母排序（数字→英文→中文拼音首字母） -->
+            <tr><td class=”term”>13F文件</td><td class=”definition”>美国机构投资者（公募、对冲基金等）每季度提交的持仓披露文件。</td><td class=”usage”>观察机构筹码结构变化、分化信号（如贝莱德减持Mag7转向价值股），识别资金迁移前兆。</td></tr>
+            <tr><td class=”term”>Backwardation 现货溢价（正基差）</td><td class=”definition”>现货价格＞期货价格，现货紧缺行情。</td><td class=”usage”>正向基差反映现货市场供不应求，近月合约强势；持有现货库存有利，需借入现货交割的套保盘面临成本上升。</td></tr>
+            <tr><td class=”term”>Basis 基差</td><td class=”definition”>同一标的现货价与期货价的差值，是基差交易的核心观测指标。</td><td class=”usage”>正基差（Backwardation）反映现货紧缺，负基差（Contango）反映远期溢价；基差回归速度决定套利收益，是判断套利机会是否成立的第一指标。</td></tr>
+            <tr><td class=”term”>Basis Trade 基差交易</td><td class=”definition”>赚取现货与期货之间价差（基差）收敛的收益，价格中性，不赌资产涨跌。公式：Basis = 现货价 − 期货价。</td><td class=”usage”>主流场景为美债现券+国债期货套利、原油/黄金期现套利；高杠杆运作（10-20×），流动性收紧时价差异常扩大可致爆仓，需密切监控Repo利率与波动率。</td></tr>
+            <tr><td class=”term”>Carry Trade 套息交易</td><td class=”definition”>借入低息避险货币（日元、瑞郎）兑换买入高息货币或资产，持有赚取利息差额。收益 = 高息资产利息 − 融资负债利息。</td><td class=”usage”>risk-on行情下大规模入场推升高贝塔资产；risk-off时集中平仓踩踏，汇兑亏损可吞噬全部息差。监控CFTC日元净空头可判断拥挤度。</td></tr>
+            <tr><td class=”term”>CDD (Coin Days Destroyed)</td><td class=”definition”>币天销毁 = 持币数量 × 持币天数。长期不动币的转移导致数值突然跃升。</td><td class=”usage”>识别”伪长期持有者”悄悄出货；CDD脉冲 = 老筹码松动预警（耐心消耗信号）。</td></tr>
+            <tr><td class=”term”>CFTC持仓</td><td class=”definition”>美国商品期货交易委员会每周公布的投机/杠杆基金持仓报告，含日元、美债期货等。</td><td class=”usage”>监控日元净空头极值 → Carry trade拥挤度；仓位极端时平仓风险巨大，常为转折先行指标。</td></tr>
+            <tr><td class=”term”>Contango 期货溢价（负基差）</td><td class=”definition”>期货价格＞现货价格，现货供给充足、远期仓储成本高。</td><td class=”usage”>负基差反映库存充裕或远期看涨预期；多头展期不利（每月展期损耗），大宗商品ETF在Contango结构中存在持续展期成本。</td></tr>
+            <tr><td class=”term”>Delta Neutral Delta中性</td><td class=”definition”>组合对资产单边涨跌敏感度为零，不赌方向只赚价差。实现方式：同时持有相反方向头寸（多现货+空期货）。</td><td class=”usage”>基差交易的典型特征——无论资产涨跌，组合盈亏只由基差变动决定；真正实现”中性套利”，但需动态再平衡维持Delta中性。</td></tr>
+            <tr><td class=”term”>Funding Rate (资金费率)</td><td class=”definition”>永续合约中多头向空头（或空头向多头）定期支付的费率。</td><td class=”usage”>极正值=多头杠杆狂热（易形成顶部）；极负值=空头拥挤恐慌（常见短期底部/反弹窗口）。</td></tr>
+            <tr><td class=”term”>Gamma对冲 / 期权螺旋</td><td class=”definition”>期权做市商为保持Delta中性而买卖底层资产，价格变动时被迫反向调仓。</td><td class=”usage”>加速下跌/上涨：股价跌→做市商卖出正股→更跌；形成自我强化螺旋，流动性瞬间枯竭。</td></tr>
+            <tr><td class=”term”>Leverage 杠杆</td><td class=”definition”>借钱放大交易规模，以提高资金使用效率。</td><td class=”usage”>基差交易普遍使用高杠杆（10-20×甚至更高），因基差本身幅度很小；价差回归时获利可观，但价差逆向放大也会引发快速爆仓，需严格保证金管理。</td></tr>
+            <tr><td class=”term”>LTH (Long-Term Holder)</td><td class=”definition”>长期持有者（链上通常指持币>155天的比特币地址，也可泛指锁仓筹码）。</td><td class=”usage”>LTH供应量增加 → 筹码沉淀，结构偏稳；LTH向交易所转移 → 潜在抛压，年龄结构变脆。</td></tr>
+            <tr><td class=”term”>Mag7 / AI基建拥挤</td><td class=”definition”>Magnificent 7（美股七大科技巨头）以及AI基础设施链（服务器、网络、电力、算力）的资金高度集中。</td><td class=”usage”>系统脆弱性典型信号：拥挤交易一旦逆转，对手盘稀薄，踩踏速度远超一般板块轮动。</td></tr>
+            <tr><td class=”term”>MOVE指数</td><td class=”definition”>美债期权的隐含波动率指数（类似VIX但针对利率市场）。</td><td class=”usage”>低位（<80）代表市场自满、波动压制；快速脉冲预示利率风险暴露，易触发基差交易与流动性危机。</td></tr>
+            <tr><td class=”term”>Put/Call Ratio</td><td class=”definition”>看跌期权与看涨期权的成交量（或持仓量）比值。</td><td class=”usage”>极低值（<0.5）过度乐观 → 潜在风险；极高值（>1.2~1.5）恐慌峰值 → 常见反转机会。</td></tr>
+            <tr><td class=”term”>Repo 回购</td><td class=”definition”>短期融资工具，以国债等优质抵押品借入现金。</td><td class=”usage”>美债基差交易的主要加杠杆工具——低成本融入现金后买入现券；Repo利率异常飙升（资金紧张）时基差交易被迫去杠杆平仓，引发连锁下跌。</td></tr>
+            <tr><td class=”term”>Repo市场 / GC Repo / SOFR</td><td class=”definition”>以国债等优质抵押品进行的短期资金借贷市场（回购）；GC为一般担保利率，SOFR为隔夜融资利率。</td><td class=”usage”>回购利率异常飙升或现金囤积（机构去风险）→ 流动性水温下降信号，暗示边际收紧，美债基差交易压力上升。</td></tr>
+            <tr><td class=”term”>risk-off</td><td class=”definition”>避险行情、风险规避情绪。投资者抛售股票/高收益债/高息货币，增持国债/黄金/美元/现金。</td><td class=”usage”>套息交易集中平仓，高波动资产承压下跌；监控VIX、MOVE、Put/Call Ratio可量化恐慌程度；risk-off周期中现金为王。</td></tr>
+            <tr><td class=”term”>risk-on</td><td class=”definition”>风险偏好行情、乐观做多情绪。资金追逐高收益高波动资产，股票/商品/高息货币走强。</td><td class=”usage”>套息交易大规模入场推升风险资产；Carry Trade利差扩大与risk-on形成正反馈循环；但需警惕过度乐观后的反转信号。</td></tr>
+            <tr><td class=”term”>USD/JPY Carry Trade</td><td class=”definition”>借入低息/零息日元，兑换为高息货币或买入高收益资产（美债、美股、加密货币）。</td><td class=”usage”>极端拥挤时（CFTC净空头九年极值）→ 日元升值或日本央行加息会引发踩踏：平仓抛售全球风险资产，形成跨市场死亡螺旋。</td></tr>
+            <tr><td class=”term”>Unwind 平仓、了结头寸</td><td class=”definition”>大规模集中离场平仓。多指因流动性突变或风险事件触发的集体去杠杆行为。</td><td class=”usage”>carry trades unwind → 套息交易集体平仓，汇率剧烈波动；basis trade unwind → 基差交易去杠杆，Repo利率飙升时常为前兆；unwind速度决定市场冲击深度。</td></tr>
+            <tr><td class=”term”>VIX指数</td><td class=”definition”>标普500指数期权的隐含波动率，俗称”恐慌指数”。</td><td class=”usage”>低VIX=市场自满（脆弱性积累）；高VIX>35常见恐慌底部；脉冲式飙升伴随流动性挤兑信号。</td></tr>
+            <tr><td class=”term”>筹码结构</td><td class=”definition”>流通盘在不同价格区间的分布（套牢盘、获利盘、锁仓盘、筹码年龄）。</td><td class=”usage”>上方大量套牢盘压制上涨；高度集中/锁仓良好的标的易被边际资金推动；筹码年龄影响耐心阈值。</td></tr>
+            <tr><td class=”term”>反身性 (Reflexivity)</td><td class=”definition”>索罗斯理论：认知改变行为，行为改变事实，事实反过来强化认知，形成正反馈环路。</td><td class=”usage”>价格自我实现：偏见引导资金→价格变化→强化偏见；直至临界点微小事件逆转方向。</td></tr>
+            <tr><td class=”term”>基差 (Basis)</td><td class=”definition”>期货价格与现货价格之差（期货升水为正基差，贴水为负基差）。</td><td class=”usage”>正基差看涨情绪；基差收窄/由正转负预示套利平仓；美债basis trade则依赖基差波动。</td></tr>
+            <tr><td class=”term”>伽马对冲 (Gamma Hedge)</td><td class=”definition”>见Gamma对冲 / 期权螺旋。</td><td class=”usage”>同上 — 期权做市商动态对冲放大趋势，高伽马区域容易引发踩踏或轧空。</td></tr>
+            <tr><td class=”term”>老甲鱼开关</td><td class=”definition”>穿越牛熊者自创的多维决策组合：偏见过热+对手盘恶化+系统脆弱性+价格确认，共振后强制减仓/转现金。</td><td class=”usage”>避免”爱上持仓”的纪律工具；不是预测而是概率优势下的生存动作。</td></tr>
+            <tr><td class=”term”>两融余额</td><td class=”definition”>A股融资融券余额，代表场内杠杆资金总量。</td><td class=”usage”>持续减少 → 主动降杠杆、边际抛压积蓄；脉冲式增加则情绪亢奋，需警惕反向拐点。</td></tr>
+            <tr><td class=”term”>流动性溢价</td><td class=”definition”>市场中可交易资金总量（水位）赋予资产的额外价格补偿。</td><td class=”usage”>牛市流动性泛滥垃圾也涨，枯竭时好资产被贱卖；水位性质（散户热钱/机构配置/杠杆资金）决定持续性。</td></tr>
+            <tr><td class=”term”>美债基差交易 (Treasury Basis Trade)</td><td class=”definition”>做多国债期货+做空现货国债，赚取期货与现货之间的价差（基差）。</td><td class=”usage”>高杠杆，极度依赖回购流动性与低波动；波动率跳升→保证金追缴→双向平仓踩踏，流动性瞬间蒸干。</td></tr>
+            <tr><td class=”term”>偏见生命周期</td><td class=”definition”>市场对某一资产过度乐观/悲观从形成、强化到崩溃的过程（索罗斯反身性的时间轴）。</td><td class=”usage”>早期介入，强化期持有，末期退出（路人皆推荐时）；微小催化剂引发逆转。</td></tr>
+            <tr><td class=”term”>期权隐含波动率微笑</td><td class=”definition”>不同行权价期权的隐含波动率构成的曲线形态。</td><td class=”usage”>偏call微笑（虚值call溢价）→ 狂热看涨；偏put微笑 → 恐慌避险；结构极端变化提示定价权暗牌意图。</td></tr>
+            <tr><td class=”term”>日元套利交易</td><td class=”definition”>见 USD/JPY Carry Trade。</td><td class=”usage”>同上 — 全球风险资产的关键流动性来源，一旦逆转将重创所有高贝塔品种。</td></tr>
+            <tr><td class=”term”>对手盘</td><td class=”definition”>愿意在当前价格进行反向交易的市场参与者（买方 vs 卖方）。</td><td class=”usage”>价格运动的本质是消耗对手盘；当一侧对手盘耗尽，价格加速朝另一侧滑行。</td></tr>
+            <tr><td class=”term”>对手盘剩余能量 (第五维)</td><td class=”definition”>在当前价格水平上，还有多少筹码愿意卖出（或买入）的潜在存量。</td><td class=”usage”>成交量萎缩+抛压测试可判断能量是否耗尽；卖盘耗尽时，任何利好都成为核弹级向上催化剂。</td></tr>
+            <tr><td class=”term”>定价权（明牌/暗牌）</td><td class=”definition”>短期价格的主导力量。明牌：大股东、公募、游资（龙虎榜可见）；暗牌：通过期货、期权、TRS等衍生品隐藏的真实仓位。</td><td class=”usage”>仅看明牌会失真，需监控期货基差、未平仓量、波动率微笑等暗牌信号，推测真正的边际定价者。</td></tr>
+            <tr><td class=”term”>定量宽松/收紧</td><td class=”definition”>央行通过购债（QE）或售债/缩表（QT）调节市场流动性。</td><td class=”usage”>影响资产水位拐点，宏观背景的”水温”源头；边际变化比绝对水位更关键。</td></tr>
+            <tr><td class=”term”>回购市场 (Repo)</td><td class=”definition”>见 Repo市场 / GC Repo / SOFR。</td><td class=”usage”>同上 — 机构融资与资金囤积的第一现场，利率异常是流动性危机的早期心电图。</td></tr>
+            <tr><td class=”term”>未平仓量 (OI, Open Interest)</td><td class=”definition”>衍生品市场中尚未平仓的合约总量（期货/期权）。</td><td class=”usage”>OI骤增代表新资金入场，骤降代表仓位平仓/踩踏；结合价格可辨别趋势是否健康。</td></tr>
+            <tr><td class=”term”>系统脆弱性 (第六维)</td><td class=”definition”>市场结构高度集中、杠杆化、关联紧密，单一节点触发即可引发连锁崩塌。</td><td class=”usage”>牛市后期”大象独舞”最脆弱；集中度本身就是风险信号，需预演脆弱链条和对手盘稀薄区。</td></tr>
+            <tr><td class=”term”>总回报互换 (TRS, Total Return Swap)</td><td class=”definition”>双方交换资产的总回报（资本利得+现金流），不持有底层资产，只需支付保证金。</td><td class=”usage”>暗牌核心工具：以小资金获取大敞口，且不出现在股东名单；暗藏杠杆与定价权，监管盲区风险巨大。</td></tr>
+        </tbody>
+    </table>
+    
+    <div class="note">
+        💡 <strong>框架速记</strong> — 六维透镜：筹码分布决定地基，<strong>流动性（水温）</strong>决定高度，<strong>偏见生命周期</strong>驱动情绪钟摆，<strong>定价权（明暗牌）</strong>掌控短期节奏，<strong>对手盘剩余能量</strong>解释价格拐点力度，<strong>系统脆弱性</strong>警告跨资产坍塌风险。<br>
+        🎯 老甲鱼实战心法：“不是爱上持仓，而是爱上纪律；不猜方向，只监控脆弱性信号和对手盘消耗程度。”
+    </div>
+    <footer>基于多轮牛熊对话沉淀 · 六维生存框架 v2.0 | 按术语首字母排序</footer>
+</div>
+</body>
+</html>

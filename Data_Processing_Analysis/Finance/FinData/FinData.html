@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>企业账户 · 信息查询</title>
+<link rel="stylesheet" href="../../InvStrat/InvStrat.css">
+<link rel="stylesheet" href="../Finance.css">
+<script src="../../../js/config.js"></script>
+<style>
+/* =============================================================
+   FinData 展示页专用样式
+   ============================================================= */
+
+/* ---- 搜索区 ---- */
+.fin-search-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+@media (max-width: 1000px) {
+    .fin-search-area { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+    .fin-search-area { grid-template-columns: 1fr; }
+}
+
+.fin-search-field { position: relative; }
+.fin-search-field label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #5b6f86;
+    margin-bottom: 3px;
+}
+.fin-search-field input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid #cbd5e0;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.fin-search-field input:focus {
+    outline: none;
+    border-color: #b8860b;
+    box-shadow: 0 0 0 3px rgba(184,134,11,0.15);
+}
+
+/* ---- 搜索建议下拉 ---- */
+.fin-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #cbd5e0;
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    z-index: 100;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+}
+.fin-suggestions.show { display: block; }
+.fin-suggestions .sug-item {
+    padding: 10px 14px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f2f5;
+    transition: background 0.1s;
+}
+.fin-suggestions .sug-item:last-child { border-bottom: none; }
+.fin-suggestions .sug-item:hover { background: #f8f0dc; }
+.fin-suggestions .sug-item .sug-name {
+    font-weight: 600;
+    color: #1e3a5f;
+}
+.fin-suggestions .sug-item .sug-meta {
+    font-size: 0.72rem;
+    color: #8ba0b8;
+    margin-left: 8px;
+}
+
+/* ---- 企业信息展示区 ---- */
+.enterprise-display {
+    background: #f9fbfe;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-top: 8px;
+    display: none;
+}
+.enterprise-display.show { display: block; }
+
+.enterprise-display .ent-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.enterprise-display .ent-header .ent-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e3a5f;
+}
+.enterprise-display .ent-header .ent-uscc {
+    font-size: 0.82rem;
+    color: #6b83a0;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+}
+
+/* ---- 财务数据摘要 ---- */
+.fin-summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+@media (max-width: 700px) {
+    .fin-summary-grid { grid-template-columns: 1fr; }
+}
+
+.fin-summary-card {
+    background: #f0f4f8;
+    border-radius: 14px;
+    padding: 14px 16px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+}
+.fin-summary-card .fs-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b83a0;
+    margin-bottom: 4px;
+}
+.fin-summary-card .fs-value {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #2d3748;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+}
+.fin-summary-card .fs-value.positive { color: #28a06b; }
+.fin-summary-card .fs-value.negative { color: #dc3545; }
+.fin-summary-card.fs-current { border-color: #b8860b; background: #fffdf0; }
+.fin-summary-card.fs-liability { border-color: #e8a0a0; background: #fef2f2; }
+.fin-summary-card.fs-fixed { border-color: #a0b8e8; background: #eef2fd; }
+
+/* ---- 财务明细表 ---- */
+.fin-detail-section {
+    margin-top: 12px;
+}
+.fin-detail-section h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #b8860b;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.fin-detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+}
+.fin-detail-table th {
+    background: #eef4fa;
+    color: #2d4a6e;
+    font-weight: 600;
+    padding: 6px 10px;
+    text-align: left;
+    font-size: 0.72rem;
+    border-bottom: 2px solid #dce2ec;
+    white-space: nowrap;
+}
+.fin-detail-table th:not(:first-child) { text-align: right; }
+.fin-detail-table td {
+    padding: 5px 10px;
+    border-bottom: 1px solid #eef2f7;
+}
+.fin-detail-table td:not(:first-child) {
+    text-align: right;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.fin-detail-table tbody tr:hover { background: #fdf8ee; }
+.fin-detail-table .total-row td {
+    font-weight: 700;
+    border-top: 2px solid #cbd5e0;
+    color: #1e3a5f;
+}
+/* 多周期表容器可横向滚动 */
+.fin-detail-section .table-wrap {
+    overflow-x: auto;
+    margin-bottom: 8px;
+}
+
+/* ---- 银行流水月份标签 ---- */
+.bf-month-tag {
+    display: inline-block;
+    padding: 6px 10px;
+    margin: 2px 4px 2px 0;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    background: #eef2f6;
+    color: #475569;
+    border: 1px solid #dde3ea;
+    text-decoration: none;
+    transition: 0.15s;
+}
+.bf-month-tag:hover {
+    background: #dce8f5;
+    border-color: #2c7da0;
+}
+.bf-month-tag .bf-meta {
+    font-weight: 400;
+    font-size: 0.72rem;
+    color: #8ba3bc;
+}
+.bf-month-tag .bf-inflow { color: #28a06b; }
+.bf-month-tag .bf-outflow { color: #dc3545; }
+
+/* ---- 数据类型徽章 ---- */
+.data-type-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+.data-type-badge.dt-report { background: #fef3c7; color: #92400e; }
+.data-type-badge.dt-bankflow { background: #dbeafe; color: #1e40af; }
+.data-type-badge.dt-both { background: #f3e8ff; color: #6b21a8; }
+
+/* ---- DB 子标签切换 ---- */
+.db-subtabs {
+    display: flex;
+    gap: 2px;
+    margin-left: 12px;
+}
+.db-subtab {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    color: #6b83a0;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    transition: all 0.15s;
+    position: relative;
+    bottom: -6px;
+}
+.db-subtab:hover { color: #4a5a72; background: #f0f4f8; }
+.db-subtab.active {
+    color: #fff;
+    background: #2c7da0;
+    border-radius: 8px;
+}
+.db-subtab[data-tab="bankflow"] {
+    color: #2c7da0;
+}
+.db-subtab[data-tab="bankflow"].active {
+    color: #fff;
+    background: #2c7da0;
+}
+
+/* ---- 空状态 ---- */
+.no-enterprise-selected {
+    text-align: center;
+    padding: 30px 20px;
+    color: #8ba3bc;
+}
+.no-enterprise-selected .icon { font-size: 2.5rem; margin-bottom: 8px; }
+.no-enterprise-selected p { font-size: 0.9rem; }
+</style>
+</head>
+<body class="finance-page">
+<div class="container">
+
+  <!-- ===== 主标题 ===== -->
+  <div class="main-header">
+    <h1>💳️ 企业账户 · 信息查询</h1>
+    <p>
+      <span class="update-time"><span class="emoji">📋</span> 企业财务数据一览</span>
+      <span class="update-time"><span class="emoji">🕒</span> 更新: <span id="updateDate"><script>document.write(new Date().toLocaleDateString('zh-CN'));</script></span></span>
+      <span class="market-badge"><a href="http://192.168.0.105:8000/FinData_Data/FinData_Data.html" class="db-link" target="_blank" rel="noopener noreferrer"><span class="emoji">🗄️</span> DB 接続・データ読み込み</a></span>
+    </p>
+  </div>
+
+  <!-- ============================================================
+       Panel 1: 企业查询
+       ============================================================ -->
+  <div class="section-card">
+    <div class="section-title">
+      🔍 企业查询 · 自动检索
+      <span class="badge">输入企业名称 / 代码 / 联系方式自动填充</span>
+    </div>
+    <div class="sub-block">
+
+      <!-- 搜索区 -->
+      <div class="fin-search-area">
+        <div class="fin-search-field">
+          <label>企业名称</label>
+          <input type="text" id="search_name" placeholder="输入企业名称搜索…" maxlength="100" autocomplete="off">
+          <div class="fin-suggestions" id="sug_name"></div>
+        </div>
+        <div class="fin-search-field">
+          <label>社会统一代码</label>
+          <input type="text" id="search_uscc" placeholder="输入统一代码搜索…" maxlength="30" autocomplete="off">
+          <div class="fin-suggestions" id="sug_uscc"></div>
+        </div>
+        <div class="fin-search-field">
+          <label>联系方式</label>
+          <input type="text" id="search_contact" placeholder="输入联系方式搜索…" maxlength="50" autocomplete="off">
+          <div class="fin-suggestions" id="sug_contact"></div>
+        </div>
+        <div class="fin-search-field">
+          <label>上市代码</label>
+          <input type="text" id="search_stock" placeholder="如 600666.SH" maxlength="30" autocomplete="off">
+          <div class="fin-suggestions" id="sug_stock"></div>
+        </div>
+      </div>
+
+      <!-- 企业信息展示 -->
+      <div class="enterprise-display" id="entDisplay">
+        <div class="ent-header">
+          <span class="ent-name" id="ent_name">—</span>
+          <span class="ent-uscc" id="ent_uscc">—</span>
+        </div>
+
+        <!-- 财务摘要 -->
+        <div class="fin-summary-grid">
+          <div class="fin-summary-card fs-current">
+            <div class="fs-label">💰 流动资产</div>
+            <div class="fs-value" id="fs_current_assets">—</div>
+          </div>
+          <div class="fin-summary-card fs-liability">
+            <div class="fs-label">📉 负债</div>
+            <div class="fs-value" id="fs_liabilities">—</div>
+          </div>
+          <div class="fin-summary-card fs-fixed">
+            <div class="fs-label">🏭 固定资产</div>
+            <div class="fs-value" id="fs_fixed_assets">—</div>
+          </div>
+        </div>
+
+        <!-- 流动资产明细 -->
+        <div class="fin-detail-section" id="detail_current">
+          <h4>📊 流动资产组成</h4>
+          <div class="table-wrap">
+          <table class="fin-detail-table">
+            <thead id="th_current"><tr><th>项目</th><th style="text-align:right;">金额</th></tr></thead>
+            <tbody id="dt_current_body"></tbody>
+          </table>
+          </div>
+        </div>
+
+        <!-- 负债明细 -->
+        <div class="fin-detail-section" id="detail_liability">
+          <h4>📊 负债组成</h4>
+          <div class="table-wrap">
+          <table class="fin-detail-table">
+            <thead id="th_liability"><tr><th>项目</th><th style="text-align:right;">金额</th></tr></thead>
+            <tbody id="dt_liability_body"></tbody>
+          </table>
+          </div>
+        </div>
+
+        <!-- 固定资产明细 -->
+        <div class="fin-detail-section" id="detail_fixed">
+          <h4>📊 固定资产组成</h4>
+          <div class="table-wrap">
+          <table class="fin-detail-table">
+            <thead id="th_fixed"><tr><th>项目</th><th style="text-align:right;">金额</th></tr></thead>
+            <tbody id="dt_fixed_body"></tbody>
+          </table>
+        </div>
+
+        <!-- 银行流水汇总 -->
+        <div class="fin-detail-section" id="detail_cashflow" style="display:none;">
+          <h4>📋 银行流水汇总</h4>
+          <div id="cf_content" style="padding:4px 0;"></div>
+        </div>
+      </div>
+
+      <!-- 空状态 -->
+      <div id="emptyHint" class="no-enterprise-selected">
+        <div class="icon">🏢</div>
+        <p>在上方输入企业名称、统一代码或联系方式搜索</p>
+        <p style="font-size:0.82rem;color:#8ba3bc;margin-top:4px;">选择后自动填充财务信息</p>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="text-align:center;margin:4px 0 8px;position:relative;">
+    <div style="position:absolute;left:0;right:0;top:50%;height:2px;background:linear-gradient(90deg,transparent,#cbd5e0,transparent);"></div>
+    <span style="position:relative;background:#f4f7fc;padding:0 20px;font-size:1.3rem;">⬇</span>
+  </div>
+
+  <!-- ============================================================
+       Panel 2: DB 登録情報
+       ============================================================ -->
+  <div class="section-card">
+    <div class="section-title">
+      📚 DB 登録情報
+      <div class="db-subtabs">
+        <button type="button" class="db-subtab active" data-tab="report">📊 财务报告</button>
+        <button type="button" class="db-subtab" data-tab="bankflow">💳 银行流水</button>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+        <span class="badge" id="recordsCount" style="background:#2c7da0;">0</span>
+        <button type="button" class="btn btn-outline btn-sm" id="refreshBtn">🔄 刷新</button>
+      </div>
+    </div>
+    <div class="sub-block">
+      <div class="records-toolbar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="搜索企业名称、统一代码…">
+        </div>
+        <div class="text-muted" style="font-size:0.8rem;">共 <strong id="recordsCountLabel">0</strong> 条</div>
+      </div>
+      <div id="recordsList">
+        <div class="loading-skeleton">
+          <div class="skeleton-item"></div>
+          <div class="skeleton-item"></div>
+        </div>
+      </div>
+      <div class="db-footer">📡 数据来源：FinData_Data 录入系统 · 输入信息自动检索</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="message-area" id="msgArea"></div>
+
+<script src="../../InvStrat/InvStrat.js"></script>
+<script src="../Finance.js"></script>
+<!-- FinData 不使用 PF.init（有自己的数据加载逻辑），仅引用 PF.toggle -->
+
+<!-- ── FinData 专用逻辑 ── -->
+<script>
+(function() {
+  'use strict';
+
+  // ============================================================
+  //  配置
+  // ============================================================
+  var _cfg = window.API_CONFIG || { baseUrl: 'http://' + (window.location.hostname || 'localhost') + ':8000', apiKey: '' };
+  var BASE = _cfg.baseUrl.replace(/\/+$/, '');
+  var API = BASE + '/FinData_Data/api.php';
+  var API_KEY = _cfg.apiKey;
+
+  var _enterprises = [];   // 所有企业（来自 list）
+  var _bankFlows = [];     // 所有银行流水（来自 list_bank_flows）
+  var _debounceTimers = {};
+
+  // ============================================================
+  //  工具
+  // ============================================================
+  function esc(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function $(id) { return document.getElementById(id); }
+
+  function toast(text, type) {
+    type = type||'info';
+    var c = $('msgArea');
+    if (!c) { c = document.createElement('div'); c.id='msgArea'; c.className='message-area'; document.body.appendChild(c); }
+    var t = document.createElement('div');
+    t.className = 'message-toast ' + type;
+    var icons = {success:'✅',error:'❌',info:'ℹ️',warning:'⚠️'};
+    t.innerHTML = (icons[type]||'') + ' ' + text;
+    c.appendChild(t);
+    setTimeout(function(){ t.style.animation='slideOut 0.3s forwards'; setTimeout(function(){t.remove()},300); }, 3500);
+  }
+
+  function fmtNum(n) {
+    if (n === null || n === undefined || n === '') return '—';
+    var v = parseFloat(n);
+    if (isNaN(v)) return '—';
+    return v.toLocaleString('zh-CN', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+
+  // ============================================================
+  //  搜索建议
+  // ============================================================
+  function doSearch(fieldId, sugId) {
+    var q = $(fieldId).value.trim();
+    var sugEl = $(sugId);
+    if (!sugEl) return;
+
+    if (!q) { sugEl.classList.remove('show'); return; }
+
+    // 本地已加载的数据中过滤
+    if (_enterprises.length > 0) {
+      var matches = _enterprises.filter(function(ent) {
+        var d = ent.data || ent;
+        return (d.company_name||'').indexOf(q) !== -1
+            || (d.uscc||'').indexOf(q) !== -1
+            || (d.contact||'').indexOf(q) !== -1
+            || (d.stock_code||'').indexOf(q) !== -1;
+      });
+
+      if (matches.length === 0 || matches.length > 10) {
+        sugEl.classList.remove('show');
+        return;
+      }
+
+      sugEl.innerHTML = matches.map(function(ent) {
+        var d = ent.data || ent;
+        var name = d.company_name || '-';
+        var uscc = d.uscc || '-';
+        var contact = d.contact || '-';
+        var stock = d.stock_code || '';
+        var meta = '🆔 ' + esc(uscc);
+        if (stock) meta += ' · 📈 ' + esc(stock);
+        meta += ' · 📞 ' + esc(contact);
+        return '<div class="sug-item" data-eid="' + (ent.id||'') + '">'
+          + '<span class="sug-name">' + esc(name) + '</span>'
+          + '<span class="sug-meta">' + meta + '</span>'
+          + '</div>';
+      }).join('');
+      sugEl.classList.add('show');
+    }
+  }
+
+  function debounceSearch(fieldId, sugId, ms) {
+    return function() {
+      var key = fieldId;
+      if (_debounceTimers[key]) clearTimeout(_debounceTimers[key]);
+      _debounceTimers[key] = setTimeout(function() { doSearch(fieldId, sugId); }, ms||300);
+    };
+  }
+
+  // ============================================================
+  //  选中企业 → 填充信息
+  // ============================================================
+  function selectEnterprise(entId) {
+    // 隐藏所有建议
+    document.querySelectorAll('.fin-suggestions').forEach(function(el) { el.classList.remove('show'); });
+
+    // 在本地数据中查找
+    var enterprise = null;
+    for (var i = 0; i < _enterprises.length; i++) {
+      if (String(_enterprises[i].id) === String(entId)) {
+        enterprise = _enterprises[i];
+        break;
+      }
+    }
+    if (!enterprise) {
+      // 从 API 获取详情
+      fetch(API + '?action=detail&id=' + entId)
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+          if (res.success && res.record) {
+            fillEnterpriseData(res.record);
+          }
+        })
+        .catch(function() { toast('无法获取详细信息', 'error'); });
+      return;
+    }
+
+    fillEnterpriseData(enterprise.data || enterprise);
+  }
+
+  function fillEnterpriseData(ent) {
+    // 更新搜索框
+    $('search_name').value = ent.company_name || '';
+    $('search_uscc').value = ent.uscc || '';
+    $('search_contact').value = ent.contact || '';
+    $('search_stock').value = ent.stock_code || '';
+
+    // 显示企业信息面板
+    var display = $('entDisplay');
+    display.classList.add('show');
+    $('emptyHint').style.display = 'none';
+
+    $('ent_name').textContent = ent.company_name || '—';
+    var sc = ent.stock_code || '';
+    $('ent_uscc').textContent = '🆔 ' + (ent.uscc || '—') + (sc ? '  📈 ' + sc : '');
+
+    // 读取 reports（API 现在返回 reports 替代 financial_data）
+    var reports = ent.reports || {};
+    var periods = Object.keys(reports).sort().reverse();  // 最新在前
+
+    if (periods.length === 0) {
+      // 兼容旧数据：直接读 financial_data
+      var legFin = ent.financial_data || {};
+      renderSinglePeriod(legFin);
+      return;
+    }
+
+    // 最新周期作为摘要显示
+    var latest = reports[periods[0]];
+    var lfd = latest.financial_data || {};
+
+    var ca = lfd.current_assets || {};
+    var lb = lfd.liabilities || {};
+    var fa = lfd.fixed_assets || {};
+
+    $('fs_current_assets').textContent = fmtNum(ca.total || 0);
+    $('fs_current_assets').className = 'fs-value' + ((ca.total||0) >= 0 ? ' positive' : ' negative');
+    $('fs_liabilities').textContent = fmtNum(lb.total || 0);
+    $('fs_liabilities').className = 'fs-value' + ((lb.total||0) > 0 ? ' negative' : '');
+    $('fs_fixed_assets').textContent = fmtNum(fa.total || 0);
+    $('fs_fixed_assets').className = 'fs-value' + ((fa.total||0) >= 0 ? ' positive' : ' negative');
+
+    // 多周期对比表
+    renderMultiPeriodComparison('dt_current_body', 'detail_current', 'dt_liability_body', 'detail_liability', 'dt_fixed_body', 'detail_fixed', reports, periods);
+    renderCashFlow(reports, periods);
+
+    toast('已加载「' + (ent.company_name||'') + '」的财务信息，共 ' + periods.length + ' 个周期', 'success');
+  }
+
+  /** 兼容旧数据：单周期显示 */
+  function renderSinglePeriod(fin) {
+    var cats = [
+      { key: 'current_assets', detailId: 'detail_current', bodyId: 'dt_current_body', summaryId: 'fs_current_assets' },
+      { key: 'liabilities',    detailId: 'detail_liability', bodyId: 'dt_liability_body', summaryId: 'fs_liabilities' },
+      { key: 'fixed_assets',   detailId: 'detail_fixed', bodyId: 'dt_fixed_body', summaryId: 'fs_fixed_assets' }
+    ];
+    for (var c = 0; c < cats.length; c++) {
+      var cat = cats[c];
+      var sec = fin[cat.key] || {};
+      var items = sec.items || [];
+      $('detail_' + cat.key.replace('_', '')).style.display = items.length ? '' : 'none';
+      renderDetailTable(cat.bodyId, items);
+    }
+  }
+
+  /** 多周期对比渲染 */
+  function renderMultiPeriodComparison(caBodyId, caDetailId, lbBodyId, lbDetailId, faBodyId, faDetailId, reports, periods) {
+    var categories = [
+      { key: 'current_assets', bodyId: caBodyId, detailId: caDetailId },
+      { key: 'liabilities',    bodyId: lbBodyId, detailId: lbDetailId },
+      { key: 'fixed_assets',   bodyId: faBodyId, detailId: faDetailId }
+    ];
+
+    for (var c = 0; c < categories.length; c++) {
+      var cat = categories[c];
+
+      // 收集所有周期中出现的全部项目名
+      var allNames = {};
+      for (var p = 0; p < periods.length; p++) {
+        var fd = (reports[periods[p]] || {}).financial_data || {};
+        var sec = fd[cat.key] || {};
+        var items = sec.items || [];
+        for (var i = 0; i < items.length; i++) {
+          allNames[items[i].name] = true;
+        }
+      }
+      var sortedNames = Object.keys(allNames).sort();
+      var hasData = sortedNames.length > 0;
+
+      $(cat.detailId).style.display = hasData ? '' : 'none';
+      if (!hasData) continue;
+
+      // 构建周期数值索引
+      var periodValues = {};
+      for (var p = 0; p < periods.length; p++) {
+        var fd2 = (reports[periods[p]] || {}).financial_data || {};
+        var sec2 = fd2[cat.key] || {};
+        var items2 = sec2.items || [];
+        periodValues[periods[p]] = {};
+        for (var i = 0; i < items2.length; i++) {
+          periodValues[periods[p]][items2[i].name] = items2[i].amount;
+        }
+      }
+
+      // 设表头
+      var prefixes = { current_assets: 'current', liabilities: 'liability', fixed_assets: 'fixed' };
+      var prefix = prefixes[cat.key] || cat.key;
+      var thEl = $('th_' + prefix);
+      if (thEl) {
+        var thHtml = '<tr><th>项目</th>';
+        for (var p = 0; p < periods.length; p++) {
+          thHtml += '<th style="text-align:right;">' + esc(reports[periods[p]].period_label) + '</th>';
+        }
+        thHtml += '</tr>';
+        thEl.innerHTML = thHtml;
+        var ths = thEl.querySelectorAll('th:not(:first-child)');
+        for (var t = 0; t < ths.length; t++) { ths[t].style.textAlign = 'right'; }
+      }
+
+      // 渲染行
+      var body = $(cat.bodyId);
+      if (!body) continue;
+      var html = '';
+      for (var i = 0; i < sortedNames.length; i++) {
+        var name = sortedNames[i];
+        html += '<tr><td>' + esc(name) + '</td>';
+        for (var p = 0; p < periods.length; p++) {
+          var val = periodValues[periods[p]] ? (periodValues[periods[p]][name] || 0) : 0;
+          html += '<td>' + fmtNum(val) + '</td>';
+        }
+        html += '</tr>';
+      }
+      // 合计行（计算值 = 子项之和）
+      html += '<tr class="total-row"><td>📊 合计（计算）</td>';
+      for (var p = 0; p < periods.length; p++) {
+        var fd3 = (reports[periods[p]] || {}).financial_data || {};
+        var total = (fd3[cat.key] || {}).total || 0;
+        html += '<td><strong>' + fmtNum(total) + '</strong></td>';
+      }
+      html += '</tr>';
+      // 报告合计行（仅当有 reported_total 时）
+      var hasRep = false;
+      for (var p = 0; p < periods.length; p++) {
+        var fdx = (reports[periods[p]] || {}).financial_data || {};
+        if ((fdx[cat.key] || {}).reported_total) { hasRep = true; break; }
+      }
+      if (hasRep) {
+        html += '<tr class="total-row" style="background:#f0f4f8;"><td>📋 合计（报告）</td>';
+        for (var p = 0; p < periods.length; p++) {
+          var fdy = (reports[periods[p]] || {}).financial_data || {};
+          var rt = (fdy[cat.key] || {}).reported_total || 0;
+          html += '<td>' + fmtNum(rt) + '</td>';
+        }
+        html += '</tr>';
+      }
+      body.innerHTML = html;
+    }
+  }
+
+  /** 渲染银行流水汇总 */
+  function renderCashFlow(reports, periods) {
+    var el = $('cf_content');
+    var detailEl = $('detail_cashflow');
+    if (!el || !detailEl) return;
+
+    var hasCashFlow = false;
+    for (var p = 0; p < periods.length; p++) {
+      var rp = reports[periods[p]];
+      if (rp && rp.cash_flow_summary) { hasCashFlow = true; break; }
+    }
+
+    if (!hasCashFlow) { detailEl.style.display = 'none'; return; }
+    detailEl.style.display = '';
+
+    var html = '';
+    for (var p = 0; p < periods.length; p++) {
+      var rp = reports[periods[p]];
+      if (!rp || !rp.cash_flow_summary) continue;
+      var cf = rp.cash_flow_summary;
+      var label = rp.period_label || periods[p];
+      html += '<div style="margin-bottom:14px;border:1px solid #e2e8f0;border-radius:12px;padding:12px 16px;background:#fafcfe;">';
+      html += '<div style="font-weight:700;color:#1e3a5f;margin-bottom:8px;">📋 ' + esc(label) + ' 银行流水</div>';
+      html += '<table class="fin-detail-table" style="margin:0;">';
+      html += '<tr><td style="width:140px;font-weight:600;">交易笔数</td><td style="font-family:monospace;">' + cf.transaction_count + '</td></tr>';
+      html += '<tr><td style="font-weight:600;">💰 收入合计</td><td style="font-family:monospace;color:#28a06b;font-weight:700;">' + fmtNum(cf.total_credits) + '</td></tr>';
+      html += '<tr><td style="font-weight:600;">📤 支出合计</td><td style="font-family:monospace;color:#dc3545;font-weight:700;">' + fmtNum(cf.total_debits) + '</td></tr>';
+      html += '<tr class="total-row"><td style="font-weight:700;">🏦 期末余额</td><td style="font-family:monospace;font-weight:800;">' + fmtNum(cf.ending_balance) + '</td></tr>';
+      if (cf.currency) html += '<tr><td style="font-weight:600;">币种</td><td>' + esc(cf.currency) + '</td></tr>';
+      if (cf.start_date && cf.end_date) html += '<tr><td style="font-weight:600;">日期范围</td><td>' + esc(cf.start_date) + ' ~ ' + esc(cf.end_date) + '</td></tr>';
+      html += '</table></div>';
+    }
+    el.innerHTML = html;
+  }
+
+  /** 单周期简单明细表（兼容旧数据） */
+  function renderDetailTable(bodyId, items) {
+    var body = $(bodyId);
+    if (!body) return;
+    if (!items || !items.length) {
+      body.innerHTML = '';
+      return;
+    }
+    var html = '';
+    var total = 0;
+    for (var i = 0; i < items.length; i++) {
+      var amt = parseFloat(items[i].amount || 0);
+      total += amt;
+      html += '<tr><td>' + esc(items[i].name || '—') + '</td><td>' + fmtNum(amt) + '</td></tr>';
+    }
+    html += '<tr class="total-row"><td>合计</td><td>' + fmtNum(total) + '</td></tr>';
+    body.innerHTML = html;
+  }
+
+  // ============================================================
+  //  建议点击委托
+  // ============================================================
+  document.addEventListener('click', function(e) {
+    var item = e.target.closest('.sug-item');
+    if (item) {
+      var eid = item.dataset.eid;
+      selectEnterprise(eid);
+    }
+  });
+
+  // ============================================================
+  //  搜索输入绑定
+  // ============================================================
+  function bindSearch(fieldId, sugId) {
+    var el = $(fieldId);
+    if (!el) return;
+    el.addEventListener('input', debounceSearch(fieldId, sugId, 300));
+    el.addEventListener('blur', function() {
+      setTimeout(function() {
+        var sug = $(sugId);
+        if (sug) sug.classList.remove('show');
+      }, 200);
+    });
+    el.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        var sug = $(sugId);
+        var first = sug ? sug.querySelector('.sug-item') : null;
+        if (first) {
+          selectEnterprise(first.dataset.eid);
+        }
+      }
+    });
+  }
+
+  // ============================================================
+  //  DB 记录列表
+  // ============================================================
+  var _activeTab = 'report';  // 'report' | 'bankflow'
+
+  function getDataTypeLabel(hasReports, hasBankFlows) {
+    if (hasReports && hasBankFlows) return '<span class="data-type-badge dt-both">📊💳 财务报告 + 银行流水</span>';
+    if (hasReports) return '<span class="data-type-badge dt-report">📊 财务报告</span>';
+    if (hasBankFlows) return '<span class="data-type-badge dt-bankflow">💳 银行流水</span>';
+    return '';
+  }
+
+  function renderBankFlowMonthTags(bfRecords) {
+    if (!bfRecords || !bfRecords.length) return '';
+    var sorted = bfRecords.slice().sort(function(a, b) { return b.report_month.localeCompare(a.report_month); });
+    var baseUrl = BASE || ('http://' + (window.location.hostname || '192.168.0.105') + ':8000');
+    var h = '';
+    for (var i = 0; i < sorted.length; i++) {
+      var bf = sorted[i];
+      var inflow = parseFloat(bf.cash_inflow || 0);
+      var outflow = parseFloat(bf.cash_outflow || 0);
+      var htmlPath = bf.report_html_path || '';
+      var htmlUrl = '';
+      if (htmlPath) {
+        var relPath = htmlPath.replace('/home/jefflu/api', '');
+        htmlUrl = baseUrl + relPath;
+      }
+      if (htmlUrl) {
+        h += '<a href="' + htmlUrl + '" target="_blank" class="bf-month-tag">';
+      } else {
+        h += '<span class="bf-month-tag">';
+      }
+      h += '📋 ' + esc(bf.report_month)
+        + ' <span class="bf-meta">'
+        + ' <span class="bf-inflow">↑' + fmtNum(inflow) + '</span>'
+        + ' <span class="bf-outflow">↓' + fmtNum(outflow) + '</span>'
+        + ' · ' + (bf.transaction_count || 0) + '笔'
+        + '</span>';
+      if (htmlUrl) { h += '</a>'; } else { h += '</span>'; }
+    }
+    return h;
+  }
+
+  function renderRecords(records) {
+    if (_activeTab === 'report') {
+      renderReportRecords(records);
+    } else {
+      renderBankFlowRecords();
+    }
+  }
+
+  /** 渲染财务报告列表 */
+  function renderReportRecords(records) {
+    var el = $('recordsList');
+    if (!el) return;
+    _enterprises = records;
+
+    var ft = ($('searchInput').value||'').trim().toLowerCase();
+
+    if (!records||!records.length) {
+      el.innerHTML = '<div class="empty-state"><div class="icon">📂</div><p>暂无财务报告数据</p><p class="text-muted" style="font-size:0.85rem;color:#8ba3bc;">在 FinData 数据录入页导入 JSON 文件后可见</p></div>';
+      $('recordsCount').textContent='0'; $('recordsCountLabel').textContent='0';
+      return;
+    }
+
+    var f = ft ? records.filter(function(r) {
+      var d = r.data || r;
+      return JSON.stringify(d).toLowerCase().indexOf(ft) !== -1;
+    }) : records;
+
+    $('recordsCount').textContent = f.length;
+    $('recordsCountLabel').textContent = f.length;
+
+    if (!f.length) {
+      el.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><p>未找到匹配的财务报告记录</p></div>';
+      return;
+    }
+
+    var h = '<div class="record-list">';
+    for (var i = 0; i < f.length; i++) {
+      var rec = f[i], d = rec.data||rec, rid = rec.id||i;
+      var name = d.company_name||'-', uscc = d.uscc||'-', stockCode = d.stock_code||'', contact = d.contact||'-';
+      var updatedAt = d.updated_at||rec.updated_at||d.created_at||rec.created_at||'';
+      var reports = d.reports || {};
+      var repPeriods = Object.keys(reports).sort().reverse();
+      var latestRep = repPeriods.length ? reports[repPeriods[0]] : null;
+      var latestFin = latestRep ? (latestRep.financial_data || {}) : (d.financial_data || {});
+      var caTotal = latestFin.current_assets ? (latestFin.current_assets.total||0) : 0;
+      var lbTotal = latestFin.liabilities ? (latestFin.liabilities.total||0) : 0;
+      var faTotal = latestFin.fixed_assets ? (latestFin.fixed_assets.total||0) : 0;
+
+      h += '<div class="record-card" data-id="'+rid+'">'
+        + '<div class="record-header" onclick="PF.toggle(this)">'
+        + '<span class="expand-icon">▶</span>'
+        + '<div class="rec-info"><div class="rec-title">'+esc(name)+' · '+esc(uscc)+(stockCode?' · '+esc(stockCode):'')+'</div>'
+        + '<div class="rec-meta">'
+        + '<span class="data-type-badge dt-report">📊 财务报告</span>'
+        + (repPeriods.length ? '<span style="font-weight:600;">📋 '+esc(repPeriods.join(' · '))+'</span>' : '')
+        + (updatedAt?'<span>📅 '+esc(updatedAt.slice(0,10))+'</span>':'')
+        + '<span>📞 '+esc(contact)+'</span>'
+        + '<span>💰 流动资产: <strong>'+fmtNum(caTotal)+'</strong></span>'
+        + '<span>📉 负债: <strong>'+fmtNum(lbTotal)+'</strong></span>'
+        + '<span>🏭 固定资产: <strong>'+fmtNum(faTotal)+'</strong></span>'
+        + '</div></div>'
+        + '<div class="rec-actions">'
+        + '<button class="btn btn-outline btn-xs" onclick="event.stopPropagation(); loadEnterprise('+rid+')">📋</button>'
+        + '</div></div>'
+        + '<div class="record-detail"><div class="record-detail-inner">'
+        + '<div class="detail-field"><div class="det-label">企业名称</div><div class="det-value">'+esc(name)+'</div></div>'
+        + '<div class="detail-field"><div class="det-label">社会统一代码</div><div class="det-value">'+esc(uscc)+'</div></div>'
+        + (stockCode?'<div class="detail-field"><div class="det-label">上市代码</div><div class="det-value">'+esc(stockCode)+'</div></div>':'')
+        + '<div class="detail-field"><div class="det-label">联系方式</div><div class="det-value">'+esc(contact)+'</div></div>'
+        + (repPeriods.length ? '<div class="detail-field"><div class="det-label">报告周期</div><div class="det-value">'+esc(repPeriods.join(' · '))+'</div></div>' : '')
+        + '<div class="detail-field"><div class="det-label">流动资产</div><div class="det-value"><strong>'+fmtNum(caTotal)+'</strong></div></div>'
+        + '<div class="detail-field"><div class="det-label">负债</div><div class="det-value"><strong>'+fmtNum(lbTotal)+'</strong></div></div>'
+        + '<div class="detail-field"><div class="det-label">固定资产</div><div class="det-value"><strong>'+fmtNum(faTotal)+'</strong></div></div>'
+        + (updatedAt?'<div class="detail-field"><div class="det-label">更新时间</div><div class="det-value">'+esc(updatedAt)+'</div></div>':'')
+        + '<div class="detail-actions">'
+        + '<button class="btn btn-sm" onclick="loadEnterprise('+rid+')">📋 加载到视图</button>'
+        + '</div></div></div></div>';
+    }
+    h += '</div>';
+    el.innerHTML = h;
+  }
+
+  /** 渲染银行流水列表 */
+  function renderBankFlowRecords() {
+    var el = $('recordsList');
+    if (!el) return;
+
+    var ft = ($('searchInput').value||'').trim().toLowerCase();
+
+    if (!_bankFlows || !_bankFlows.length) {
+      el.innerHTML = '<div class="empty-state"><div class="icon">📂</div><p>暂无银行流水数据</p><p class="text-muted" style="font-size:0.85rem;color:#8ba3bc;">在银行流水录入页导入 JSON 文件后可见</p></div>';
+      $('recordsCount').textContent='0'; $('recordsCountLabel').textContent='0';
+      return;
+    }
+
+    // 按企业分组
+    var groups = {};
+    for (var i = 0; i < _bankFlows.length; i++) {
+      var bf = _bankFlows[i];
+      if (ft && (bf.company_name||'').toLowerCase().indexOf(ft) === -1
+            && (bf.uscc||'').toLowerCase().indexOf(ft) === -1) {
+        continue;
+      }
+      var key = bf.company_name + '|' + bf.uscc;
+      if (!groups[key]) {
+        groups[key] = { company_name: bf.company_name, uscc: bf.uscc, months: [] };
+      }
+      groups[key].months.push(bf);
+    }
+
+    var groupList = Object.values(groups);
+    $('recordsCount').textContent = groupList.length;
+    $('recordsCountLabel').textContent = groupList.length;
+
+    if (!groupList.length) {
+      el.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><p>未找到匹配的银行流水记录</p></div>';
+      return;
+    }
+
+    var h = '<div class="record-list">';
+    for (var g = 0; g < groupList.length; g++) {
+      var grp = groupList[g];
+      var sortedMonths = grp.months.sort(function(a, b) { return b.report_month.localeCompare(a.report_month); });
+      var totalInflow = 0, totalOutflow = 0, totalTx = 0;
+      sortedMonths.forEach(function(m) {
+        totalInflow += parseFloat(m.cash_inflow || 0);
+        totalOutflow += parseFloat(m.cash_outflow || 0);
+        totalTx += m.transaction_count || 0;
+      });
+
+      h += '<div class="record-card" data-key="'+esc(grp.company_name)+'">'
+        + '<div class="record-header" onclick="PF.toggle(this)">'
+        + '<span class="expand-icon">▶</span>'
+        + '<div class="rec-info"><div class="rec-title">'+esc(grp.company_name)+' · '+esc(grp.uscc)+'</div>'
+        + '<div class="rec-meta">'
+        + '<span class="data-type-badge dt-bankflow">💳 银行流水</span>'
+        + '<span>📅 ' + esc(sortedMonths[0].report_month) + (sortedMonths.length > 1 ? ' 等 ' + sortedMonths.length + ' 个月' : '') + '</span>'
+        + '<span>💰 流入: <strong style="color:#28a06b;">'+fmtNum(totalInflow)+'</strong> 流出: <strong style="color:#dc3545;">'+fmtNum(totalOutflow)+'</strong></span>'
+        + '<span>📄 ' + totalTx + ' 笔交易</span>'
+        + '</div></div>'
+        + '<div class="rec-actions"></div></div>'
+        + '<div class="record-detail"><div class="record-detail-inner">'
+        + '<div class="detail-field"><div class="det-label">企业名称</div><div class="det-value">'+esc(grp.company_name)+'</div></div>'
+        + '<div class="detail-field"><div class="det-label">社会统一代码</div><div class="det-value">'+esc(grp.uscc)+'</div></div>'
+        + '<div class="detail-field"><div class="det-label">数据类型</div><div class="det-value"><span class="data-type-badge dt-bankflow">💳 银行流水</span></div></div>'
+        + '<div class="detail-field" style="border-top:1px dashed #dde3ea;padding-top:6px;"><div class="det-label" style="color:#2c7da0;">💳 银行流水明细</div>'
+        + '<div class="det-value" style="display:flex;flex-wrap:wrap;gap:2px;">'+renderBankFlowMonthTags(sortedMonths)+'</div></div>'
+        + '</div></div></div>';
+    }
+    h += '</div>';
+    el.innerHTML = h;
+  }  function loadRecords() {
+    var el=$('recordsList');
+    if (el) el.innerHTML='<div class="loading-skeleton"><div class="skeleton-item"></div><div class="skeleton-item"></div></div>';
+
+    // 同时获取企业财务数据和银行流水数据
+    var records = [];
+    var bankFlows = [];
+    var fetchCount = 0;
+
+    function finalRender() {
+      fetchCount++;
+      if (fetchCount === 2) {
+        _bankFlows = bankFlows;
+        renderRecords(records);
+      }
+    }
+
+    fetch(API+'?action=list', { headers: { 'X-API-Key': API_KEY } })
+      .then(function(r){return r.json();})
+      .then(function(res){
+        records = (res.success ? (res.records||[]) : []);
+        finalRender();
+      })
+      .catch(function(){
+        records = [];
+        finalRender();
+      });
+
+    fetch(API+'?action=list_bank_flows', { headers: { 'X-API-Key': API_KEY } })
+      .then(function(r){return r.json();})
+      .then(function(res){
+        bankFlows = (res.success ? (res.records||[]) : []);
+        finalRender();
+      })
+      .catch(function(){
+        bankFlows = [];
+        finalRender();
+      });
+  }
+
+  function loadEnterprise(id) {
+    var rec = null;
+    for (var i = 0; i < _enterprises.length; i++) {
+      if (String(_enterprises[i].id) === String(id)) { rec = _enterprises[i]; break; }
+    }
+    if (rec) {
+      fillEnterpriseData(rec.data||rec);
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+  }
+
+  // ============================================================
+  //  初始化
+  // ============================================================
+  document.addEventListener('DOMContentLoaded', function() {
+    // 搜索绑定
+    bindSearch('search_name', 'sug_name');
+    bindSearch('search_uscc', 'sug_uscc');
+    bindSearch('search_contact', 'sug_contact');
+    bindSearch('search_stock', 'sug_stock');
+
+    // DB 搜索
+    var si = $('searchInput');
+    if (si) si.addEventListener('input', function(){
+      if (_activeTab === 'report') {
+        renderReportRecords(_enterprises);
+      } else {
+        renderBankFlowRecords();
+      }
+    });
+
+    // DB 子标签切换
+    var subtabs = document.querySelectorAll('.db-subtab');
+    subtabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        subtabs.forEach(function(t) { t.classList.remove('active'); });
+        this.classList.add('active');
+        _activeTab = this.dataset.tab;
+        // 搜索框清空
+        $('searchInput').value = '';
+        // 重新渲染
+        if (_activeTab === 'report') {
+          renderRecords(_enterprises);
+        } else {
+          renderRecords([]);
+        }
+      });
+    });
+
+    // 刷新
+    var rf = $('refreshBtn');
+    if (rf) rf.addEventListener('click', loadRecords);
+
+    // 加载数据
+    loadRecords();
+
+    // ── DB 链接动态解析 ──
+    var links = document.querySelectorAll('.db-link');
+    links.forEach(function(a) {
+      a.href = a.href.replace(/http:\/\/[^:]+:8000\//, BASE + '/');
+    });
+  });
+
+  // ============================================================
+  //  全局暴露
+  // ============================================================
+  window.loadEnterprise = loadEnterprise;
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpine Linux 系统配置查阅指南</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+</head>
+<body class="page-alpine-guide">
+
+    <h1>Alpine Linux 本机配置查阅指南</h1>
+    <p>在 Alpine Linux 系统中，由于它主打精简和轻量化，默认没有安装像 <code>neofetch</code> 或 <code>lshw</code> 这样的重型复杂工具。不过，你可以通过 Alpine 自带的系统文件和轻量命令完整地查阅本机配置。</p>
+    <p>以下是查阅不同硬件和系统配置的常用命令及实际输出参考：</p>
+
+    <!-- 1. 查看系统版本与内核信息 -->
+    <h3>1. 查看系统版本与内核信息</h3>
+    <pre class="command-block"><span class="comment"># 查看 Alpine Linux 的具体版本号</span>
+<span class="command">cat /etc/alpine-release</span>
+<span class="output">3.23.4</span>
+
+<span class="comment"># 查看当前运行的系统内核版本及架构</span>
+<span class="command">uname -a</span>
+<span class="output">Linux jefflu 6.18.33-0-lts #1-Alpine SMP PREEMPT_DYNAMIC 2026-05-24 18:06:34 x86_64 Linux</span></pre>
+
+    <!-- 2. 查看 CPU 信息 -->
+    <h3>2. 查看 CPU 信息</h3>
+    <pre class="command-block"><span class="comment"># 查看 CPU 的型号、核心数、频率等详细信息</span>
+<span class="command">cat /proc/cpuinfo</span>
+<span class="output">processor       : 0
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 142
+model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
+stepping        : 10
+microcode       : 0xf0
+cpu MHz         : 799.997
+cache size      : 3072 KB
+physical id     : 0
+siblings        : 4
+core id         : 0
+cpu cores       : 2
+apicid          : 0
+initial apicid  : 0
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 22
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb pti ssbd ibrs ibpb stibp tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm arat pln pts hwp hwp_notify hwp_act_window hwp_epp vnmi md_clear flush_l1d arch_capabilities
+vmx flags       : vnmi preemption_timer invvpid ept_x_only ept_ad ept_1gb flexpriority tsc_offset vtpr mtf vapic ept vpid unrestricted_guest ple pml ept_violation_ve ept_mode_based_exec
+bugs            : cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs itlb_multihit srbds mmio_stale_data retbleed gds spectre_v2_user old_microcode vmscape
+bogomips        : 4599.93
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 39 bits physical, 48 bits virtual
+power management:
+
+processor       : 1
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 142
+model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
+stepping        : 10
+microcode       : 0xf0
+cpu MHz         : 800.013
+cache size      : 3072 KB
+physical id     : 0
+siblings        : 4
+core id         : 1
+cpu cores       : 2
+apicid          : 2
+initial apicid  : 2
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 22
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb pti ssbd ibrs ibpb stibp tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm arat pln pts hwp hwp_notify hwp_act_window hwp_epp vnmi md_clear flush_l1d arch_capabilities
+vmx flags       : vnmi preemption_timer invvpid ept_x_only ept_ad ept_1gb flexpriority tsc_offset vtpr mtf vapic ept vpid unrestricted_guest ple pml ept_violation_ve ept_mode_based_exec
+bugs            : cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs itlb_multihit srbds mmio_stale_data retbleed gds spectre_v2_user old_microcode vmscape
+bogomips        : 4599.93
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 39 bits physical, 48 bits virtual
+power management:
+
+processor       : 2
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 142
+model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
+stepping        : 10
+microcode       : 0xf0
+cpu MHz         : 799.980
+cache size      : 3072 KB
+physical id     : 0
+siblings        : 4
+core id         : 0
+cpu cores       : 2
+apicid          : 1
+initial apicid  : 1
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 22
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb pti ssbd ibrs ibpb stibp tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm arat pln pts hwp hwp_notify hwp_act_window hwp_epp vnmi md_clear flush_l1d arch_capabilities
+vmx flags       : vnmi preemption_timer invvpid ept_x_only ept_ad ept_1gb flexpriority tsc_offset vtpr mtf vapic ept vpid unrestricted_guest ple pml ept_violation_ve ept_mode_based_exec
+bugs            : cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs itlb_multihit srbds mmio_stale_data retbleed gds spectre_v2_user old_microcode vmscape
+bogomips        : 4599.93
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 39 bits physical, 48 bits virtual
+power management:
+
+processor       : 3
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 142
+model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
+stepping        : 10
+microcode       : 0xf0
+cpu MHz         : 800.022
+cache size      : 3072 KB
+physical id     : 0
+siblings        : 4
+core id         : 1
+cpu cores       : 2
+apicid          : 3
+initial apicid  : 3
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 22
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb pti ssbd ibrs ibpb stibp tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm arat pln pts hwp hwp_notify hwp_act_window hwp_epp vnmi md_clear flush_l1d arch_capabilities
+vmx flags       : vnmi preemption_timer invvpid ept_x_only ept_ad ept_1gb flexpriority tsc_offset vtpr mtf vapic ept vpid unrestricted_guest ple pml ept_violation_ve ept_mode_based_exec
+bugs            : cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs itlb_multihit srbds mmio_stale_data retbleed gds spectre_v2_user old_microcode vmscape
+bogomips        : 4599.93
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 39 bits physical, 48 bits virtual
+power management:</span>
+
+<span class="comment"># 或者使用更简洁的命令查看核心数</span>
+<span class="command">nproc</span></pre>
+
+    <!-- 3. 查看内存 (RAM) 使用情况 -->
+    <h3>3. 查看内存 (RAM) 使用情况</h3>
+    <pre class="command-block"><span class="comment"># 查看总内存、已用内存和剩余内存（-h 表示以容易阅读的 Mb/Gb 显示）</span>
+<span class="command">free -h</span>
+<span class="output">              total        used        free      shared  buff/cache   available
+Mem:           3.5Gi       968Mi       2.1Gi       624Ki       696Mi       2.6Gi
+Swap:             0B          0B          0B</span>
+
+<span class="comment"># 查看更详细的内存硬件映射信息</span>
+<span class="command">cat /proc/meminfo</span>
+<span class="output">MemTotal:        3675280 kB
+MemFree:         2196888 kB
+MemAvailable:    2683992 kB
+Buffers:           43360 kB
+Cached:           622932 kB
+SwapCached:            0 kB
+Active:          1132420 kB
+Inactive:         122216 kB
+Active(anon):     588960 kB
+Inactive(anon):        0 kB
+Active(file):     543460 kB
+Inactive(file):   122216 kB
+Unevictable:         124 kB
+Mlocked:               0 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+Zswap:                 0 kB
+Zswapped:              0 kB
+Dirty:                20 kB
+Writeback:             0 kB
+AnonPages:        569284 kB
+Mapped:           300692 kB
+Shmem:               624 kB
+KReclaimable:      46816 kB
+Slab:             103352 kB
+SReclaimable:      46816 kB
+SUnreclaim:        56536 kB
+KernelStack:        4000 kB
+PageTables:        13732 kB
+SecPageTables:      2056 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:     1837640 kB
+Committed_AS:    1320844 kB
+VmallocTotal:   34359738367 kB
+VmallocUsed:       32064 kB
+VmallocChunk:          0 kB
+Percpu:             1040 kB
+AnonHugePages:    118784 kB
+ShmemHugePages:        0 kB
+ShmemPmdMapped:        0 kB
+FileHugePages:     73728 kB
+FilePmdMapped:         0 kB
+Unaccepted:            0 kB
+Balloon:               0 kB
+HugePages_Total:       0
+HugePages_Free:        0
+HugePages_Rsvd:        0
+HugePages_Surp:        0
+Hugepagesize:       2048 kB
+Hugetlb:               0 kB
+DirectMap4k:      109928 kB
+DirectMap2M:     1644544 kB
+DirectMap1G:     2097152 kB</span></pre>
+
+    <!-- 4. 查看磁盘空间与分区 -->
+    <h3>4. 查看磁盘空间与分区</h3>
+    <pre class="command-block"><span class="comment"># 查看各个挂载分区的磁盘空间使用率（-h 同为易读模式）</span>
+<span class="command">df -h</span>
+<span class="output">Filesystem                Size      Used Available Use% Mounted on
+devtmpfs                 10.0M         0     10.0M   0% /dev
+shm                       1.8G         0      1.8G   0% /dev/shm
+/dev/sda3               453.2G      4.8G    425.3G   1% /
+tmpfs                   717.8M    356.0K    717.5M   0% /run
+/dev/sda1               271.1M     38.5M    213.6M  15% /boot
+tmpfs                     1.8G         0      1.8G   0% /tmp</span>
+
+<span class="comment"># 查看系统识别到的所有磁盘及分区列表</span>
+<span class="command">fdisk -l</span>
+<span class="output">Disk /dev/sda: 466 GB, 500107862016 bytes, 976773168 sectors
+60801 cylinders, 255 heads, 63 sectors/track
+Units: sectors of 1 * 512 = 512 bytes
+
+Device  Boot StartCHS    EndCHS        StartLBA     EndLBA    Sectors  Size Id Type
+/dev/sda1 *  0,32,33     38,94,56          2048     616447     614400  300M 83 Linux
+/dev/sda2    38,94,57    560,137,25      616448    9005055    8388608 4096M 82 Linux swap
+/dev/sda3    560,137,26  1023,254,63    9005056  976773167  967768112  461G 83 Linux</span></pre>
+
+    <!-- 5. 查看网络配置与 IP 地址 -->
+    <h3>5. 查看网络配置与 IP 地址</h3>
+    <pre class="command-block"><span class="comment"># 查看网卡信息及 IP 地址（Alpine 默认不带 ifconfig，推荐用 ip 命令）</span>
+<span class="command">ip a</span>
+<span class="output">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether e8:6a:64:4a:ab:d3 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.0.105/24 scope global eth0
+       valid_lft forever preferred_lft forever
+    inet6 2409:8a20:5a30:c434:ea6a:64ff:fe4a:abd3/64 scope global dynamic flags 100
+       valid_lft 86232sec preferred_lft 14232sec
+    inet6 fe80::ea6a:64ff:fe4a:abd3/64 scope link
+       valid_lft forever preferred_lft forever
+3: wlan0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP qlen 1000
+    link/ether 00:f4:8d:eb:a7:79 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.0.107/24 scope global wlan0
+       valid_lft forever preferred_lft forever
+    inet6 2409:8a20:5a30:c434:2f4:8dff:feeb:a779/64 scope global dynamic flags 100
+       valid_lft 86232sec preferred_lft 14232sec
+    inet6 fe80::2f4:8dff:feeb:a779/64 scope link
+       valid_lft forever preferred_lft forever
+4: tailscale0: &lt;POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP&gt; mtu 1280 qdisc pfifo_fast state UNKNOWN qlen 500
+    link/[65534]
+    inet 100.105.237.93/32 scope global tailscale0
+       valid_lft forever preferred_lft forever
+    inet6 fd7a:115c:a1e0::2d35:ed5e/128 scope global
+       valid_lft forever preferred_lft forever
+    inet6 fe80::fe73:abc2:e032:63d5/64 scope link flags 800
+       valid_lft forever preferred_lft forever</span>
+
+<span class="comment"># 查看路由表（网关设置）</span>
+<span class="command">ip route</span>
+<span class="output">default via 192.168.0.1 dev eth0  metric 202
+default via 192.168.0.1 dev wlan0  metric 303
+192.168.0.0/24 dev eth0 scope link  src 192.168.0.105
+192.168.0.0/24 dev wlan0 scope link  src 192.168.0.107</span></pre>
+
+    <hr>
+
+    <!-- 6. MariaDB 服务状态概览 -->
+    <h3>6. MariaDB 服务状态概览</h3>
+    <table class="info-table">
+        <tr><th>项目</th><th>信息</th></tr>
+        <tr><td>版本</td><td>MariaDB 11.4.11</td></tr>
+        <tr><td>运行状态</td><td class="status-ok">✅ 运行中（PID: 3314）</td></tr>
+        <tr><td>数据目录</td><td><code>/var/lib/mysql</code></td></tr>
+        <tr><td>Socket</td><td><code>/var/run/mysqld/mysqld.sock</code></td></tr>
+        <tr><td>端口</td><td>3306（TCP, 绑定 0.0.0.0）</td></tr>
+        <tr><td>配置文件</td><td><code>/etc/my.cnf</code>, <code>/etc/my.cnf.d/mariadb-server.cnf</code></td></tr>
+    </table>
+
+    <p><strong>配置要点：</strong></p>
+    <ul>
+        <li><code>skip_ssl</code> — SSL 已禁用</li>
+        <li><code>bind-address = 0.0.0.0</code> — 允许远程连接</li>
+        <li><code>max_connections = 10</code></li>
+        <li><code>innodb_buffer_pool_size = 20M</code></li>
+        <li><code>skip_name_resolve = 1</code></li>
+    </ul>
+
+    <div class="note-box">
+        <strong>⚠️ 注意：</strong>当前以用户 <code>jefflu</code> 运行，但 MariaDB 的 root 用户使用了 <code>unix_socket</code> 身份认证插件。这意味着只有 OS 的 <code>root</code> 用户才能以 MariaDB root 身份登录，当前用户没有权限直接查询数据库内容。
+        如需查看数据库，可尝试以下方式：
+        <pre class="command-block"><span class="comment"># 方式一：以 root 系统用户执行</span>
+    <span class="command">su -c "mariadb -e 'SHOW DATABASES;'"</span>
+
+    <span class="comment"># 方式二：提供密码远程连接（如果配置了密码认证用户）</span>
+    <span class="command">mariadb -h 127.0.0.1 -u root -p -e "SHOW DATABASES;"</span></pre>
+    </div>
+
+    <!-- 7. 本机环境基本信息 -->
+    <h3>7. 本机环境基本信息</h3>
+    <table class="info-table">
+        <tr><th>项目</th><th>信息</th></tr>
+        <tr><td>系统运行时间</td><td>2026 年 5 月 30 日</td></tr>
+        <tr><td>平台</td><td>Linux on x86_64</td></tr>
+        <tr><td>内核版本</td><td>6.18.33-0-lts</td></tr>
+        <tr><td>Shell</td><td><code>/bin/sh</code></td></tr>
+        <tr><td>工作目录</td><td><code>/home/jefflu</code></td></tr>
+    </table>
+
+    <hr>
+</body>
+</html>

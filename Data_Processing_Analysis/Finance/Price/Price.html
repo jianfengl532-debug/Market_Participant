@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>价格数据 · 支撑压力查询 & 现货信息</title>
+<link rel="stylesheet" href="../../InvStrat/InvStrat.css">
+<link rel="stylesheet" href="../Finance.css">
+<script src="../../../js/config.js"></script>
+</head>
+<body class="finance-page">
+<div class="container">
+
+
+  <!-- ===== 主标题 ===== -->
+  <div class="main-header">
+    <h1>💰 价格数据 · 支撑压力查询 &amp; 现货信息</h1>
+    <p>
+      <span class="update-time"><span class="emoji">📈</span> データクレンジング・整備</span>
+      <span class="update-time"><span class="emoji">🕒</span> 更新: <span id="updateDate"><script>document.write(new Date().toLocaleDateString('zh-CN'));</script></span></span>
+      <span class="market-badge"><a href="http://192.168.0.105:8000/Price_Data/Price_Data.html" class="db-link" target="_blank" rel="noopener noreferrer"><span class="emoji">🗄️</span> DB 接続・データ読み込み</a></span>
+    </p>
+  </div>
+
+  <!-- ============================================================
+       Panel 1: 价格查询
+       ============================================================ -->
+  <div class="section-card">
+    <div class="section-title">
+      🔍 价格查询 · 自动检索
+      <span class="badge">代码检索 · 斐波那契计算</span>
+    </div>
+    <div class="sub-block">
+      <div class="price-layout">
+
+        <!-- ====== 左侧：支撑/压力 ====== -->
+        <div class="calc-panel">
+          <h3>价格支撑 / 压力 位</h3>
+
+          <div class="calc-field">
+            <label>代码 <span class="text-muted" style="font-weight:400;">（输入后自动检索）</span></label>
+            <div class="code-search">
+              <input type="text" id="sr_code" placeholder="输入代码，如 CU、AL…" maxlength="20" autocomplete="off">
+              <span class="search-spinner" id="sr_spinner">⏳</span>
+              <div class="code-suggestions" id="sr_sug"></div>
+            </div>
+          </div>
+
+          <div class="calc-field">
+            <label>品种</label>
+            <div class="display-box empty" id="sr_variety">—</div>
+          </div>
+
+          <hr class="calc-divider">
+
+          <div style="font-size:0.75rem;font-weight:600;color:#5b6f86;margin-bottom:6px;">📋 价格列表</div>
+          <div class="calc-field"><label>价格 1</label><div class="display-box empty" id="sr_p1">—</div></div>
+          <div class="calc-field"><label>价格 2</label><div class="display-box empty" id="sr_p2">—</div></div>
+          <div class="calc-field"><label>价格 3</label><div class="display-box empty" id="sr_p3">—</div></div>
+          <div class="calc-field"><label>价格 4</label><div class="display-box empty" id="sr_p4">—</div></div>
+          <div class="calc-field"><label>价格 5</label><div class="display-box empty" id="sr_p5">—</div></div>
+
+          <hr class="calc-divider">
+
+          <div style="font-size:0.75rem;font-weight:600;color:#5b6f86;margin-bottom:6px;">📊 斐波那契支撑 / 压力位</div>
+          <div id="sr_results">
+            <div class="calc-empty"><div class="icon">📊</div><p>输入代码后自动计算</p></div>
+          </div>
+
+          <div class="calc-legend" style="margin-top:4px;">
+            <span><span class="gold-dot"></span> 金色 = 0.618 / 1.618</span>
+            <span>乘数: 0.236·0.382·0.5·0.618·0.786·1.272·1.618</span>
+          </div>
+        </div>
+
+        <!-- ====== 右侧：现货价格 ====== -->
+        <div class="spot-panel">
+          <h3>现货价格信息</h3>
+
+          <div class="spot-field">
+            <label>代码 <span class="text-muted" style="font-weight:400;">（输入后自动检索）</span></label>
+            <div class="code-search">
+              <input type="text" id="sp_code" placeholder="输入代码，如 CU、AL…" maxlength="20" autocomplete="off">
+              <span class="search-spinner" id="sp_spinner">⏳</span>
+              <div class="code-suggestions" id="sp_sug"></div>
+            </div>
+          </div>
+
+          <div class="spot-field"><label>品种</label><div class="display-box empty" id="sp_variety">—</div></div>
+          <div class="spot-field"><label>型号</label><div class="display-box empty" id="sp_model">—</div></div>
+          <div class="spot-field"><label>规格</label><div class="display-box empty" id="sp_spec">—</div></div>
+          <div class="spot-field"><label>质量</label><div class="display-box empty" id="sp_quality">—</div></div>
+          <div class="spot-field"><label>价格</label><div class="display-box empty" id="sp_price">—</div></div>
+
+          <div class="action-bar">
+            <button type="button" class="btn btn-outline btn-sm" onclick="PF.clearAll()">🗑️ 清空全部</button>
+            <span class="text-muted" style="font-size:0.75rem;color:#8ba3bc;">仅「代码」可输入</span>
+          </div>
+        </div>
+
+      </div><!-- /price-layout -->
+    </div><!-- /sub-block -->
+  </div><!-- /section-card -->
+
+  <div style="text-align:center;margin:4px 0 8px;position:relative;">
+    <div style="position:absolute;left:0;right:0;top:50%;height:2px;background:linear-gradient(90deg,transparent,#cbd5e0,transparent);"></div>
+    <span style="position:relative;background:#f4f7fc;padding:0 20px;font-size:1.3rem;">⬇</span>
+  </div>
+
+  <!-- ============================================================
+       Panel 2: DB 登録情報
+       ============================================================ -->
+  <div class="section-card">
+    <div class="section-title">
+      📚 DB 登録情報
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+        <span class="badge" id="recordsCount" style="background:#2c7da0;">0</span>
+        <button type="button" class="btn btn-outline btn-sm" id="refreshBtn">🔄 刷新</button>
+      </div>
+    </div>
+    <div class="sub-block">
+      <div class="records-toolbar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="搜索代码、品种…">
+        </div>
+        <div class="text-muted" style="font-size:0.8rem;">共 <strong id="recordsCountLabel">0</strong> 条</div>
+      </div>
+      <div id="recordsList">
+        <div class="loading-skeleton">
+          <div class="skeleton-item"></div>
+          <div class="skeleton-item"></div>
+        </div>
+      </div>
+      <div class="db-footer">📡 数据来源：Price_Data 录入系统 · 输入代码自动检索</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="message-area" id="msgArea"></div>
+
+<script src="../../InvStrat/InvStrat.js"></script>
+<script src="../Finance.js"></script>
+<script>document.addEventListener('DOMContentLoaded', PF.init);</script>
+
+<!-- ── DB 链接动态解析 + 数据自动加载（与 FxCap/GeoEnv 同一模式） ── -->
+<script>
+(function() {
+  'use strict';
+
+  // 动态解析 DB 链接主机名
+  var cfg = window.API_CONFIG || { baseUrl: 'http://' + (window.location.hostname || 'localhost') + ':8000', apiKey: '' };
+  var base = cfg.baseUrl.replace(/\/+$/, '');
+  var apiKey = cfg.apiKey;
+  var links = document.querySelectorAll('.db-link');
+  links.forEach(function(a) {
+    a.href = a.href.replace(/http:\/\/[^:]+:8000\//, base + '/');
+  });
+
+  // ── DB からデータを取得して表示 ──
+  var apiBase = base + '/Price_Data/api.php';
+
+  fetch(apiBase + '?action=list', { headers: { 'X-API-Key': apiKey } })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var records = data.records || data.data || [];
+      if (!records.length) {
+        // 无数据时不干扰现有 recordsList（由 Finance.js 的 PF.init 负责显示空状态）
+        return;
+      }
+
+      // 查找 DB 登録情報 区域的记录容器
+      var list = document.getElementById('recordsList');
+      var count = document.getElementById('recordsCount');
+      var countLabel = document.getElementById('recordsCountLabel');
+      if (!list) return;
+
+      // 更新计数
+      if (count) count.textContent = records.length;
+      if (countLabel) countLabel.textContent = records.length;
+
+      var html = '<div class="record-list">';
+      records.forEach(function(r) {
+        var code = r.code || '-';
+        var variety = r.variety || '-';
+        var price = r.price || '-';
+        var model = r.model || '';
+        var spec = r.spec || '';
+        var quality = r.quality || '';
+        var createdAt = r.created_at || '';
+
+        html += '<div class="record-card" data-id="' + (r.id || '') + '">'
+          + '<div class="record-header" onclick="this.closest(\'.record-card\').classList.toggle(\'expanded\')">'
+          + '<span class="expand-icon">▶</span>'
+          + '<div class="rec-info"><div class="rec-title">' + esc(code) + ' · ' + esc(variety) + '</div>'
+          + '<div class="rec-meta">'
+          + (createdAt ? '<span>📅 ' + esc(createdAt.slice(0, 10)) + '</span>' : '')
+          + (model ? '<span>📦 ' + esc(model) + '</span>' : '')
+          + (spec ? '<span>📏 ' + esc(spec) + '</span>' : '')
+          + (quality ? '<span>⭐ ' + esc(quality) + '</span>' : '')
+          + (price !== '-' ? '<span>💰 <strong>' + esc(price) + '</strong></span>' : '')
+          + '</div></div>'
+          + '</div>'
+          + '<div class="record-detail"><div class="record-detail-inner">'
+          + '<div class="detail-field"><div class="det-label">代码</div><div class="det-value">' + esc(code) + '</div></div>'
+          + '<div class="detail-field"><div class="det-label">品种</div><div class="det-value">' + esc(variety) + '</div></div>'
+          + (model ? '<div class="detail-field"><div class="det-label">型号</div><div class="det-value">' + esc(model) + '</div></div>' : '')
+          + (spec ? '<div class="detail-field"><div class="det-label">规格</div><div class="det-value">' + esc(spec) + '</div></div>' : '')
+          + (quality ? '<div class="detail-field"><div class="det-label">质量</div><div class="det-value">' + esc(quality) + '</div></div>' : '')
+          + (price !== '-' ? '<div class="detail-field"><div class="det-label">价格</div><div class="det-value"><strong>' + esc(price) + '</strong></div></div>' : '')
+          + (createdAt ? '<div class="detail-field"><div class="det-label">录入时间</div><div class="det-value">' + esc(createdAt) + '</div></div>' : '')
+          + '</div></div></div>';
+      });
+      html += '</div>';
+
+      // 仅在 recordsList 仍为 loading 骨架时替换
+      if (list.querySelector('.loading-skeleton')) {
+        list.innerHTML = html;
+      } else {
+        // 已被 PF.init 渲染，追加数据
+        var existing = list.querySelector('.record-list');
+        if (existing) {
+          existing.insertAdjacentHTML('beforeend', html.replace('<div class="record-list">', ''));
+        } else {
+          list.innerHTML = html;
+        }
+      }
+    })
+    .catch(function(err) {
+      // API 不可达时不显示（CORS 或网络问题），现有的 localStorage 数据由 PF.init 负责
+      console.log('Price DB fetch skipped:', err);
+    });
+
+  function esc(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>个人账户 · 信息查询</title>
+<link rel="stylesheet" href="../../InvStrat/InvStrat.css">
+<link rel="stylesheet" href="../Finance.css">
+<script src="../../../js/config.js"></script>
+<style>
+/* =============================================================
+   PerAcc 展示页专用样式
+   ============================================================= */
+
+/* ---- 搜索区 ---- */
+.peracc-search-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+@media (max-width: 800px) {
+    .peracc-search-area { grid-template-columns: 1fr; }
+}
+
+.peracc-search-field { position: relative; }
+.peracc-search-field label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #5b6f86;
+    margin-bottom: 3px;
+}
+.peracc-search-field input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid #cbd5e0;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.peracc-search-field input:focus {
+    outline: none;
+    border-color: #b8860b;
+    box-shadow: 0 0 0 3px rgba(184,134,11,0.15);
+}
+
+/* ---- 搜索建议下拉 ---- */
+.peracc-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #cbd5e0;
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    z-index: 100;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+}
+.peracc-suggestions.show { display: block; }
+.peracc-suggestions .sug-item {
+    padding: 10px 14px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f2f5;
+    transition: background 0.1s;
+}
+.peracc-suggestions .sug-item:last-child { border-bottom: none; }
+.peracc-suggestions .sug-item:hover { background: #f8f0dc; }
+.peracc-suggestions .sug-item .sug-name {
+    font-weight: 600;
+    color: #1e3a5f;
+}
+.peracc-suggestions .sug-item .sug-meta {
+    font-size: 0.72rem;
+    color: #8ba0b8;
+    margin-left: 8px;
+}
+
+/* ---- 总权益展示 ---- */
+.total-equity-display {
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f0dc, #eee0bc);
+    border-radius: 20px;
+    margin-bottom: 20px;
+}
+.total-equity-display .te-label {
+    font-size: 0.85rem;
+    color: #7a5a1a;
+    font-weight: 600;
+}
+.total-equity-display .te-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #b8860b;
+    letter-spacing: 1px;
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+}
+.total-equity-display .te-sub {
+    font-size: 0.75rem;
+    color: #a08040;
+    margin-top: 2px;
+}
+
+/* ---- 账户卡片 ---- */
+.acc-card {
+    background: #f9fbfe;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+}
+.acc-card:last-child { margin-bottom: 0; }
+
+.acc-card .acc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.acc-card .acc-header .acc-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e3a5f;
+}
+.acc-card .acc-header .acc-no {
+    font-size: 0.82rem;
+    color: #6b83a0;
+}
+
+.acc-card .acc-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+@media (max-width: 600px) {
+    .acc-card .acc-details { grid-template-columns: 1fr; }
+}
+.acc-card .acc-details .ad-item {
+    text-align: center;
+    padding: 8px 10px;
+    background: #f0f4f8;
+    border-radius: 12px;
+}
+.acc-card .acc-details .ad-item .ad-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6b83a0;
+    text-transform: uppercase;
+}
+.acc-card .acc-details .ad-item .ad-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-top: 2px;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+}
+
+/* ---- 持仓子表 ---- */
+.pos-mini-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+    margin-top: 8px;
+}
+.pos-mini-table th {
+    background: #eef4fa;
+    color: #2d4a6e;
+    font-weight: 600;
+    padding: 6px 8px;
+    text-align: center;
+    font-size: 0.72rem;
+    border-bottom: 2px solid #dce2ec;
+}
+.pos-mini-table td {
+    padding: 5px 8px;
+    text-align: center;
+    border-bottom: 1px solid #eef2f7;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+}
+.pos-mini-table tbody tr:hover { background: #fdf8ee; }
+
+/* ---- 空状态 ---- */
+.no-person-selected {
+    text-align: center;
+    padding: 30px 20px;
+    color: #8ba3bc;
+}
+.no-person-selected .icon { font-size: 2.5rem; margin-bottom: 8px; }
+.no-person-selected p { font-size: 0.9rem; }
+</style>
+</head>
+<body class="finance-page">
+<div class="container">
+
+  
+
+  <!-- ===== 主标题 ===== -->
+  <div class="main-header">
+    <h1>💳️ 个人账户 · 信息查询</h1>
+    <p>
+      <span class="update-time"><span class="emoji">📋</span> 账户持仓一览</span>
+      <span class="update-time"><span class="emoji">🕒</span> 更新: <span id="updateDate"><script>document.write(new Date().toLocaleDateString('zh-CN'));</script></span></span>
+      <span class="market-badge"><a href="http://192.168.0.105:8000/PerAcc_Data/PerAcc_Data.html" class="db-link" target="_blank" rel="noopener noreferrer"><span class="emoji">🗄️</span> DB 接続・データ読み込み</a></span>
+    </p>
+  </div>
+
+  <!-- ============================================================
+       Panel 1: 人员查询
+       ============================================================ -->
+  <div class="section-card">
+    <div class="section-title">
+      🔍 人员查询 · 自动检索
+      <span class="badge">输入姓名 / 身份证 / 手机号自动填充</span>
+    </div>
+    <div class="sub-block">
+
+      <!-- 搜索区 -->
+      <div class="peracc-search-area">
+        <div class="peracc-search-field">
+          <label>姓名</label>
+          <input type="text" id="search_name" placeholder="输入姓名搜索…" maxlength="50" autocomplete="off">
+          <div class="peracc-suggestions" id="sug_name"></div>
+        </div>
+        <div class="peracc-search-field">
+          <label>身份证</label>
+          <input type="text" id="search_id" placeholder="输入身份证号搜索…" maxlength="30" autocomplete="off">
+          <div class="peracc-suggestions" id="sug_id"></div>
+        </div>
+        <div class="peracc-search-field">
+          <label>联系号码</label>
+          <input type="text" id="search_phone" placeholder="输入手机号搜索…" maxlength="30" autocomplete="off">
+          <div class="peracc-suggestions" id="sug_phone"></div>
+        </div>
+      </div>
+
+      <!-- 总权益 -->
+      <div class="total-equity-display">
+        <div class="te-label">💰 总权益</div>
+        <div class="te-value" id="te_value">—</div>
+        <div class="te-sub" id="te_sub">请搜索并选择人员</div>
+      </div>
+
+      <!-- 账户信息 -->
+      <div id="accountInfoArea">
+        <div class="no-person-selected">
+          <div class="icon">💳️</div>
+          <p>在上方输入姓名、身份证或手机号搜索</p>
+          <p style="font-size:0.82rem;color:#8ba3bc;margin-top:4px;">选择后自动填充账户信息</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="text-align:center;margin:4px 0 8px;position:relative;">
+    <div style="position:absolute;left:0;right:0;top:50%;height:2px;background:linear-gradient(90deg,transparent,#cbd5e0,transparent);"></div>
+    <span style="position:relative;background:#f4f7fc;padding:0 20px;font-size:1.3rem;">⬇</span>
+  </div>
+
+  <!-- ============================================================
+       Panel 2: DB 登録情報
+       ============================================================ -->
+  <div class="section-card">
+    <div class="section-title">
+      📚 DB 登録情報
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+        <span class="badge" id="recordsCount" style="background:#2c7da0;">0</span>
+        <button type="button" class="btn btn-outline btn-sm" id="refreshBtn">🔄 刷新</button>
+      </div>
+    </div>
+    <div class="sub-block">
+      <div class="records-toolbar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="搜索姓名、身份证、手机号…">
+        </div>
+        <div class="text-muted" style="font-size:0.8rem;">共 <strong id="recordsCountLabel">0</strong> 条</div>
+      </div>
+      <div id="recordsList">
+        <div class="loading-skeleton">
+          <div class="skeleton-item"></div>
+          <div class="skeleton-item"></div>
+        </div>
+      </div>
+      <div class="db-footer">📡 数据来源：PerAcc_Data 录入系统 · 输入信息自动检索</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="message-area" id="msgArea"></div>
+
+<script src="../../InvStrat/InvStrat.js"></script>
+<script src="../Finance.js"></script>
+<!-- PerAcc 不使用 PF.init（有自己的数据加载逻辑），仅引用 PF.toggle -->
+
+<!-- ── PerAcc 专用逻辑 ── -->
+<script>
+(function() {
+  'use strict';
+
+  // ============================================================
+  //  配置
+  // ============================================================
+  var _cfg = window.API_CONFIG || { baseUrl: 'http://' + (window.location.hostname || 'localhost') + ':8000', apiKey: '' };
+  var API = _cfg.baseUrl.replace(/\/+$/, '') + '/PerAcc_Data/api.php';
+  var API_KEY = _cfg.apiKey;
+
+  var _persons = [];   // 所有人员（来自 list）
+  var _debounceTimers = {};
+
+  // ============================================================
+  //  工具
+  // ============================================================
+  function esc(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function $(id) { return document.getElementById(id); }
+
+  function toast(text, type) {
+    type = type||'info';
+    var c = $('msgArea');
+    if (!c) { c = document.createElement('div'); c.id='msgArea'; c.className='message-area'; document.body.appendChild(c); }
+    var t = document.createElement('div');
+    t.className = 'message-toast ' + type;
+    var icons = {success:'✅',error:'❌',info:'ℹ️',warning:'⚠️'};
+    t.innerHTML = (icons[type]||'') + ' ' + text;
+    c.appendChild(t);
+    setTimeout(function(){ t.style.animation='slideOut 0.3s forwards'; setTimeout(function(){t.remove()},300); }, 3500);
+  }
+
+  // ============================================================
+  //  搜索建议
+  // ============================================================
+  function doSearch(fieldId, sugId) {
+    var q = $(fieldId).value.trim();
+    var sugEl = $(sugId);
+    if (!sugEl) return;
+
+    if (!q) { sugEl.classList.remove('show'); return; }
+
+    // 本地已加载的数据中过滤
+    if (_persons.length > 0) {
+      var matches = _persons.filter(function(p) {
+        var d = p.data || p;
+        return (d.name||'').indexOf(q) !== -1
+            || (d.id_number||'').indexOf(q) !== -1
+            || (d.phone||'').indexOf(q) !== -1;
+      });
+
+      if (matches.length === 0 || matches.length > 10) {
+        sugEl.classList.remove('show');
+        return;
+      }
+
+      sugEl.innerHTML = matches.map(function(p) {
+        var d = p.data || p;
+        var name = d.name || '-';
+        var idNum = d.id_number || '-';
+        var phone = d.phone || '-';
+        return '<div class="sug-item" data-pid="' + (p.id||'') + '">'
+          + '<span class="sug-name">' + esc(name) + '</span>'
+          + '<span class="sug-meta">🆔 ' + esc(idNum) + ' · 📞 ' + esc(phone) + '</span>'
+          + '</div>';
+      }).join('');
+      sugEl.classList.add('show');
+    }
+  }
+
+  function debounceSearch(fieldId, sugId, ms) {
+    return function() {
+      var key = fieldId;
+      if (_debounceTimers[key]) clearTimeout(_debounceTimers[key]);
+      _debounceTimers[key] = setTimeout(function() { doSearch(fieldId, sugId); }, ms||300);
+    };
+  }
+
+  // ============================================================
+  //  选中人员 → 填充信息
+  // ============================================================
+  function selectPerson(personId) {
+    // 隐藏所有建议
+    document.querySelectorAll('.peracc-suggestions').forEach(function(el) { el.classList.remove('show'); });
+
+    // 在本地数据中查找
+    var person = null;
+    for (var i = 0; i < _persons.length; i++) {
+      if (String(_persons[i].id) === String(personId)) {
+        person = _persons[i];
+        break;
+      }
+    }
+    if (!person) {
+      // 从 API 获取详情
+      fetch(API + '?action=detail&id=' + personId)
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+          if (res.success && res.record) {
+            fillPersonData(res.record);
+          }
+        })
+        .catch(function() { toast('无法获取详细信息', 'error'); });
+      return;
+    }
+
+    fillPersonData(person.data || person);
+  }
+
+  function fillPersonData(person) {
+    // 更新搜索框
+    $('search_name').value = person.name || '';
+    $('search_id').value = person.id_number || '';
+    $('search_phone').value = person.phone || '';
+
+    // 更新总权益
+    var te = person.total_equity || 0;
+    $('te_value').textContent = parseFloat(te).toFixed(2);
+    $('te_sub').textContent = '👤 ' + (person.name||'') + ' · 共 ' + (person.accounts||[]).length + ' 个账户';
+
+    // 渲染账户信息
+    var area = $('accountInfoArea');
+    var accounts = person.accounts || [];
+
+    if (!accounts.length) {
+      area.innerHTML = '<div class="no-person-selected"><div class="icon">🏦</div><p>该人员暂无账户信息</p></div>';
+      return;
+    }
+
+    var html = '';
+    for (var i = 0; i < accounts.length; i++) {
+      var acc = accounts[i];
+      var avail = parseFloat(acc.available_amount || 0);
+      var posEq = parseFloat(acc.position_equity || 0);
+      var accEq = parseFloat(acc.account_equity || (avail + posEq));
+
+      html += '<div class="acc-card">';
+      html += '<div class="acc-header">';
+      html += '<span class="acc-name">🏦 ' + esc(acc.broker_name || '-') + '</span>';
+      html += '<span class="acc-no">📄 ' + esc(acc.account_no || '-') + '</span>';
+      html += '</div>';
+
+      html += '<div class="acc-details">';
+      html += '<div class="ad-item"><div class="ad-label">可用额度</div><div class="ad-value">' + avail.toFixed(2) + '</div></div>';
+      html += '<div class="ad-item"><div class="ad-label">持仓权益</div><div class="ad-value">' + posEq.toFixed(2) + '</div></div>';
+      html += '<div class="ad-item"><div class="ad-label">账户权益</div><div class="ad-value">' + accEq.toFixed(2) + '</div></div>';
+      html += '</div>';
+
+      // 持仓明细
+      var positions = acc.positions || [];
+      if (positions.length > 0) {
+        html += '<table class="pos-mini-table">';
+        html += '<thead><tr><th>品种</th><th>代码</th><th>数量</th><th>杠杆</th><th>保证金率</th><th>成本价</th><th>最新价</th><th>持仓权益</th><th>持仓成本</th></tr></thead><tbody>';
+        for (var pi = 0; pi < positions.length; pi++) {
+          var pos = positions[pi];
+          var mp = parseFloat(pos.market_price || pos.cost_price || 0);
+          var lev = parseInt(pos.leverage || 1);
+          var mr  = parseFloat(pos.margin_rate || 1);
+          var pe  = (parseInt(pos.quantity||0) * mp * lev * mr).toFixed(2);
+          var ce  = (parseInt(pos.quantity||0) * parseFloat(pos.cost_price||0)).toFixed(2);
+          html += '<tr>'
+            + '<td>' + esc(pos.variety||'') + '</td>'
+            + '<td>' + esc(pos.code||'') + '</td>'
+            + '<td>' + esc(parseInt(pos.quantity)||0) + '</td>'
+            + '<td>' + esc(parseInt(pos.leverage)||1) + '</td>'
+            + '<td>' + esc(pos.margin_rate||1) + '</td>'
+            + '<td>' + esc(pos.cost_price||0) + '</td>'
+            + '<td>' + esc(pos.market_price||'') + '</td>'
+            + '<td><strong>' + pe + '</strong></td>'
+            + '<td>' + ce + '</td>'
+            + '</tr>';
+        }
+        html += '</tbody></table>';
+
+        // 出入金记录显示
+        if (acc.cash_flows && acc.cash_flows.length > 0) {
+          html += '<div style="margin-top:8px;font-size:0.78rem;"><strong>出\\入金记录</strong></div>';
+          var cfTotal = 0;
+          for (var ci = 0; ci < acc.cash_flows.length; ci++) {
+            var cf = acc.cash_flows[ci];
+            cfTotal += parseFloat(cf.amount || 0);
+            html += '<div style="font-size:0.78rem;color:#4a5a72;padding:2px 0;">📅 ' + esc(cf.flow_date||'') + '  💰 ' + esc(parseFloat(cf.amount||0).toFixed(2)) + '</div>';
+          }
+          html += '<div style="font-size:0.78rem;font-weight:600;color:#2d3748;border-top:1px solid #e2e8f0;padding-top:2px;margin-top:2px;">出入金合计: ' + cfTotal.toFixed(2) + '</div>';
+        }
+      } else {
+        html += '<div style="text-align:center;padding:10px;color:#8ba3bc;font-size:0.8rem;">暂无持仓数据</div>';
+      }
+
+      html += '</div>';
+    }
+
+    area.innerHTML = html;
+    toast('已加载「' + (person.name||'') + '」的账户信息', 'success');
+  }
+
+  // ============================================================
+  //  建议点击委托
+  // ============================================================
+  document.addEventListener('click', function(e) {
+    var item = e.target.closest('.sug-item');
+    if (item) {
+      var pid = item.dataset.pid;
+      selectPerson(pid);
+    }
+  });
+
+  // ============================================================
+  //  搜索输入绑定
+  // ============================================================
+  function bindSearch(fieldId, sugId) {
+    var el = $(fieldId);
+    if (!el) return;
+    el.addEventListener('input', debounceSearch(fieldId, sugId, 300));
+    el.addEventListener('blur', function() {
+      setTimeout(function() {
+        var sug = $(sugId);
+        if (sug) sug.classList.remove('show');
+      }, 200);
+    });
+    el.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        var sug = $(sugId);
+        var first = sug ? sug.querySelector('.sug-item') : null;
+        if (first) {
+          selectPerson(first.dataset.pid);
+        }
+      }
+    });
+  }
+
+  // ============================================================
+  //  DB 记录列表
+  // ============================================================
+  function renderRecords(records) {
+    var el = $('recordsList');
+    if (!el) return;
+    _persons = records;
+
+    var ft = ($('searchInput').value||'').trim().toLowerCase();
+
+    if (!records||!records.length) {
+      el.innerHTML = '<div class="empty-state"><div class="icon">📂</div><p>暂无数据</p><p class="text-muted" style="font-size:0.85rem;color:#8ba3bc;">在数据录入页添加记录后可见</p></div>';
+      $('recordsCount').textContent='0'; $('recordsCountLabel').textContent='0';
+      return;
+    }
+
+    var f = ft ? records.filter(function(r) {
+      var d = r.data || r;
+      return JSON.stringify(d).toLowerCase().indexOf(ft) !== -1;
+    }) : records;
+
+    $('recordsCount').textContent = f.length;
+    $('recordsCountLabel').textContent = f.length;
+
+    if (!f.length) {
+      el.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><p>未找到匹配记录</p></div>';
+      return;
+    }
+
+    var h = '<div class="record-list">';
+    for (var i = 0; i < f.length; i++) {
+      var rec = f[i], d = rec.data||rec, rid = rec.id||i;
+      var name = d.name||'-', idNum = d.id_number||'-', phone = d.phone||'-';
+      var totalEq = d.total_equity||'-', accCount = (d.accounts||[]).length;
+      var createdAt = d.created_at||rec.created_at||'';
+
+      h += '<div class="record-card" data-id="'+rid+'">'
+        + '<div class="record-header" onclick="PF.toggle(this)">'
+        + '<span class="expand-icon">▶</span>'
+        + '<div class="rec-info"><div class="rec-title">'+esc(name)+' · '+esc(idNum)+'</div>'
+        + '<div class="rec-meta">'
+        + (createdAt?'<span>📅 '+esc(createdAt.slice(0,10))+'</span>':'')
+        + '<span>📞 '+esc(phone)+'</span>'
+        + '<span>🏦 '+accCount+' 个账户</span>'
+        + '<span>💰 <strong>'+esc(totalEq)+'</strong></span>'
+        + '</div></div>'
+        + '<div class="rec-actions">'
+        + '<button class="btn btn-outline btn-xs" onclick="event.stopPropagation(); loadPerson('+rid+')">📋</button>'
+        + '</div></div>'
+        + '<div class="record-detail"><div class="record-detail-inner">'
+        + '<div class="detail-field"><div class="det-label">姓名</div><div class="det-value">'+esc(name)+'</div></div>'
+        + '<div class="detail-field"><div class="det-label">身份证</div><div class="det-value">'+esc(idNum)+'</div></div>'
+        + '<div class="detail-field"><div class="det-label">联系号码</div><div class="det-value">'+esc(phone)+'</div></div>'
+        + (d.backup_phone?'<div class="detail-field"><div class="det-label">备用联系方式</div><div class="det-value">'+esc(d.backup_phone)+'</div></div>':'')
+        + (d.notes?'<div class="detail-field"><div class="det-label">备注</div><div class="det-value">'+esc(d.notes)+'</div></div>':'')
+        + '<div class="detail-field"><div class="det-label">总权益</div><div class="det-value"><strong>'+esc(totalEq)+'</strong></div></div>'
+        + (createdAt?'<div class="detail-field"><div class="det-label">录入时间</div><div class="det-value">'+esc(createdAt)+'</div></div>':'')
+        + '<div class="detail-actions">'
+        + '<button class="btn btn-sm" onclick="loadPerson('+rid+')">📋 加载到视图</button>'
+        + '</div></div></div></div>';
+    }
+    h += '</div>';
+    el.innerHTML = h;
+  }
+
+  function loadRecords() {
+    var el=$('recordsList');
+    if (el) el.innerHTML='<div class="loading-skeleton"><div class="skeleton-item"></div><div class="skeleton-item"></div></div>';
+
+    fetch(API+'?action=list', { headers: { 'X-API-Key': API_KEY } })
+      .then(function(r){return r.json();})
+      .then(function(res){
+        var records = (res.success ? (res.records||[]) : []);
+        renderRecords(records);
+      })
+      .catch(function(){
+        $('recordsList').innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><p>无法连接数据库</p></div>';
+      });
+  }
+
+  function loadPerson(id) {
+    var rec = null;
+    for (var i = 0; i < _persons.length; i++) {
+      if (String(_persons[i].id) === String(id)) { rec = _persons[i]; break; }
+    }
+    if (rec) {
+      fillPersonData(rec.data||rec);
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+  }
+
+  // ============================================================
+  //  初始化
+  // ============================================================
+  document.addEventListener('DOMContentLoaded', function() {
+    // 搜索绑定
+    bindSearch('search_name', 'sug_name');
+    bindSearch('search_id', 'sug_id');
+    bindSearch('search_phone', 'sug_phone');
+
+    // DB 搜索
+    var si = $('searchInput');
+    if (si) si.addEventListener('input', function(){ renderRecords(_persons); });
+
+    // 刷新
+    var rf = $('refreshBtn');
+    if (rf) rf.addEventListener('click', loadRecords);
+
+    // 加载数据
+    loadRecords();
+
+    // ── DB 链接动态解析 ──
+    var links = document.querySelectorAll('.db-link');
+    links.forEach(function(a) {
+      a.href = a.href.replace(/http:\/\/[^:]+:8000\//, API.replace(/\/[^/]+\.php$/, '') + '/');
+    });
+  });
+
+  // ============================================================
+  //  全局暴露
+  // ============================================================
+  window.loadPerson = loadPerson;
+
+})();
+</script>
+</body>
+</html>
