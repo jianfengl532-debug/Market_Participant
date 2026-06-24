@@ -172,7 +172,8 @@
       "Bash(git commit *)",
       "Bash(/bin/cat)",
       "Bash(/bin/cat /share/www/docs/关键步骤指令.txt)",
-      "Bash(/bin/ls /share/www/css/style.css)"
+      "Bash(/bin/ls /share/www/css/style.css)",
+      "Bash(grep -n \"API.replace.*php\\\\$\\\\|apiBase\\\\.replace\\\\|\\\\.replace.*api\\\\.php\" /share/www/Data_Processing_Analysis/InvStrat/GeoEnv/GeoEnv.html /share/www/Data_Processing_Analysis/InvStrat/FxCap/FxCap.html /share/www/Data_Processing_Analysis/InvStrat/IndBiz/IndBiz.html /share/www/Data_Processing_Analysis/Finance/Price/Price.html /share/www/Data_Processing_Analysis/Finance/FinData/FinData.html)"
     ],
     "additionalDirectories": [
       "/home/jefflu/api",

@@ -316,7 +316,8 @@
   //  配置
   // ============================================================
   var _cfg = window.API_CONFIG || { baseUrl: 'http://' + (window.location.hostname || 'localhost') + ':8000', apiKey: '' };
-  var API = _cfg.baseUrl.replace(/\/+$/, '') + '/PerAcc_Data/api.php';
+  var BASE = _cfg.baseUrl.replace(/\/+$/, '');
+  var API = BASE + '/PerAcc_Data/api.php';
   var API_KEY = _cfg.apiKey;
 
   var _persons = [];   // 所有人员（来自 list）
@@ -657,7 +658,7 @@
     // ── DB 链接动态解析 ──
     var links = document.querySelectorAll('.db-link');
     links.forEach(function(a) {
-      a.href = a.href.replace(/http:\/\/[^:]+:8000\//, API.replace(/\/[^/]+\.php$/, '') + '/');
+      a.href = a.href.replace(/http:\/\/[^:]+:8000\//, BASE + '/');
     });
   });
 
