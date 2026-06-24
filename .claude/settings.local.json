@@ -178,7 +178,8 @@
       "Bash(/bin/cat ~/.git-credentials)",
       "Bash(git push *)",
       "Bash(wget -q -O- --timeout=5 \"https://github.com/jianfengl532-debug/Market_Participant\")",
-      "Bash(wget -q -O- --timeout=5 \"https://jefflu.tail9f69ce.ts.net/ping.php\" --header=\"X-API-Key: mk_jfl_a8f3c9e2b7d4p6q5r1\")"
+      "Bash(wget -q -O- --timeout=5 \"https://jefflu.tail9f69ce.ts.net/ping.php\" --header=\"X-API-Key: mk_jfl_a8f3c9e2b7d4p6q5r1\")",
+      "Bash(/bin/ls /share/www/lucifer/)"
     ],
     "additionalDirectories": [
       "/home/jefflu/api",

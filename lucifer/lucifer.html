@@ -8,7 +8,261 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- 外部样式表 -->
-    <link rel="stylesheet" href="../css/style.css">
+    <style>
+    /* ── 个人简历与通讯录 专用样式 ── */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: linear-gradient(145deg, #e6edf5 0%, #d5dfeb 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        color: #1e2a3a;
+    }
+
+    .resume-card {
+        max-width: 950px;
+        width: 100%;
+        background: #ffffff;
+        border-radius: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 20, 40, 0.15);
+        overflow: hidden;
+        transition: box-shadow 0.2s;
+    }
+
+    .resume-grid {
+        display: grid;
+        grid-template-columns: 340px 1fr;
+    }
+
+    /* ── 左侧：个人资料区 ── */
+    .profile-section {
+        background: #f5f9fe;
+        padding: 2rem 1.5rem;
+        border-right: 1px solid #e2eaf2;
+    }
+
+    .avatar-wrapper {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    .avatar-circle {
+        width: 100px; height: 100px;
+        background: linear-gradient(135deg, #2c6e9e, #4a8fc1);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.8rem;
+        color: #fff;
+        box-shadow: 0 8px 20px rgba(44, 110, 158, 0.25);
+    }
+
+    .name {
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: #142433;
+        margin-bottom: 0.25rem;
+    }
+
+    .title {
+        font-size: 0.8rem;
+        color: #2c6e9e;
+        font-weight: 500;
+    }
+    .bio {
+        font-size: 0.78rem;
+        color: #4a627a;
+        margin-top: 0.75rem;
+        line-height: 1.5;
+        text-align: center;
+        padding: 0 0.4rem;
+    }
+
+    .info-title {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #1e3a5f;
+        margin-top: 1.5rem;
+        margin-bottom: 0.6rem;
+        padding-bottom: 0.3rem;
+        border-bottom: 2px solid #dbe3ed;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .info-title i { color: #2c6e9e; font-size: 0.85rem; }
+
+    .contact-list { display: flex; flex-direction: column; gap: 0.45rem; }
+    .contact-item {
+        font-size: 0.78rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #2c4058;
+    }
+    .contact-item i { width: 16px; color: #5b8cbc; font-size: 0.8rem; }
+    .contact-item a { color: #2c6e9e; text-decoration: none; }
+    .contact-item a:hover { text-decoration: underline; }
+
+    .skills-box {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 0.3rem;
+    }
+    .skill-tag {
+        background: #e2eaf2;
+        color: #1e3a5f;
+        font-size: 0.7rem;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-weight: 500;
+        letter-spacing: 0.2px;
+    }
+
+    .edu-item {
+        font-size: 0.78rem;
+        margin-bottom: 0.7rem;
+        line-height: 1.4;
+    }
+    .edu-date {
+        float: right;
+        color: #6a849e;
+        font-size: 0.72rem;
+    }
+
+    .social-mini {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+    .social-mini a {
+        width: 34px; height: 34px;
+        background: #e2eaf2;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #2c6e9e;
+        text-decoration: none;
+        transition: 0.15s;
+        font-size: 0.9rem;
+    }
+    .social-mini a:hover {
+        background: #2c6e9e;
+        color: #fff;
+    }
+
+    /* ── 右侧：通讯录区 ── */
+    .contacts-section {
+        padding: 2rem 1.8rem;
+    }
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.2rem;
+    }
+    .section-header h2 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #142433;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .section-header h2 i { color: #2c6e9e; }
+    .friends-badge {
+        font-size: 0.72rem;
+        color: #2c6e9e;
+        background: #eaf1f9;
+        padding: 4px 12px;
+        border-radius: 20px;
+    }
+
+    .friends-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .friend-card {
+        background: #f5f9fe;
+        border-radius: 1.2rem;
+        padding: 1rem 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        transition: 0.15s;
+        border: 1px solid transparent;
+    }
+    .friend-card:hover {
+        border-color: #cbdae7;
+        background: #f0f5fb;
+    }
+    .friend-avatar {
+        font-size: 2.2rem;
+        color: #4a7fa8;
+        flex-shrink: 0;
+        width: 48px;
+        text-align: center;
+    }
+    .friend-info { flex: 1; min-width: 0; }
+    .friend-name {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #142433;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .friend-tag {
+        font-size: 0.65rem;
+        font-weight: 400;
+        color: #4a7fa8;
+        background: #e2eaf2;
+        padding: 1px 8px;
+        border-radius: 12px;
+    }
+    .contact-details {
+        font-size: 0.75rem;
+        color: #2c4058;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 3px 6px;
+    }
+    .contact-details a {
+        color: #2c6e9e;
+        text-decoration: none;
+    }
+    .contact-details a:hover { text-decoration: underline; }
+    .contact-separator { color: #b5c7db; font-size: 0.6rem; }
+
+    .footer-note {
+        font-size: 0.72rem;
+        color: #6a849e;
+        border-top: 1px solid #e2eaf2;
+        padding-top: 0.8rem;
+        margin-top: 1rem;
+        text-align: center;
+    }
+
+    /* ── 响应式 ── */
+    @media (max-width: 700px) {
+        .resume-grid { grid-template-columns: 1fr; }
+        .profile-section { border-right: none; border-bottom: 1px solid #e2eaf2; }
+        .contacts-section { padding: 1.5rem; }
+    }
+    </style>
 </head>
 <body>
 <div class="resume-card">
@@ -21,7 +275,7 @@
                     <i class="fas fa-user-astronaut"></i>
                 </div>
             </div>
-            <div class="name">陈思羽</div>
+            <div class="name">陈</div>
             <div style="text-align: center;">
                 <span class="title"><i class="fas fa-briefcase" style="margin-right: 6px;"></i> 全栈开发工程师 / 技术撰稿人</span>
             </div>
