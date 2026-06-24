@@ -1,0 +1,4 @@
+https://jianfengl532-debug.github.io/Market_Participant/Data_Processing_Analysis/Finance/FinData/FinData.html 页面：
+由于页面样式限制了宽度（A4纸宽度），所以，在显示“流动资产”、“负债”、“固定资产”数据时，由于数据太长，导致不能够完全显示。
+
+整改建议：缩小字体 或者 将数据单位改为“万元”显示，这样就可以缩短宽度，从而得以全部展示。
