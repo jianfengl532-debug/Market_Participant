@@ -11,11 +11,11 @@
 <div class="container">
 
     <h1>🗄️ 数据库架构设计 — InvStrat_db</h1>
-    <div class="subhead">MariaDB 11.4 · 21 张表 · utf8mb4 · InnoDB · 最后更新: 2026-06-29 · 新增 per_account_trade_records + per_account_import_logs</div>
+    <div class="subhead">MariaDB 11.4 · 23 张表 · utf8mb4 · InnoDB · 最后更新: 2026-06-29 全线升级 v3</div>
 
     <!-- 概览 -->
     <h2>概览</h2>
-    <p>数据库 <code>InvStrat_db</code>（MariaDB 11.4）服务于五个分析/数据模块，共 <strong>18 张表</strong>。</p>
+    <p>数据库 <code>InvStrat_db</code>（MariaDB 11.4）服务于五个分析/数据模块，共 <strong>23 张表</strong>。</p>
     <pre><code>InvStrat_db
 ├── 🌍 GeoEnv（地缘政治分析）    3 表
 │   ├── geo_env_events          主表
@@ -38,29 +38,33 @@
 │   ├── price_spot_data            现货价格
 │   └── price_calc_records         斐波那契计算结果
 │
-├── 💳 PerAcc（个人账户管理）    6 表（新增 2 张）
-│   ├── per_accounts               人员主表
-│   ├── per_account_brokers        券商账户（2026-06 新增 UNIQUE 约束）
-│   ├── per_account_positions      持仓明细（2026-06 新增期货字段）
-│   ├── per_account_cash_flows     出入金记录
-│   ├── per_account_trade_records  逐笔交易记录（2026-06 新表）
-│   └── per_account_import_logs    导入日志（2026-06 新表，SHA256 幂等）
+├── 💳 PerAcc（个人账户管理）    8 表（2026-06 大幅扩展）
+│   ├── per_accounts                       人员主表
+│   ├── per_account_brokers                券商账户（UK broker_name+account_no）
+│   ├── per_account_positions              持仓明细（新增 product_type/exchange/浮动盈亏字段）
+│   ├── per_account_cash_flows             出入金记录（新增 category/note 字段）
+│   ├── per_account_trade_records          逐笔交易记录（期货/股票成交明细）
+│   ├── per_account_import_logs            导入日志（SHA256 幂等检测）
+│   ├── per_account_futures_daily          期货每日资金快照（2026-06 v2 新表）
+│   └── per_account_futures_positions_daily 期货每日持仓明细（2026-06 v2 新表）
 │
 └── 🏢 FinData（企业财务数据）  2 表
     ├── fin_enterprises            企业主表（JSON reports 存储多周期财务数据）
     └── fin_bank_flows             银行流水数据表
     <br><br>
     📥 PerAcc 自动导入管道（2026-06-29 全线投产）
-    ─────────────────────────────────
-    34 个 JSON 文件已自动导入：
+    ─────────────────────────────────────────────
+    34 个 JSON 文件已导入（含 v2 重导入），167 条记录：
     ├── 27 期货日结单（华鑫期货 · 陆剑峰 · 2026-05-21 ~ 06-29）
-    │   ├── → per_account_positions（持仓更新）
+    │   ├── → per_account_futures_daily（27 条每日资金快照）
+    │   ├── → per_account_futures_positions_daily（21 条每日持仓明细）
+    │   ├── → per_account_positions（持仓更新 + 浮动盈亏/保证金）
     │   ├── → per_account_trade_records（逐笔交易记录）
-    │   └── → per_account_cash_flows（出入金）
+    │   └── → per_account_cash_flows（出入金，category=银行存管转账）
     ├── 6  股票成交明细（华泰证券 · 夏静 · 2026-02 ~ 06）
     │   └── → per_account_trade_records（48 条交易记录）
     └── 1  股票资金明细（华泰证券 · 夏静）
-        └── → per_account_cash_flows（83 条出入金记录）</code></pre>
+        └── → per_account_cash_flows（83 条记录，含 category 分类）</code></pre>
 
     <hr>
 
@@ -399,7 +403,7 @@ positions       cash_flows      (预留)
         </tbody>
     </table>
 
-    <h3><code>per_account_cash_flows</code> — 出入金记录子表</h3>
+    <h3><code>per_account_cash_flows</code> — 出入金记录子表（2026-06 v2 新增分类字段）</h3>
     <table>
         <thead>
             <tr><th>字段</th><th>类型</th><th>说明</th></tr>
@@ -409,6 +413,8 @@ positions       cash_flows      (预留)
             <tr><td><code>broker_id</code></td><td>BIGINT UNSIGNED FK</td><td>→ <code>per_account_brokers.id</code>（CASCADE）</td></tr>
             <tr><td><code>flow_date</code></td><td>DATE</td><td>出入金日期</td></tr>
             <tr><td><code>amount</code></td><td>DECIMAL(15,2)</td><td>金额（正=入金，负=出金）</td></tr>
+            <tr><td><code>category</code></td><td>VARCHAR(50)</td><td>摘要分类: 银行存管转账/证券买入/证券卖出/基金资金拨入/基金资金拨出/其他（v2 新增）</td></tr>
+            <tr><td><code>note</code></td><td>TEXT</td><td>原始摘要（v2 新增）</td></tr>
         </tbody>
     </table>
 
@@ -668,6 +674,45 @@ CREATE TABLE per_account_cash_flows (
             <tr><td><code>order_id</code></td><td>VARCHAR(50)</td><td>委托编号</td></tr>
             <tr><td><code>source_file</code></td><td>VARCHAR(500)</td><td>数据来源 JSON 文件路径</td></tr>
             <tr><td><code>created_at</code></td><td>DATETIME</td><td>创建时间</td></tr>
+        </tbody>
+    </table>
+
+    <h3><code>per_account_futures_daily</code> — 期货每日资金快照（2026-06 v2 新表）</h3>
+    <p>每个期货券商/每天一条记录，存储日结单的资金概况。与 <code>per_account_brokers</code> 通过 <code>broker_id</code> 外键关联。使用 <code>UNIQUE KEY (broker_id, trade_date)</code> 确保同一天不重复。</p>
+    <table>
+        <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>broker_id</code></td><td>BIGINT UNSIGNED FK</td><td>→ per_account_brokers.id</td></tr>
+            <tr><td><code>trade_date</code></td><td>DATE</td><td>交易日期</td></tr>
+            <tr><td><code>prev_balance</code></td><td>DECIMAL(15,2)</td><td>上日结存</td></tr>
+            <tr><td><code>client_equity</code></td><td>DECIMAL(15,2)</td><td>客户权益</td></tr>
+            <tr><td><code>available_amount</code></td><td>DECIMAL(15,2)</td><td>可用资金</td></tr>
+            <tr><td><code>margin_used</code></td><td>DECIMAL(15,2)</td><td>保证金占用</td></tr>
+            <tr><td><code>floating_pnl</code></td><td>DECIMAL(15,2)</td><td>浮动盈亏</td></tr>
+            <tr><td><code>realized_pnl</code></td><td>DECIMAL(15,2)</td><td>平仓盈亏</td></tr>
+            <tr><td><code>fee_total</code></td><td>DECIMAL(10,2)</td><td>手续费合计</td></tr>
+            <tr><td><code>risk_degree</code></td><td>VARCHAR(20)</td><td>风险度</td></tr>
+            <tr><td><code>deposit_withdraw</code></td><td>DECIMAL(15,2)</td><td>当日存取合计</td></tr>
+            <tr><td><code>source_file</code></td><td>VARCHAR(500)</td><td>数据来源文件</td></tr>
+        </tbody>
+    </table>
+
+    <h3><code>per_account_futures_positions_daily</code> — 期货每日持仓明细（2026-06 v2 新表）</h3>
+    <p>每个日结单/每合约一条记录。通过 <code>daily_id</code> 外键关联到 <code>per_account_futures_daily</code>。</p>
+    <table>
+        <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>daily_id</code></td><td>BIGINT UNSIGNED FK</td><td>→ per_account_futures_daily.id</td></tr>
+            <tr><td><code>contract_code</code></td><td>VARCHAR(50)</td><td>合约代码</td></tr>
+            <tr><td><code>direction</code></td><td>ENUM(long/short)</td><td>多/空方向</td></tr>
+            <tr><td><code>volume</code></td><td>INT</td><td>持仓手数</td></tr>
+            <tr><td><code>avg_price</code></td><td>DECIMAL(12,2)</td><td>持仓均价</td></tr>
+            <tr><td><code>settlement_prev</code></td><td>DECIMAL(12,2)</td><td>昨结算价</td></tr>
+            <tr><td><code>settlement_current</code></td><td>DECIMAL(12,2)</td><td>今结算价</td></tr>
+            <tr><td><code>floating_pnl</code></td><td>DECIMAL(15,2)</td><td>浮动盈亏</td></tr>
+            <tr><td><code>margin_used</code></td><td>DECIMAL(15,2)</td><td>交易保证金</td></tr>
         </tbody>
     </table>
 

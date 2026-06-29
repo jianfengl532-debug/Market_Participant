@@ -11,7 +11,7 @@
 <div class="container">  <!-- 块级容器: 内容居中布局 最大宽度210mm -->
 
     <h1>📁 网站项目架构</h1>  <!-- 一级标题: 页面主标题 -->
-    <div class="subhead">最后更新: 2026-06-29 · 添加 PerAcc 数据导入管道 + 交易记录表 + 导入日志表</div>  <!-- 块级容器: 副标题/元信息 -->
+    <div class="subhead">最后更新: 2026-06-29 · 全面升级 PerAcc 模块（v3）：导入面板、展示页重构、期货日表、数据库 23 表</div>  <!-- 块级容器: 副标题/元信息 -->
 
     <hr>  <!-- 水平分割线: 分隔内容段落 -->
 
@@ -48,7 +48,7 @@
                                                                 ↓
                                                          MariaDB (MySQL)
                                                          InvStrat_db
-                                                         18 张表 (含 PerAcc 4 表 + FinData 1 表)</code></pre>  <!-- 代码块结束 -->
+                                                         23 张表 (PerAcc 8 表 + 其他 15 表)</code></pre>  <!-- 代码块结束 -->
 
     <hr>  <!-- 水平分割线: 分隔内容段落 -->
 
@@ -139,9 +139,14 @@
 │   └── api.php                                   ← CRUD API
 │
 ├── PerAcc_Data/                                  ← 💳 个人账户管理 - 数据录入（独立于 DB.js）
-│   ├── PerAcc_Data.html                          ← 录入页面
-│   ├── PerAcc_Data.js                            ← 内联 JS 外化（二级 CRUD + 搜索）
-│   └── api.php                                   ← CRUD + 搜索 API（人员/账户/持仓/出入金）
+│   ├── PerAcc_Data.html                          ← 录入页面（含文件选择器+格式检测导入面板）
+│   ├── PerAcc_Data.js                            ← JS（二级 CRUD + 搜索 + 文件上传导入）
+│   ├── api.php                                   ← CRUD + 搜索 + stock_calc 计算 API
+│   ├── import_peracc_lib.php                     ← 导入共享库
+│   ├── import_futures_daily.php                  ← 期货日结单导入器
+│   ├── import_stock_trades.php                   ← 股票成交明细导入器
+│   ├── import_stock_funds.php                    ← 股票资金明细导入器
+│   └── import_api.php                            ← 统一导入入口（CLI + HTTP 上传）
 │
 ├── Price_Data/                                   ← 📊 价格数据 - 数据录入（独立于 DB.js）
 │   ├── Price_Data.html                           ← 录入页面
@@ -170,7 +175,7 @@
             <tr><td>💱 FxCap</td><td><code>InvStrat/FxCap/FxCap.html</code></td><td><code>FxCap_Data/FxCap_Data.html</code></td><td><code>FxCap_Data/api.php</code></td><td><code>currency_interest_events</code> + 子表</td></tr>
             <tr><td>🏭 IndBiz</td><td><code>InvStrat/IndBiz/IndBiz.html</code></td><td><code>IndBiz_Data/IndBiz_Data.html</code></td><td><code>IndBiz_Data/api.php</code></td><td><code>industry_business_events</code> + 子表</td></tr>
             <tr><td>📊 Price</td><td><code>Finance/Price/Price.html</code></td><td><code>Price_Data/Price_Data.html</code></td><td><code>Price_Data/api.php</code></td><td><code>price_spot_data</code> + <code>price_calc_records</code></td></tr>
-            <tr><td>💳 PerAcc</td><td><code>Finance/PerAcc/PerAcc.html</code></td><td><code>PerAcc_Data/PerAcc_Data.html</code></td><td><code>PerAcc_Data/api.php</code></td><td><code>per_accounts</code> + 3 子表</td></tr>
+            <tr><td>💳 PerAcc</td><td><code>Finance/PerAcc/PerAcc.html</code></td><td><code>PerAcc_Data/PerAcc_Data.html</code></td><td><code>PerAcc_Data/api.php</code></td><td><code>per_accounts</code> + 7 子表（含期货日表、交易记录、导入日志）</td></tr>
             <tr><td>🏢 FinData</td><td><code>Finance/FinData/FinData.html</code></td><td><code>FinData_Data/FinData_Data.html</code><br><code>Bank_Flows/Bank_Flows.html</code></td><td><code>FinData_Data/api.php</code></td><td><code>fin_enterprises</code>（JSON reports）<br><code>fin_bank_flows</code>（银行流水独立表）</td></tr>
         </tbody>  <!-- 表格主体结束 -->
     </table>  <!-- 表格结束 -->
@@ -324,7 +329,7 @@
         <tr><td>💳 PerAcc（新）</td><td><code>per_account_trade_records</code></td><td>1（逐笔交易记录，含期货/股票成交明细，支持幂等导入）</td><td>1 新表</td></tr>
         <tr><td>📋 PerAcc（新）</td><td><code>per_account_import_logs</code></td><td>1（导入溯源，SHA256 幂等检测，记录每次 JSON 导入）</td><td>1 新表</td></tr>
         <tfoot>
-            <tr><td colspan="3"><strong>合计</strong></td><td><strong>21 表</strong></td></tr>
+            <tr><td colspan="3"><strong>合计</strong></td><td><strong>23 表</strong></td></tr>
         </tfoot>
     </table>  <!-- 表格结束 -->
     <p>InvStrat 三个分析模块的子表通过 <code>event_id</code> 外键关联到主表，<code>ON DELETE CASCADE</code>。<strong>Price 模块</strong>的两张表相互独立，无外键约束。<strong>PerAcc 模块</strong>使用四级 FK 链（per_accounts → per_account_brokers → per_account_positions / per_account_cash_flows），全部 ON DELETE CASCADE。<strong>PerAcc 模块</strong>使用四级 FK 链（per_accounts → per_account_brokers → per_account_positions / per_account_cash_flows），全部 ON DELETE CASCADE。</p>  <!-- 段落: 外键说明 + Price 特例 -->
@@ -346,23 +351,40 @@
             <tr><td><strong>PerAcc 身份证唯一性</strong></td><td><code>save</code> 和 <code>update</code> 接口在写入前检查 <code>id_number</code> 是否重复。数据库 <code>per_accounts.id_number</code> 有 UNIQUE 约束 <code>uk_id_number</code>。检测到重复时返回错误"身份证号已存在：XXX（记录 #N）"，前端显示错误不清空表单。</td></tr>
             <tr><td><strong>API（PerAcc 模块）</strong></td><td><code>PerAcc_Data/api.php</code> 额外支持 <code>search</code>（姓名/身份证/手机号搜索）和 <code>detail</code>（单条完整记录含账户/持仓/出入金）。</td></tr>
             <tr><td><strong>PerAcc 前端</strong></td><td>展示页 <code>Finance/PerAcc/PerAcc.html</code> 使用 <code>Finance.js</code> 中的 <code>PF</code> 命名空间（调用 <code>PF.init</code>），数据录入页使用独立的 <code>PerAcc_Data.js</code>（793 行），不共享 <code>DB.js</code>。</td></tr>
-            <tr><td><strong>PerAcc 自动导入管道（2026-06-29 新增）</strong></td>
+            <tr><td><strong>PerAcc 导入管道（2026-06-29 v1+v3）</strong></td>
                 <td>
-                    四个 PHP 导入器 + 一个扫描 API，支持 JSON → DB 自动批量导入：<br>
-                    &bull; <code>import_futures_daily.php</code> — 期货日结单导入（持仓更新 + 逐笔交易 + 出入金）<br>
+                    5 个 PHP 导入器，支持 JSON → DB 自动导入：<br>
+                    &bull; <code>import_futures_daily.php</code> — 期货日结单导入（写入日快照表 + 逐笔成交 + 出入金）<br>
                     &bull; <code>import_stock_trades.php</code> — 股票成交明细导入（交易记录 + 持仓重建）<br>
-                    &bull; <code>import_stock_funds.php</code> — 股票资金明细导入（出入金 + 可用资金更新）<br>
-                    &bull; <code>import_peracc_lib.php</code> — 共享库（券商匹配、幂等检测、导入日志）<br>
-                    &bull; <code>import_api.php</code> — Web 扫描/导入接口 + CLI 批量导入<br>
-                    支持 SHA256 文件哈希幂等检测、试运行（dry-run）、导入日志溯源
+                    &bull; <code>import_stock_funds.php</code> — 股票资金明细导入（含摘要分类 category）<br>
+                    &bull; <code>import_peracc_lib.php</code> — 共享库（券商匹配、SHA256 幂等检测）<br>
+                    &bull; <code>import_api.php</code> — 统一入口（CLI 批量 + HTTP 上传 + import_upload 端点）<br>
+                    已导入 34 个文件（27 期货日结 + 6 股票成交 + 1 资金明细），167 条记录。<br>
+                    v3 更新：录入页导入面板改为「文件选择器」+ 自动格式检测（识别期货/股票/资金三类）
                 </td>
             </tr>
-            <tr><td><strong>PerAcc 展示页增强（2026-06-29 更新）</strong></td>
+            <tr><td><strong>PerAcc 展示页重构（2026-06-29 v2）</strong></td>
                 <td>
-                    新增资产看板（dashboard）：净资产、可用资金、持仓市值、浮动盈亏四卡展示。<br>
-                    持仓表新增产品类型标签（股票/期货）、交易所、浮动盈亏列。
+                    删除旧资产看板四卡；每个券商卡片新增 4 个实时计算字段：<br>
+                    &bull; 投入本金（银行存管转账净额）&bull; 股票成本支出合计（证券买入-卖出）<br>
+                    &bull; 本金余额 &bull; 持股市值合计<br>
+                    持仓表删除「杠杆」「保证金率」「浮动盈亏」三列；<br>
+                    出入金记录仅显示「银行存管转账」分类；<br>
+                    后端新增 <code>stock_calc</code> API 端点，前端异步加载计算结果
                 </td>
             </tr>
+            <tr><td><strong>DB 按钮密码保护（2026-06-29 修复）</strong></td>
+                <td>
+                    6 个展示页 DB 按钮统一密码保护：<br>
+                    &bull; <code>openDbLink(url)</code> 放在 <code>js/config.js</code>（所有页面共享）<br>
+                    &bull; 初始密码 000000，控制台 <code>changeDbPassword()</code> 修改<br>
+                    &bull; 修复 <code>target="_blank"</code> 空白页 bug
+                </td>
+            </tr>
+            <tr><td><strong>FinData 财务数据宽度修复</strong></td>
+                <td>
+                    FinData.html 财务明细表万元单位显示，缩小字号，标注「单位：万元」
+                </td>
             </tr>
             <tr><td><strong>Price 前端</strong></td><td>不共享 <code>DB.js</code>，数据录入页使用独立的 <code>Price_Data.js</code>（896 行，含斐波那契计算 + CRUD + autocomplete + 代码查询），展示页使用 <code>Finance/Finance.js</code>（392 行）。</td></tr>
             <tr><td><strong>db_config.php</strong></td><td>共享数据库配置，5 个 <code>api.php</code> 统一通过 <code>require_once '../db_config.php'; $pdo = getDB();</code> 获取 PDO 单例。消除 5 处密码硬编码。</td></tr>
