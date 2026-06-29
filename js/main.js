@@ -177,3 +177,71 @@
         });
     });
 })();
+
+/* ============================================================
+   DB 密码保护 — 所有页面共享
+   点击「🗄️ DB 接続・データ読み込み」时弹出密码验证
+   初始密码: 000000，可在浏览器 localStorage 中修改
+   ============================================================ */
+(function() {
+    'use strict';
+
+    var STORAGE_KEY = 'db_access_password';
+    var DEFAULT_PASSWORD = '000000';
+
+    function getPassword() {
+        try {
+            var saved = localStorage.getItem(STORAGE_KEY);
+            return saved || DEFAULT_PASSWORD;
+        } catch(e) {
+            return DEFAULT_PASSWORD;
+        }
+    }
+
+    /**
+     * 验证密码并打开 DB 链接
+     */
+    window.openDbLink = function(url) {
+        var password = prompt('🔐 请输入 DB 访问密码：');
+        if (password === null) return;
+
+        if (password === getPassword()) {
+            window.open(url, '_blank', 'noopener,noreferrer');
+        } else {
+            var hint = DEFAULT_PASSWORD;
+            try {
+                var saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) hint = saved.slice(0, 4) + '****';
+            } catch(e) {}
+            alert('❌ 密码错误。默认密码: 000000（可联系管理员修改）');
+        }
+    };
+
+    /**
+     * 修改密码（在控制台调用 window.changeDbPassword()）
+     */
+    window.changeDbPassword = function() {
+        var current = prompt('请输入当前密码：');
+        if (current === null) return;
+        if (current !== getPassword()) {
+            alert('❌ 当前密码错误');
+            return;
+        }
+        var newPwd = prompt('请输入新密码（至少4位）：');
+        if (!newPwd || newPwd.length < 4) {
+            alert('❌ 密码至少4位');
+            return;
+        }
+        var confirmPwd = prompt('请再次输入新密码：');
+        if (newPwd !== confirmPwd) {
+            alert('❌ 两次输入不一致');
+            return;
+        }
+        try {
+            localStorage.setItem(STORAGE_KEY, newPwd);
+            alert('✅ 密码已更新');
+        } catch(e) {
+            alert('❌ 保存失败');
+        }
+    };
+})();

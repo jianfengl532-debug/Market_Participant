@@ -153,7 +153,7 @@
 .fin-summary-card.fs-liability { border-color: #e8a0a0; background: #fef2f2; }
 .fin-summary-card.fs-fixed { border-color: #a0b8e8; background: #eef2fd; }
 
-/* ---- 财务明细表 ---- */
+/* ---- 财务明细表（2026-06 优化：窄字体 + 万元单位） ---- */
 .fin-detail-section {
     margin-top: 12px;
 }
@@ -166,25 +166,34 @@
     align-items: center;
     gap: 6px;
 }
+.fin-detail-section h4 .unit-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #6b83a0;
+    background: #eef2f6;
+    padding: 2px 8px;
+    border-radius: 8px;
+    margin-left: 4px;
+}
 .fin-detail-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     margin-bottom: 10px;
 }
 .fin-detail-table th {
     background: #eef4fa;
     color: #2d4a6e;
     font-weight: 600;
-    padding: 6px 10px;
+    padding: 5px 8px;
     text-align: left;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     border-bottom: 2px solid #dce2ec;
     white-space: nowrap;
 }
 .fin-detail-table th:not(:first-child) { text-align: right; }
 .fin-detail-table td {
-    padding: 5px 10px;
+    padding: 4px 8px;
     border-bottom: 1px solid #eef2f7;
 }
 .fin-detail-table td:not(:first-child) {
@@ -192,6 +201,7 @@
     font-family: 'JetBrains Mono', 'Consolas', monospace;
     font-weight: 600;
     white-space: nowrap;
+    font-size: 0.7rem;
 }
 .fin-detail-table tbody tr:hover { background: #fdf8ee; }
 .fin-detail-table .total-row td {
@@ -199,10 +209,12 @@
     border-top: 2px solid #cbd5e0;
     color: #1e3a5f;
 }
+.fin-detail-table .total-row td:not(:first-child) { font-size: 0.72rem; }
 /* 多周期表容器可横向滚动 */
 .fin-detail-section .table-wrap {
     overflow-x: auto;
     margin-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* ---- 银行流水月份标签 ---- */
@@ -298,7 +310,7 @@
     <p>
       <span class="update-time"><span class="emoji">📋</span> 企业财务数据一览</span>
       <span class="update-time"><span class="emoji">🕒</span> 更新: <span id="updateDate"><script>document.write(new Date().toLocaleDateString('zh-CN'));</script></span></span>
-      <span class="market-badge"><a href="http://192.168.0.105:8000/FinData_Data/FinData_Data.html" class="db-link" target="_blank" rel="noopener noreferrer"><span class="emoji">🗄️</span> DB 接続・データ読み込み</a></span>
+      <span class="market-badge"><a href="javascript:void(0)" class="db-link" onclick="openDbLink('http://192.168.0.105:8000/FinData_Data/FinData_Data.html')" target="_blank" rel="noopener noreferrer"<span class="emoji">🗄️</span> DB 接続・データ読み込み</a></span>
     </p>
   </div>
 
@@ -346,22 +358,22 @@
         <!-- 财务摘要 -->
         <div class="fin-summary-grid">
           <div class="fin-summary-card fs-current">
-            <div class="fs-label">💰 流动资产</div>
+            <div class="fs-label">💰 流动资产 <span style="font-size:0.6rem;color:#8ba3bc;">（万元）</span></div>
             <div class="fs-value" id="fs_current_assets">—</div>
           </div>
           <div class="fin-summary-card fs-liability">
-            <div class="fs-label">📉 负债</div>
+            <div class="fs-label">📉 负债 <span style="font-size:0.6rem;color:#8ba3bc;">（万元）</span></div>
             <div class="fs-value" id="fs_liabilities">—</div>
           </div>
           <div class="fin-summary-card fs-fixed">
-            <div class="fs-label">🏭 固定资产</div>
+            <div class="fs-label">🏭 固定资产 <span style="font-size:0.6rem;color:#8ba3bc;">（万元）</span></div>
             <div class="fs-value" id="fs_fixed_assets">—</div>
           </div>
         </div>
 
         <!-- 流动资产明细 -->
         <div class="fin-detail-section" id="detail_current">
-          <h4>📊 流动资产组成</h4>
+          <h4>📊 流动资产组成 <span class="unit-badge">单位：万元</span></h4>
           <div class="table-wrap">
           <table class="fin-detail-table">
             <thead id="th_current"><tr><th>项目</th><th style="text-align:right;">金额</th></tr></thead>
@@ -372,7 +384,7 @@
 
         <!-- 负债明细 -->
         <div class="fin-detail-section" id="detail_liability">
-          <h4>📊 负债组成</h4>
+          <h4>📊 负债组成 <span class="unit-badge">单位：万元</span></h4>
           <div class="table-wrap">
           <table class="fin-detail-table">
             <thead id="th_liability"><tr><th>项目</th><th style="text-align:right;">金额</th></tr></thead>
@@ -383,7 +395,7 @@
 
         <!-- 固定资产明细 -->
         <div class="fin-detail-section" id="detail_fixed">
-          <h4>📊 固定资产组成</h4>
+          <h4>📊 固定资产组成 <span class="unit-badge">单位：万元</span></h4>
           <div class="table-wrap">
           <table class="fin-detail-table">
             <thead id="th_fixed"><tr><th>项目</th><th style="text-align:right;">金额</th></tr></thead>
@@ -393,7 +405,7 @@
 
         <!-- 银行流水汇总 -->
         <div class="fin-detail-section" id="detail_cashflow" style="display:none;">
-          <h4>📋 银行流水汇总</h4>
+          <h4>📋 银行流水汇总 <span class="unit-badge">单位：万元</span></h4>
           <div id="cf_content" style="padding:4px 0;"></div>
         </div>
       </div>
@@ -493,11 +505,14 @@
     setTimeout(function(){ t.style.animation='slideOut 0.3s forwards'; setTimeout(function(){t.remove()},300); }, 3500);
   }
 
+  /** 格式化金额为万元显示 */
   function fmtNum(n) {
     if (n === null || n === undefined || n === '') return '—';
     var v = parseFloat(n);
     if (isNaN(v)) return '—';
-    return v.toLocaleString('zh-CN', {minimumFractionDigits:2, maximumFractionDigits:2});
+    var wan = v / 10000;
+    // 万元值保留2位小数，避免过大数字撑宽表格
+    return wan.toLocaleString('zh-CN', {minimumFractionDigits:2, maximumFractionDigits:2});
   }
 
   // ============================================================

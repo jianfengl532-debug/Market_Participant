@@ -192,6 +192,72 @@
 }
 .pos-mini-table tbody tr:hover { background: #fdf8ee; }
 
+/* ---- 资产看板 ---- */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+@media (max-width: 800px) {
+    .dashboard-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 500px) {
+    .dashboard-grid { grid-template-columns: 1fr; }
+}
+.dash-card {
+    background: #f9fbfe;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 14px 16px;
+    text-align: center;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.dash-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+.dash-card .dc-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6b83a0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.dash-card .dc-value {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #1e3a5f;
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+}
+.dash-card .dc-sub {
+    font-size: 0.72rem;
+    color: #8ba3bc;
+    margin-top: 2px;
+}
+.dash-card.dc-gold { background: linear-gradient(135deg, #fdf8ee, #f8f0dc); border-color: #e8d8a0; }
+.dash-card.dc-gold .dc-value { color: #b8860b; }
+.dash-card.dc-green { border-color: #c6f6d5; }
+.dash-card.dc-green .dc-value { color: #276749; }
+.dash-card.dc-red { border-color: #fed7d7; }
+.dash-card.dc-red .dc-value { color: #9b2c2c; }
+.dash-card.dc-blue { border-color: #bee3f8; }
+.dash-card.dc-blue .dc-value { color: #2b6cb0; }
+
+/* ---- 产品分类标签 ---- */
+.product-tag {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+.product-tag.stock { background: #e8f5e9; color: #2e7d32; }
+.product-tag.futures { background: #e3f2fd; color: #1565c0; }
+.product-tag.option { background: #fce4ec; color: #c62828; }
+.product-tag.fund { background: #fff3e0; color: #e65100; }
+
 /* ---- 空状态 ---- */
 .no-person-selected {
     text-align: center;
@@ -213,7 +279,7 @@
     <p>
       <span class="update-time"><span class="emoji">📋</span> 账户持仓一览</span>
       <span class="update-time"><span class="emoji">🕒</span> 更新: <span id="updateDate"><script>document.write(new Date().toLocaleDateString('zh-CN'));</script></span></span>
-      <span class="market-badge"><a href="http://192.168.0.105:8000/PerAcc_Data/PerAcc_Data.html" class="db-link" target="_blank" rel="noopener noreferrer"><span class="emoji">🗄️</span> DB 接続・データ読み込み</a></span>
+      <span class="market-badge"><a href="javascript:void(0)" class="db-link" onclick="openDbLink('http://192.168.0.105:8000/PerAcc_Data/PerAcc_Data.html')" target="_blank" rel="noopener noreferrer"<span class="emoji">🗄️</span> DB 接続・データ読み込み</a></span>
     </p>
   </div>
 
@@ -251,6 +317,30 @@
         <div class="te-label">💰 总权益</div>
         <div class="te-value" id="te_value">—</div>
         <div class="te-sub" id="te_sub">请搜索并选择人员</div>
+      </div>
+
+      <!-- 资产看板 -->
+      <div class="dashboard-grid" id="dashboardGrid" style="display:none;">
+        <div class="dash-card dc-gold">
+          <div class="dc-label">净资产</div>
+          <div class="dc-value" id="dash_net_asset">—</div>
+          <div class="dc-sub">总权益 - 保证金占用</div>
+        </div>
+        <div class="dash-card dc-green">
+          <div class="dc-label">可用资金</div>
+          <div class="dc-value" id="dash_available">—</div>
+          <div class="dc-sub">各账户可用资金之和</div>
+        </div>
+        <div class="dash-card dc-blue">
+          <div class="dc-label">持仓市值</div>
+          <div class="dc-value" id="dash_position_value">—</div>
+          <div class="dc-sub">持仓权益合计</div>
+        </div>
+        <div class="dash-card" id="dash_pnl_card">
+          <div class="dc-label">浮动盈亏</div>
+          <div class="dc-value" id="dash_floating_pnl">—</div>
+          <div class="dc-sub">未实现盈亏</div>
+        </div>
       </div>
 
       <!-- 账户信息 -->
@@ -433,9 +523,46 @@
     $('te_value').textContent = parseFloat(te).toFixed(2);
     $('te_sub').textContent = '👤 ' + (person.name||'') + ' · 共 ' + (person.accounts||[]).length + ' 个账户';
 
+    // ── 填充资产看板 ──
+    var totalAvailable = 0;
+    var totalPositionValue = 0;
+    var totalFloatingPnl = 0;
+    var totalMarginUsed = 0;
+    var accounts = person.accounts || [];
+
+    for (var ai = 0; ai < accounts.length; ai++) {
+      var acc = accounts[ai];
+      totalAvailable += parseFloat(acc.available_amount || 0);
+      totalPositionValue += parseFloat(acc.position_equity || 0);
+      var positions = acc.positions || [];
+      for (var pi = 0; pi < positions.length; pi++) {
+        totalFloatingPnl += parseFloat(positions[pi].floating_pnl || 0);
+        totalMarginUsed += parseFloat(positions[pi].margin_used || 0);
+      }
+    }
+
+    var totalAsset = totalAvailable + totalPositionValue;
+    var netAsset = totalAsset - totalMarginUsed;
+
+    $('dash_net_asset').textContent = netAsset.toFixed(2);
+    $('dash_available').textContent = totalAvailable.toFixed(2);
+    $('dash_position_value').textContent = totalPositionValue.toFixed(2);
+
+    var pnlEl = $('dash_floating_pnl');
+    pnlEl.textContent = totalFloatingPnl.toFixed(2);
+    if (totalFloatingPnl > 0) {
+      pnlEl.style.color = '#276749';
+    } else if (totalFloatingPnl < 0) {
+      pnlEl.style.color = '#9b2c2c';
+    } else {
+      pnlEl.style.color = '#1e3a5f';
+    }
+
+    $('dashboardGrid').style.display = 'grid';
+
     // 渲染账户信息
     var area = $('accountInfoArea');
-    var accounts = person.accounts || [];
+    accounts = person.accounts || [];
 
     if (!accounts.length) {
       area.innerHTML = '<div class="no-person-selected"><div class="icon">🏦</div><p>该人员暂无账户信息</p></div>';
@@ -465,7 +592,7 @@
       var positions = acc.positions || [];
       if (positions.length > 0) {
         html += '<table class="pos-mini-table">';
-        html += '<thead><tr><th>品种</th><th>代码</th><th>数量</th><th>杠杆</th><th>保证金率</th><th>成本价</th><th>最新价</th><th>持仓权益</th><th>持仓成本</th></tr></thead><tbody>';
+        html += '<thead><tr><th>类型</th><th>品种</th><th>代码</th><th>数量</th><th>杠杆</th><th>保证金率</th><th>成本价</th><th>最新价</th><th>持仓权益</th><th>持仓成本</th><th>浮动盈亏</th></tr></thead><tbody>';
         for (var pi = 0; pi < positions.length; pi++) {
           var pos = positions[pi];
           var mp = parseFloat(pos.market_price || pos.cost_price || 0);
@@ -473,7 +600,11 @@
           var mr  = parseFloat(pos.margin_rate || 1);
           var pe  = (parseInt(pos.quantity||0) * mp * lev * mr).toFixed(2);
           var ce  = (parseInt(pos.quantity||0) * parseFloat(pos.cost_price||0)).toFixed(2);
+          var fp  = parseFloat(pos.floating_pnl || 0);
+          var pt = pos.product_type || 'stock';
+          var ptLabel = {stock:'股票',futures:'期货',option:'期权',fund:'基金'}[pt] || pt;
           html += '<tr>'
+            + '<td><span class="product-tag ' + pt + '">' + ptLabel + '</span></td>'
             + '<td>' + esc(pos.variety||'') + '</td>'
             + '<td>' + esc(pos.code||'') + '</td>'
             + '<td>' + esc(parseInt(pos.quantity)||0) + '</td>'
@@ -483,6 +614,8 @@
             + '<td>' + esc(pos.market_price||'') + '</td>'
             + '<td><strong>' + pe + '</strong></td>'
             + '<td>' + ce + '</td>'
+            + '<td style="color:' + (fp > 0 ? '#276749' : (fp < 0 ? '#9b2c2c' : 'inherit')) + ';font-weight:' + (fp !== 0 ? '700' : '400') + ';">'
+            + (fp !== 0 ? (fp > 0 ? '+' : '') + fp.toFixed(2) : '—') + '</td>'
             + '</tr>';
         }
         html += '</tbody></table>';

@@ -11,7 +11,7 @@
 <div class="container">
 
     <h1>🗄️ 数据库架构设计 — InvStrat_db</h1>
-    <div class="subhead">MariaDB 11.4 · 18 张表 · utf8mb4 · InnoDB · 最后更新: 2026-06-24</div>
+    <div class="subhead">MariaDB 11.4 · 21 张表 · utf8mb4 · InnoDB · 最后更新: 2026-06-29 · 新增 per_account_trade_records + per_account_import_logs</div>
 
     <!-- 概览 -->
     <h2>概览</h2>
@@ -38,15 +38,29 @@
 │   ├── price_spot_data            现货价格
 │   └── price_calc_records         斐波那契计算结果
 │
-├── 💳 PerAcc（个人账户管理）    4 表
+├── 💳 PerAcc（个人账户管理）    6 表（新增 2 张）
 │   ├── per_accounts               人员主表
-│   ├── per_account_brokers        券商账户
-│   ├── per_account_positions      持仓明细
-│   └── per_account_cash_flows     出入金记录
+│   ├── per_account_brokers        券商账户（2026-06 新增 UNIQUE 约束）
+│   ├── per_account_positions      持仓明细（2026-06 新增期货字段）
+│   ├── per_account_cash_flows     出入金记录
+│   ├── per_account_trade_records  逐笔交易记录（2026-06 新表）
+│   └── per_account_import_logs    导入日志（2026-06 新表，SHA256 幂等）
 │
 └── 🏢 FinData（企业财务数据）  2 表
     ├── fin_enterprises            企业主表（JSON reports 存储多周期财务数据）
-    └── fin_bank_flows             银行流水数据表</code></pre>
+    └── fin_bank_flows             银行流水数据表
+    <br><br>
+    📥 PerAcc 自动导入管道（2026-06-29 全线投产）
+    ─────────────────────────────────
+    34 个 JSON 文件已自动导入：
+    ├── 27 期货日结单（华鑫期货 · 陆剑峰 · 2026-05-21 ~ 06-29）
+    │   ├── → per_account_positions（持仓更新）
+    │   ├── → per_account_trade_records（逐笔交易记录）
+    │   └── → per_account_cash_flows（出入金）
+    ├── 6  股票成交明细（华泰证券 · 夏静 · 2026-02 ~ 06）
+    │   └── → per_account_trade_records（48 条交易记录）
+    └── 1  股票资金明细（华泰证券 · 夏静）
+        └── → per_account_cash_flows（83 条出入金记录）</code></pre>
 
     <hr>
 
@@ -348,6 +362,7 @@ positions       cash_flows      (预留)
     </table>
 
     <h3><code>per_account_brokers</code> — 券商账户子表</h3>
+    <p><strong>唯一约束：</strong><code>UNIQUE KEY uk_broker_account (broker_name, account_no)</code> — 全局唯一，同一券商下不允许重复资金账号。</p>
     <table>
         <thead>
             <tr><th>字段</th><th>类型</th><th>说明</th></tr>
@@ -361,7 +376,7 @@ positions       cash_flows      (预留)
         </tbody>
     </table>
 
-    <h3><code>per_account_positions</code> — 持仓明细子表</h3>
+    <h3><code>per_account_positions</code> — 持仓明细子表（2026-06 新增期货字段）</h3>
     <table>
         <thead>
             <tr><th>字段</th><th>类型</th><th>说明</th></tr>
@@ -372,10 +387,15 @@ positions       cash_flows      (预留)
             <tr><td><code>variety</code></td><td>VARCHAR(100)</td><td>品种名称</td></tr>
             <tr><td><code>code</code></td><td>VARCHAR(50)</td><td>品种代码</td></tr>
             <tr><td><code>quantity</code></td><td>DECIMAL(15,2)</td><td>持仓数量</td></tr>
-            <tr><td><code>cost_price</code></td><td>DECIMAL(12,2)</td><td>成本价</td></tr>
-            <tr><td><code>market_price</code></td><td>DECIMAL(12,2)</td><td>市价（可为 NULL）</td></tr>
-            <tr><td><code>leverage</code></td><td>DECIMAL(6,2)</td><td>杠杆倍数（默认 1）</td></tr>
-            <tr><td><code>margin_rate</code></td><td>DECIMAL(6,4)</td><td>保证金率（默认 1）</td></tr>
+            <tr><td><code>cost_price</code></td><td>DECIMAL(15,2)</td><td>成本价</td></tr>
+            <tr><td><code>market_price</code></td><td>DECIMAL(15,2)</td><td>市价/结算价（可为 NULL）</td></tr>
+            <tr><td><code>leverage</code></td><td>DECIMAL(10,2)</td><td>杠杆倍数（默认 1）</td></tr>
+            <tr><td><code>margin_rate</code></td><td>DECIMAL(10,4)</td><td>保证金率（默认 1）</td></tr>
+            <tr><td><code>product_type</code></td><td>VARCHAR(20)</td><td>产品类型: stock/futures/option/fund（2026-06 新增）</td></tr>
+            <tr><td><code>exchange</code></td><td>VARCHAR(20)</td><td>交易所（2026-06 新增）</td></tr>
+            <tr><td><code>contract_multiplier</code></td><td>INT UNSIGNED</td><td>合约乘数（期货，2026-06 新增）</td></tr>
+            <tr><td><code>floating_pnl</code></td><td>DECIMAL(15,2)</td><td>浮动盈亏（2026-06 新增）</td></tr>
+            <tr><td><code>margin_used</code></td><td>DECIMAL(15,2)</td><td>保证金占用（2026-06 新增）</td></tr>
         </tbody>
     </table>
 
@@ -625,6 +645,46 @@ CREATE TABLE per_account_cash_flows (
 
     <hr>
 
+    <!-- PerAcc 新表 -->
+    <h2>💳 PerAcc — 新增（2026-06-29）</h2>
+
+    <h3><code>per_account_trade_records</code> — 逐笔交易记录</h3>
+    <p>存储从期货日结单/股票成交明细 JSON 导入的逐笔成交记录。与 <code>per_account_brokers</code> 通过 <code>broker_id</code> 外键关联（CASCADE）。</p>
+    <table>
+        <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>broker_id</code></td><td>BIGINT UNSIGNED FK</td><td>→ <code>per_account_brokers.id</code>（CASCADE）</td></tr>
+            <tr><td><code>trade_date</code></td><td>DATE NOT NULL</td><td>成交日期</td></tr>
+            <tr><td><code>contract_code</code></td><td>VARCHAR(50)</td><td>合约代码/股票代码</td></tr>
+            <tr><td><code>contract_name</code></td><td>VARCHAR(100)</td><td>合约名称/股票名称</td></tr>
+            <tr><td><code>direction</code></td><td>ENUM(buy/sell/unknown)</td><td>买卖方向</td></tr>
+            <tr><td><code>volume</code></td><td>DECIMAL(15,2)</td><td>数量（股/手）</td></tr>
+            <tr><td><code>price</code></td><td>DECIMAL(12,2)</td><td>成交均价</td></tr>
+            <tr><td><code>amount</code></td><td>DECIMAL(15,2)</td><td>成交金额</td></tr>
+            <tr><td><code>fee</code></td><td>DECIMAL(10,2)</td><td>手续费</td></tr>
+            <tr><td><code>realized_pnl</code></td><td>DECIMAL(15,2)</td><td>平仓盈亏</td></tr>
+            <tr><td><code>open_close</code></td><td>ENUM(open/close)</td><td>开仓/平仓（期货）</td></tr>
+            <tr><td><code>order_id</code></td><td>VARCHAR(50)</td><td>委托编号</td></tr>
+            <tr><td><code>source_file</code></td><td>VARCHAR(500)</td><td>数据来源 JSON 文件路径</td></tr>
+            <tr><td><code>created_at</code></td><td>DATETIME</td><td>创建时间</td></tr>
+        </tbody>
+    </table>
+
+    <h3><code>per_account_import_logs</code> — 导入日志</h3>
+    <p>记录每次 JSON → DB 导入操作的元信息，通过 SHA256 文件哈希实现幂等导入（同一文件不重复处理）。</p>
+    <table>
+        <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>import_type</code></td><td>VARCHAR(50)</td><td>futures_daily / stock_trades / stock_funds</td></tr>
+            <tr><td><code>source_file</code></td><td>VARCHAR(500)</td><td>源文件路径</td></tr>
+            <tr><td><code>file_hash</code></td><td>VARCHAR(64)</td><td>文件 SHA256，用于幂等检测</td></tr>
+            <tr><td><code>records_imported</code></td><td>INT UNSIGNED</td><td>本次导入记录数</td></tr>
+            <tr><td><code>status</code></td><td>ENUM</td><td>success / partial / failed</td></tr>
+            <tr><td><code>created_at</code></td><td>DATETIME</td><td>创建时间</td></tr>
+        </tbody>
+    </table>
 
     <hr>
 
@@ -745,10 +805,10 @@ CREATE TABLE per_account_cash_flows (
             <tr><td><strong>字符集</strong></td><td><code>utf8mb4</code> / <code>utf8mb4_unicode_ci</code></td></tr>
             <tr><td><strong>引擎</strong></td><td><code>InnoDB</code></td></tr>
             <tr><td><strong>主键</strong></td><td><code>id</code> — <code>BIGINT UNSIGNED AUTO_INCREMENT</code></td></tr>
-            <tr><td><strong>唯一约束</strong></td><td><code>price_spot_data.code</code> → <code>uk_price_code</code>，<code>per_accounts.id_number</code> → <code>uk_id_number</code>。API 层先于数据库层做检查，返回友好错误信息。</td></tr>
+            <tr><td><strong>唯一约束</strong></td><td><code>price_spot_data.code</code> → <code>uk_price_code</code>，<code>per_accounts.id_number</code> → <code>uk_id_number</code>，<code>per_account_brokers</code> → <code>uk_broker_account</code>。API 层先于数据库层做检查，返回友好错误信息。</td></tr>
             <tr><td><strong>外键</strong></td><td><code>event_id</code>（分析模块） / <code>person_id</code> + <code>broker_id</code>（PerAcc） — 关联主表 <code>id</code>，<code>ON DELETE CASCADE</code></td></tr>
             <tr><td><strong>时间字段</strong></td><td><code>created_at</code> / <code>updated_at</code> — 自动维护（部分表无 updated_at）</td></tr>
-            <tr><td><strong>表名</strong></td><td><code>{模块}_{业务}</code> — <code>geo_env_events</code>, <code>currency_exchange_rates</code>, <code>per_account_brokers</code></td></tr>
+            <tr><td><strong>表名</strong></td><td><code>{模块}_{业务}</code> — <code>geo_env_events</code>, <code>currency_exchange_rates</code>, <code>per_account_brokers</code>, <code>per_account_trade_records</code>, <code>per_account_import_logs</code></td></tr>
             <tr><td><strong>枚举</strong></td><td>模块特有枚举列（<code>event_type</code>、<code>asset_class</code> 等）在各自主表中定义</td></tr>
         </tbody>
     </table>
