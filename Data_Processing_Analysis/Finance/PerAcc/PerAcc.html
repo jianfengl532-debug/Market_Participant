@@ -192,71 +192,40 @@
 }
 .pos-mini-table tbody tr:hover { background: #fdf8ee; }
 
-/* ---- 资产看板 ---- */
-.dashboard-grid {
+/* ---- 券商卡片计算字段（2026-06 新版） ---- */
+.calc-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 18px;
+    gap: 8px;
+    margin-bottom: 10px;
 }
 @media (max-width: 800px) {
-    .dashboard-grid { grid-template-columns: 1fr 1fr; }
+    .calc-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 500px) {
-    .dashboard-grid { grid-template-columns: 1fr; }
+    .calc-grid { grid-template-columns: 1fr; }
 }
-.dash-card {
-    background: #f9fbfe;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 14px 16px;
+.calc-item {
     text-align: center;
-    transition: transform 0.15s, box-shadow 0.15s;
+    padding: 8px 10px;
+    background: #f0f4f8;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
 }
-.dash-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-}
-.dash-card .dc-label {
-    font-size: 0.7rem;
+.calc-item .ci-label {
+    font-size: 0.68rem;
     font-weight: 600;
     color: #6b83a0;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
-.dash-card .dc-value {
-    font-size: 1.4rem;
-    font-weight: 800;
-    color: #1e3a5f;
-    margin-top: 4px;
+.calc-item .ci-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-top: 3px;
     font-family: 'JetBrains Mono', 'Consolas', monospace;
 }
-.dash-card .dc-sub {
-    font-size: 0.72rem;
-    color: #8ba3bc;
-    margin-top: 2px;
-}
-.dash-card.dc-gold { background: linear-gradient(135deg, #fdf8ee, #f8f0dc); border-color: #e8d8a0; }
-.dash-card.dc-gold .dc-value { color: #b8860b; }
-.dash-card.dc-green { border-color: #c6f6d5; }
-.dash-card.dc-green .dc-value { color: #276749; }
-.dash-card.dc-red { border-color: #fed7d7; }
-.dash-card.dc-red .dc-value { color: #9b2c2c; }
-.dash-card.dc-blue { border-color: #bee3f8; }
-.dash-card.dc-blue .dc-value { color: #2b6cb0; }
-
-/* ---- 产品分类标签 ---- */
-.product-tag {
-    display: inline-block;
-    padding: 1px 8px;
-    border-radius: 8px;
-    font-size: 0.7rem;
-    font-weight: 600;
-}
-.product-tag.stock { background: #e8f5e9; color: #2e7d32; }
-.product-tag.futures { background: #e3f2fd; color: #1565c0; }
-.product-tag.option { background: #fce4ec; color: #c62828; }
-.product-tag.fund { background: #fff3e0; color: #e65100; }
+.calc-item .ci-value.positive { color: #28a06b; }
+.calc-item .ci-value.negative { color: #dc3545; }
 
 /* ---- 空状态 ---- */
 .no-person-selected {
@@ -279,7 +248,7 @@
     <p>
       <span class="update-time"><span class="emoji">📋</span> 账户持仓一览</span>
       <span class="update-time"><span class="emoji">🕒</span> 更新: <span id="updateDate"><script>document.write(new Date().toLocaleDateString('zh-CN'));</script></span></span>
-      <span class="market-badge"><a href="javascript:void(0)" class="db-link" onclick="openDbLink('http://192.168.0.105:8000/PerAcc_Data/PerAcc_Data.html')" target="_blank" rel="noopener noreferrer"<span class="emoji">🗄️</span> DB 接続・データ読み込み</a></span>
+      <span class="market-badge"><a href="javascript:void(0)" class="db-link" onclick="openDbLink('http://192.168.0.105:8000/PerAcc_Data/PerAcc_Data.html')"><span class="emoji">🗄️</span> DB 接続・データ読み込み</a></span>
     </p>
   </div>
 
@@ -317,30 +286,6 @@
         <div class="te-label">💰 总权益</div>
         <div class="te-value" id="te_value">—</div>
         <div class="te-sub" id="te_sub">请搜索并选择人员</div>
-      </div>
-
-      <!-- 资产看板 -->
-      <div class="dashboard-grid" id="dashboardGrid" style="display:none;">
-        <div class="dash-card dc-gold">
-          <div class="dc-label">净资产</div>
-          <div class="dc-value" id="dash_net_asset">—</div>
-          <div class="dc-sub">总权益 - 保证金占用</div>
-        </div>
-        <div class="dash-card dc-green">
-          <div class="dc-label">可用资金</div>
-          <div class="dc-value" id="dash_available">—</div>
-          <div class="dc-sub">各账户可用资金之和</div>
-        </div>
-        <div class="dash-card dc-blue">
-          <div class="dc-label">持仓市值</div>
-          <div class="dc-value" id="dash_position_value">—</div>
-          <div class="dc-sub">持仓权益合计</div>
-        </div>
-        <div class="dash-card" id="dash_pnl_card">
-          <div class="dc-label">浮动盈亏</div>
-          <div class="dc-value" id="dash_floating_pnl">—</div>
-          <div class="dc-sub">未实现盈亏</div>
-        </div>
       </div>
 
       <!-- 账户信息 -->
@@ -524,45 +469,10 @@
     $('te_sub').textContent = '👤 ' + (person.name||'') + ' · 共 ' + (person.accounts||[]).length + ' 个账户';
 
     // ── 填充资产看板 ──
-    var totalAvailable = 0;
-    var totalPositionValue = 0;
-    var totalFloatingPnl = 0;
-    var totalMarginUsed = 0;
     var accounts = person.accounts || [];
 
-    for (var ai = 0; ai < accounts.length; ai++) {
-      var acc = accounts[ai];
-      totalAvailable += parseFloat(acc.available_amount || 0);
-      totalPositionValue += parseFloat(acc.position_equity || 0);
-      var positions = acc.positions || [];
-      for (var pi = 0; pi < positions.length; pi++) {
-        totalFloatingPnl += parseFloat(positions[pi].floating_pnl || 0);
-        totalMarginUsed += parseFloat(positions[pi].margin_used || 0);
-      }
-    }
-
-    var totalAsset = totalAvailable + totalPositionValue;
-    var netAsset = totalAsset - totalMarginUsed;
-
-    $('dash_net_asset').textContent = netAsset.toFixed(2);
-    $('dash_available').textContent = totalAvailable.toFixed(2);
-    $('dash_position_value').textContent = totalPositionValue.toFixed(2);
-
-    var pnlEl = $('dash_floating_pnl');
-    pnlEl.textContent = totalFloatingPnl.toFixed(2);
-    if (totalFloatingPnl > 0) {
-      pnlEl.style.color = '#276749';
-    } else if (totalFloatingPnl < 0) {
-      pnlEl.style.color = '#9b2c2c';
-    } else {
-      pnlEl.style.color = '#1e3a5f';
-    }
-
-    $('dashboardGrid').style.display = 'grid';
-
-    // 渲染账户信息
+    // ── 渲染账户信息 + 异步加载计算字段 ──
     var area = $('accountInfoArea');
-    accounts = person.accounts || [];
 
     if (!accounts.length) {
       area.innerHTML = '<div class="no-person-selected"><div class="icon">🏦</div><p>该人员暂无账户信息</p></div>';
@@ -572,9 +482,7 @@
     var html = '';
     for (var i = 0; i < accounts.length; i++) {
       var acc = accounts[i];
-      var avail = parseFloat(acc.available_amount || 0);
-      var posEq = parseFloat(acc.position_equity || 0);
-      var accEq = parseFloat(acc.account_equity || (avail + posEq));
+      var brokerId = acc.id;
 
       html += '<div class="acc-card">';
       html += '<div class="acc-header">';
@@ -582,57 +490,68 @@
       html += '<span class="acc-no">📄 ' + esc(acc.account_no || '-') + '</span>';
       html += '</div>';
 
-      html += '<div class="acc-details">';
-      html += '<div class="ad-item"><div class="ad-label">可用额度</div><div class="ad-value">' + avail.toFixed(2) + '</div></div>';
-      html += '<div class="ad-item"><div class="ad-label">持仓权益</div><div class="ad-value">' + posEq.toFixed(2) + '</div></div>';
-      html += '<div class="ad-item"><div class="ad-label">账户权益</div><div class="ad-value">' + accEq.toFixed(2) + '</div></div>';
+      // 计算区域（异步加载）
+      html += '<div class="calc-grid" id="calc_grid_' + brokerId + '">';
+      html += '<div class="calc-item"><div class="ci-label">💰 投入本金</div><div class="ci-value" id="ci_principal_' + brokerId + '">⏳</div></div>';
+      html += '<div class="calc-item"><div class="ci-label">📊 成本支出合计</div><div class="ci-value" id="ci_cost_' + brokerId + '">⏳</div></div>';
+      html += '<div class="calc-item"><div class="ci-label">🏦 本金余额</div><div class="ci-value" id="ci_balance_' + brokerId + '">⏳</div></div>';
+      html += '<div class="calc-item"><div class="ci-label">📈 持股市值</div><div class="ci-value" id="ci_marketval_' + brokerId + '">⏳</div></div>';
       html += '</div>';
 
-      // 持仓明细
+      // 持仓明细（精简版：移除 杠杆/保证金率/浮动盈亏）
       var positions = acc.positions || [];
       if (positions.length > 0) {
         html += '<table class="pos-mini-table">';
-        html += '<thead><tr><th>类型</th><th>品种</th><th>代码</th><th>数量</th><th>杠杆</th><th>保证金率</th><th>成本价</th><th>最新价</th><th>持仓权益</th><th>持仓成本</th><th>浮动盈亏</th></tr></thead><tbody>';
+        html += '<thead><tr><th>类型</th><th>品种</th><th>代码</th><th>数量</th><th>成本价</th><th>最新价</th><th>持仓成本</th><th>持仓市值</th></tr></thead><tbody>';
         for (var pi = 0; pi < positions.length; pi++) {
           var pos = positions[pi];
-          var mp = parseFloat(pos.market_price || pos.cost_price || 0);
-          var lev = parseInt(pos.leverage || 1);
-          var mr  = parseFloat(pos.margin_rate || 1);
-          var pe  = (parseInt(pos.quantity||0) * mp * lev * mr).toFixed(2);
-          var ce  = (parseInt(pos.quantity||0) * parseFloat(pos.cost_price||0)).toFixed(2);
-          var fp  = parseFloat(pos.floating_pnl || 0);
+          var qty = parseInt(pos.quantity||0);
+          var costPx = parseFloat(pos.cost_price||0);
+          var mktPx = parseFloat(pos.market_price||pos.cost_price||0);
+          var ce  = (qty * costPx).toFixed(2);
+          var pe  = (qty * mktPx).toFixed(2);
           var pt = pos.product_type || 'stock';
           var ptLabel = {stock:'股票',futures:'期货',option:'期权',fund:'基金'}[pt] || pt;
+          var exchangeTag = pos.exchange ? ' <span style="font-size:0.65rem;color:#8ba3bc;">' + esc(pos.exchange) + '</span>' : '';
           html += '<tr>'
             + '<td><span class="product-tag ' + pt + '">' + ptLabel + '</span></td>'
-            + '<td>' + esc(pos.variety||'') + '</td>'
+            + '<td>' + esc(pos.variety||'') + exchangeTag + '</td>'
             + '<td>' + esc(pos.code||'') + '</td>'
-            + '<td>' + esc(parseInt(pos.quantity)||0) + '</td>'
-            + '<td>' + esc(parseInt(pos.leverage)||1) + '</td>'
-            + '<td>' + esc(pos.margin_rate||1) + '</td>'
-            + '<td>' + esc(pos.cost_price||0) + '</td>'
-            + '<td>' + esc(pos.market_price||'') + '</td>'
-            + '<td><strong>' + pe + '</strong></td>'
+            + '<td>' + qty + '</td>'
+            + '<td>' + costPx.toFixed(2) + '</td>'
+            + '<td>' + (pos.market_price ? mktPx.toFixed(2) : '—') + '</td>'
             + '<td>' + ce + '</td>'
-            + '<td style="color:' + (fp > 0 ? '#276749' : (fp < 0 ? '#9b2c2c' : 'inherit')) + ';font-weight:' + (fp !== 0 ? '700' : '400') + ';">'
-            + (fp !== 0 ? (fp > 0 ? '+' : '') + fp.toFixed(2) : '—') + '</td>'
+            + '<td><strong>' + pe + '</strong></td>'
             + '</tr>';
         }
         html += '</tbody></table>';
-
-        // 出入金记录显示
-        if (acc.cash_flows && acc.cash_flows.length > 0) {
-          html += '<div style="margin-top:8px;font-size:0.78rem;"><strong>出\\入金记录</strong></div>';
-          var cfTotal = 0;
-          for (var ci = 0; ci < acc.cash_flows.length; ci++) {
-            var cf = acc.cash_flows[ci];
-            cfTotal += parseFloat(cf.amount || 0);
-            html += '<div style="font-size:0.78rem;color:#4a5a72;padding:2px 0;">📅 ' + esc(cf.flow_date||'') + '  💰 ' + esc(parseFloat(cf.amount||0).toFixed(2)) + '</div>';
-          }
-          html += '<div style="font-size:0.78rem;font-weight:600;color:#2d3748;border-top:1px solid #e2e8f0;padding-top:2px;margin-top:2px;">出入金合计: ' + cfTotal.toFixed(2) + '</div>';
-        }
       } else {
         html += '<div style="text-align:center;padding:10px;color:#8ba3bc;font-size:0.8rem;">暂无持仓数据</div>';
+      }
+
+      // 出入金记录：只显示"银行存管转账"
+      var bankFlows = [];
+      if (acc.cash_flows && acc.cash_flows.length > 0) {
+        bankFlows = acc.cash_flows.filter(function(cf) {
+          return (cf.category||'').indexOf('银行存管') !== -1 || (cf.category||'').indexOf('转账') !== -1;
+        });
+      }
+      if (bankFlows.length > 0) {
+        html += '<div style="margin-top:10px;padding-top:8px;border-top:1px dashed #e2e8f0;">';
+        html += '<div style="font-size:0.75rem;font-weight:600;color:#5b6f86;margin-bottom:4px;">🏦 银行存管转账记录</div>';
+        var cfTotal = 0;
+        for (var ci = 0; ci < bankFlows.length; ci++) {
+          var cf = bankFlows[ci];
+          cfTotal += parseFloat(cf.amount || 0);
+          html += '<div style="font-size:0.76rem;color:#4a5a72;padding:2px 0;display:flex;justify-content:space-between;">';
+          html += '<span>📅 ' + esc(cf.flow_date||'') + '</span>';
+          html += '<span style="font-weight:' + (parseFloat(cf.amount||0) > 0 ? '700' : '400') + ';color:' + (parseFloat(cf.amount||0) > 0 ? '#28a06b' : '#9b2c2c') + ';">'
+            + (parseFloat(cf.amount||0) > 0 ? '+' : '') + esc(parseFloat(cf.amount||0).toFixed(2)) + '</span>';
+          html += '</div>';
+        }
+        html += '<div style="font-size:0.76rem;font-weight:700;color:#2d3748;border-top:1px solid #e2e8f0;padding-top:2px;margin-top:2px;display:flex;justify-content:space-between;">'
+          + '<span>投入本金合计</span><span>' + (cfTotal >= 0 ? '+' : '') + cfTotal.toFixed(2) + '</span></div>';
+        html += '</div>';
       }
 
       html += '</div>';
@@ -640,6 +559,46 @@
 
     area.innerHTML = html;
     toast('已加载「' + (person.name||'') + '」的账户信息', 'success');
+
+    // ── 异步加载每个券商的计算字段 ──
+    for (var i = 0; i < accounts.length; i++) {
+      var acc = accounts[i];
+      var brokerId = acc.id;
+      (function(bid, brokerName) {
+        fetch(API + '?action=stock_calc&broker_id=' + bid, { headers: { 'X-API-Key': API_KEY } })
+          .then(function(r) { return r.json(); })
+          .then(function(res) {
+            if (!res.success) return;
+            var pEl = document.getElementById('ci_principal_' + bid);
+            var cEl = document.getElementById('ci_cost_' + bid);
+            var bEl = document.getElementById('ci_balance_' + bid);
+            var mEl = document.getElementById('ci_marketval_' + bid);
+            if (pEl) {
+              pEl.textContent = (res.invested_principal >= 0 ? '' : '') + parseFloat(res.invested_principal).toFixed(2);
+              pEl.className = 'ci-value' + (res.invested_principal >= 0 ? ' positive' : ' negative');
+            }
+            if (cEl) {
+              cEl.textContent = parseFloat(res.stock_cost_total).toFixed(2);
+              cEl.className = 'ci-value';
+            }
+            if (bEl) {
+              bEl.textContent = parseFloat(res.principal_balance).toFixed(2);
+              bEl.className = 'ci-value' + (res.principal_balance >= 0 ? ' positive' : ' negative');
+            }
+            if (mEl) {
+              mEl.textContent = parseFloat(res.stock_market_value).toFixed(2);
+              mEl.className = 'ci-value' + (res.stock_market_value >= 0 ? ' positive' : ' negative');
+            }
+          })
+          .catch(function() {
+            // 加载失败时显示 —
+            ['ci_principal_','ci_cost_','ci_balance_','ci_marketval_'].forEach(function(prefix) {
+              var el = document.getElementById(prefix + bid);
+              if (el) el.textContent = '—';
+            });
+          });
+      })(brokerId, acc.broker_name);
+    }
   }
 
   // ============================================================

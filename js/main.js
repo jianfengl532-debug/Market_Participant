@@ -200,20 +200,18 @@
 
     /**
      * 验证密码并打开 DB 链接
+     * 返回 false 阻止浏览器默认跳转（解决 target=_blank 空白页问题）
      */
     window.openDbLink = function(url) {
         var password = prompt('🔐 请输入 DB 访问密码：');
-        if (password === null) return;
+        if (password === null) return false;
 
         if (password === getPassword()) {
             window.open(url, '_blank', 'noopener,noreferrer');
+            return false;
         } else {
-            var hint = DEFAULT_PASSWORD;
-            try {
-                var saved = localStorage.getItem(STORAGE_KEY);
-                if (saved) hint = saved.slice(0, 4) + '****';
-            } catch(e) {}
             alert('❌ 密码错误。默认密码: 000000（可联系管理员修改）');
+            return false;
         }
     };
 
