@@ -11,7 +11,7 @@
 <div class="container">
 
     <h1>📋 项目维护 · 关键步骤指令</h1>
-    <div class="subhead">最后更新: 2026-06-24 &nbsp;|&nbsp; 点击 <code>代码块</code> 或 <code>命令</code> 即可自动复制</div>
+    <div class="subhead">最后更新: 2026-06-30 &nbsp;|&nbsp; 点击 <code>代码块</code> 或 <code>命令</code> 即可自动复制</div>
 
     <hr>
 
@@ -24,11 +24,12 @@
     <pre><code>cd /home/jefflu && sh start.sh start</code></pre>
     <pre><code>nohup tailscale funnel 8000 > /dev/null 2>&1 &</code></pre>
 
-    <p><strong>修改网页内容后 → 只需做这三步：</strong></p>
+    <p><strong>修改网页内容后 → 只需做这四步：</strong></p>
     <pre><code>cd /share/www</code></pre>
     <pre><code>git add .</code></pre>
     <pre><code>git commit -m "改了什么东西"</code></pre>
     <pre><code>git push -f origin master</code></pre>
+    <p>⚠️ 首次推送需配置认证方式（见第三节说明）。</p>
 
     <p>以上两步涵盖了日常所有操作。以下为详细说明。</p>
 
@@ -85,6 +86,28 @@
     <pre><code>git push -f origin master</code></pre>
 
     <p>等 1-2 分钟后刷新页面即可看到更新。</p>
+
+    <h3>⚠️ 首次推送 / 认证配置</h3>
+
+    <p>GitHub 已于 2021 年禁用密码认证，必须使用 <strong>Personal Access Token (PAT)</strong> 或 SSH。</p>
+
+    <p><strong>1. 设置 Remote URL</strong>（如未配置过）：</p>
+    <pre><code>git remote set-url origin https://jianfengl532-debug@github.com/jianfengl532-debug/Market_Participant.git</code></pre>
+
+    <p><strong>2. 生成 Personal Access Token：</strong><br>
+    GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)<br>
+    点「Generate new token (classic)」→ 勾选 <code>repo</code> 全部权限 → 生成并复制 token。</p>
+
+    <p><strong>3. 推送时输入 token：</strong><br>
+    执行 <code>git push</code> 后提示输入密码，<strong>粘贴刚才的 token</strong>（不是 GitHub 登录密码）。<br>
+    验证成功后会显示：</p>
+    <pre><code>Enumerating objects: ...
+remote: Resolving deltas: 100% (...), completed ...
+To https://github.com/jianfengl532-debug/Market_Participant.git
+   xxxxxx..xxxxxx  master -> master</code></pre>
+
+    <p><strong> 免密推送（可选）：</strong>运行一次以下命令，之后不再询问密码：</p>
+    <pre><code>git config --global credential.helper store</code></pre>
 
     <hr>
 
