@@ -529,6 +529,35 @@
         html += '<div style="text-align:center;padding:10px;color:#8ba3bc;font-size:0.8rem;">暂无持仓数据</div>';
       }
 
+      // 成交汇总：从 trade_records 读取
+      var trades = acc.trade_records || [];
+      if (trades.length > 0) {
+        html += '<div style="margin-top:10px;padding-top:8px;border-top:1px dashed #e2e8f0;">';
+        html += '<div style="font-size:0.75rem;font-weight:600;color:#5b6f86;margin-bottom:4px;">📋 成交汇总</div>';
+        html += '<table class="pos-mini-table">';
+        html += '<thead><tr><th>日期</th><th>合约/代码</th><th>名称</th><th>方向</th><th>数量</th><th>成交价</th><th>成交额</th><th>手续费</th><th>平仓盈亏</th></tr></thead><tbody>';
+        for (var ti = 0; ti < trades.length; ti++) {
+          var t = trades[ti];
+          var dirLabel = t.direction === 'buy' ? '买' : t.direction === 'sell' ? '卖' : t.direction||'';
+          var pnl = parseFloat(t.realized_pnl||0);
+          var pnlStyle = pnl > 0 ? 'color:#28a06b;font-weight:700;' : (pnl < 0 ? 'color:#dc3545;font-weight:700;' : '');
+          var openClose = t.open_close === 'open' ? '开' : t.open_close === 'close' ? '平' : '';
+          html += '<tr>'
+            + '<td>' + esc(t.trade_date||'') + '</td>'
+            + '<td>' + esc(t.contract_code||'') + '</td>'
+            + '<td>' + esc(t.contract_name||'') + '</td>'
+            + '<td>' + dirLabel + '</td>'
+            + '<td>' + (parseFloat(t.volume)||0) + '</td>'
+            + '<td>' + (parseFloat(t.price)||0).toFixed(2) + '</td>'
+            + '<td>' + (parseFloat(t.amount)||0).toFixed(2) + '</td>'
+            + '<td>' + (parseFloat(t.fee)||0).toFixed(2) + '</td>'
+            + '<td style="' + pnlStyle + '">' + pnl.toFixed(2) + '</td>'
+            + '</tr>';
+        }
+        html += '</tbody></table>';
+        html += '</div>';
+      }
+
       // 出入金记录：只显示"银行存管转账"
       var bankFlows = [];
       if (acc.cash_flows && acc.cash_flows.length > 0) {
