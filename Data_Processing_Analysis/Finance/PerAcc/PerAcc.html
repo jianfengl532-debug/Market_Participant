@@ -493,9 +493,9 @@
       // 计算区域（异步加载）
       html += '<div class="calc-grid" id="calc_grid_' + brokerId + '">';
       html += '<div class="calc-item"><div class="ci-label">💰 投入本金</div><div class="ci-value" id="ci_principal_' + brokerId + '">⏳</div></div>';
-      html += '<div class="calc-item"><div class="ci-label">📊 成本支出合计</div><div class="ci-value" id="ci_cost_' + brokerId + '">⏳</div></div>';
-      html += '<div class="calc-item"><div class="ci-label">🏦 本金余额</div><div class="ci-value" id="ci_balance_' + brokerId + '">⏳</div></div>';
-      html += '<div class="calc-item"><div class="ci-label">📈 持股市值</div><div class="ci-value" id="ci_marketval_' + brokerId + '">⏳</div></div>';
+      html += '<div class="calc-item"><div class="ci-label">📊 总资产/权益</div><div class="ci-value" id="ci_cost_' + brokerId + '">⏳</div></div>';
+      html += '<div class="calc-item"><div class="ci-label">🏦 可用资产</div><div class="ci-value" id="ci_balance_' + brokerId + '">⏳</div></div>';
+      html += '<div class="calc-item"><div class="ci-label">📈 持仓市值</div><div class="ci-value" id="ci_marketval_' + brokerId + '">⏳</div></div>';
       html += '</div>';
 
       // 股票账户额外显示总资产
@@ -643,24 +643,22 @@
               pEl.className = 'ci-value' + (res.invested_principal >= 0 ? ' positive' : ' negative');
             }
             if (cEl) {
-              cEl.textContent = parseFloat(res.stock_cost_total).toFixed(2);
-              cEl.className = 'ci-value';
+              cEl.textContent = parseFloat(res.total_equity).toFixed(2);
+              cEl.className = 'ci-value' + (res.total_equity >= 0 ? ' positive' : ' negative');
             }
             if (bEl) {
-              bEl.textContent = parseFloat(res.principal_balance).toFixed(2);
-              bEl.className = 'ci-value' + (res.principal_balance >= 0 ? ' positive' : ' negative');
+              bEl.textContent = parseFloat(res.available_assets).toFixed(2);
+              bEl.className = 'ci-value' + (res.available_assets >= 0 ? ' positive' : ' negative');
             }
             if (mEl) {
-              mEl.textContent = parseFloat(res.stock_market_value).toFixed(2);
-              mEl.className = 'ci-value' + (res.stock_market_value >= 0 ? ' positive' : ' negative');
+              mEl.textContent = parseFloat(res.position_value).toFixed(2);
+              mEl.className = 'ci-value' + (res.position_value >= 0 ? ' positive' : ' negative');
             }
             var svEl = document.getElementById('stock_value_' + bid);
-            if (svEl) svEl.textContent = parseFloat(res.stock_market_value).toFixed(2);
+            if (svEl) svEl.textContent = parseFloat(res.position_value).toFixed(2);
             var taEl = document.getElementById('total_assets_' + bid);
             if (taEl) {
-              var avail = parseFloat(res.invested_principal || 0) - parseFloat(res.stock_cost_total || 0);
-              var totalAssets = parseFloat(res.stock_market_value) + avail;
-              taEl.textContent = totalAssets.toFixed(2);
+              taEl.textContent = parseFloat(res.total_equity).toFixed(2);
             }
           })
           .catch(function() {
