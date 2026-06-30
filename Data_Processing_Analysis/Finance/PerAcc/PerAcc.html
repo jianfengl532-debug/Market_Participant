@@ -498,31 +498,61 @@
       html += '<div class="calc-item"><div class="ci-label">📈 持股市值</div><div class="ci-value" id="ci_marketval_' + brokerId + '">⏳</div></div>';
       html += '</div>';
 
-      // 持仓明细（精简版：移除 杠杆/保证金率/浮动盈亏）
+      // 股票账户额外显示总资产
+      if (isStockAcc) {
+        html += '<div style="margin-top:8px;padding:8px 10px;background:#f0f7fe;border-radius:12px;border:1px solid #bee3f8;font-size:0.82rem;display:flex;gap:20px;">';
+        html += '<div><span style="color:#5b6f86;">总资产:</span> <strong id="total_assets_' + brokerId + '">⏳</strong></div>';
+        html += '<div><span style="color:#5b6f86;">股票市值:</span> <strong id="stock_value_' + brokerId + '">⏳</strong></div>';
+        html += '</div>';
+      }
+
+      // 持仓明细（按类型显示不同列）
       var positions = acc.positions || [];
+      var isStockAcc = (acc.account_type === 'stock');
       if (positions.length > 0) {
         html += '<table class="pos-mini-table">';
-        html += '<thead><tr><th>类型</th><th>品种</th><th>代码</th><th>数量</th><th>成本价</th><th>最新价</th><th>持仓成本</th><th>持仓市值</th></tr></thead><tbody>';
+        if (isStockAcc) {
+          html += '<thead><tr><th>名称</th><th>代码</th><th>数量</th><th>保本价</th><th>最新价</th><th>市值</th><th>盈亏</th><th>持仓成本</th></tr></thead><tbody>';
+        } else {
+          html += '<thead><tr><th>品种</th><th>合约</th><th>数量</th><th>杠杆</th><th>保证金率</th><th>成本价</th><th>最新价</th><th>浮动盈亏</th><th>保证金占用</th><th>持仓成本</th></tr></thead><tbody>';
+        }
         for (var pi = 0; pi < positions.length; pi++) {
           var pos = positions[pi];
           var qty = parseInt(pos.quantity||0);
           var costPx = parseFloat(pos.cost_price||0);
           var mktPx = parseFloat(pos.market_price||pos.cost_price||0);
           var ce  = (qty * costPx).toFixed(2);
-          var pe  = (qty * mktPx).toFixed(2);
-          var pt = pos.product_type || 'stock';
-          var ptLabel = {stock:'股票',futures:'期货',option:'期权',fund:'基金'}[pt] || pt;
-          var exchangeTag = pos.exchange ? ' <span style="font-size:0.65rem;color:#8ba3bc;">' + esc(pos.exchange) + '</span>' : '';
-          html += '<tr>'
-            + '<td><span class="product-tag ' + pt + '">' + ptLabel + '</span></td>'
-            + '<td>' + esc(pos.variety||'') + exchangeTag + '</td>'
-            + '<td>' + esc(pos.code||'') + '</td>'
-            + '<td>' + qty + '</td>'
-            + '<td>' + costPx.toFixed(2) + '</td>'
-            + '<td>' + (pos.market_price ? mktPx.toFixed(2) : '—') + '</td>'
-            + '<td>' + ce + '</td>'
-            + '<td><strong>' + pe + '</strong></td>'
-            + '</tr>';
+          var mktVal = (qty * mktPx).toFixed(2);
+
+          if (isStockAcc) {
+            var pnl = (mktPx - costPx) * qty;
+            html += '<tr>'
+              + '<td>' + esc(pos.variety||'') + '</td>'
+              + '<td>' + esc(pos.code||'') + '</td>'
+              + '<td>' + qty + '</td>'
+              + '<td>' + costPx.toFixed(2) + '</td>'
+              + '<td>' + mktPx.toFixed(2) + '</td>'
+              + '<td>' + mktVal + '</td>'
+              + '<td style="' + (pnl >= 0 ? 'color:#28a06b' : 'color:#dc3545') + ';font-weight:700;">' + pnl.toFixed(2) + '</td>'
+              + '<td>' + ce + '</td>'
+              + '</tr>';
+          } else {
+            var fp = parseFloat(pos.floating_pnl||0);
+            var mg = parseFloat(pos.margin_used||0);
+            var exchangeTag = pos.exchange ? ' <span style="font-size:0.65rem;color:#8ba3bc;">' + esc(pos.exchange) + '</span>' : '';
+            html += '<tr>'
+              + '<td>' + esc(pos.variety||'') + exchangeTag + '</td>'
+              + '<td>' + esc(pos.code||'') + '</td>'
+              + '<td>' + qty + '</td>'
+              + '<td>' + (parseInt(pos.leverage)||1) + '</td>'
+              + '<td>' + (parseFloat(pos.margin_rate)||1).toFixed(4) + '</td>'
+              + '<td>' + costPx.toFixed(2) + '</td>'
+              + '<td>' + (pos.market_price ? mktPx.toFixed(2) : '—') + '</td>'
+              + '<td style="' + (fp >= 0 ? 'color:#28a06b' : 'color:#dc3545') + ';font-weight:700;">' + fp.toFixed(2) + '</td>'
+              + '<td>' + mg.toFixed(2) + '</td>'
+              + '<td>' + ce + '</td>'
+              + '</tr>';
+        }
         }
         html += '</tbody></table>';
       } else {
@@ -535,7 +565,11 @@
         html += '<div style="margin-top:10px;padding-top:8px;border-top:1px dashed #e2e8f0;">';
         html += '<div style="font-size:0.75rem;font-weight:600;color:#5b6f86;margin-bottom:4px;">📋 成交汇总</div>';
         html += '<table class="pos-mini-table">';
-        html += '<thead><tr><th>日期</th><th>合约/代码</th><th>名称</th><th>方向</th><th>数量</th><th>成交价</th><th>成交额</th><th>手续费</th><th>平仓盈亏</th></tr></thead><tbody>';
+        if (isStockAcc) {
+          html += '<thead><tr><th>日期</th><th>合约/代码</th><th>名称</th><th>方向</th><th>数量</th><th>成交价</th><th>成交额</th><th>平仓盈亏</th></tr></thead><tbody>';
+        } else {
+          html += '<thead><tr><th>日期</th><th>合约/代码</th><th>名称</th><th>方向</th><th>数量</th><th>成交价</th><th>成交额</th><th>手续费</th><th>平仓盈亏</th></tr></thead><tbody>';
+        }
         for (var ti = 0; ti < trades.length; ti++) {
           var t = trades[ti];
           var dirLabel = t.direction === 'buy' ? '买' : t.direction === 'sell' ? '卖' : t.direction||'';
@@ -549,9 +583,11 @@
             + '<td>' + dirLabel + '</td>'
             + '<td>' + (parseFloat(t.volume)||0) + '</td>'
             + '<td>' + (parseFloat(t.price)||0).toFixed(2) + '</td>'
-            + '<td>' + (parseFloat(t.amount)||0).toFixed(2) + '</td>'
-            + '<td>' + (parseFloat(t.fee)||0).toFixed(2) + '</td>'
-            + '<td style="' + pnlStyle + '">' + pnl.toFixed(2) + '</td>'
+            + '<td>' + (parseFloat(t.amount)||0).toFixed(2) + '</td>';
+          if (!isStockAcc) {
+            html += '<td>' + (parseFloat(t.fee)||0).toFixed(2) + '</td>';
+          }
+          html += '<td style="' + pnlStyle + '">' + pnl.toFixed(2) + '</td>'
             + '</tr>';
         }
         html += '</tbody></table>';
@@ -617,6 +653,14 @@
             if (mEl) {
               mEl.textContent = parseFloat(res.stock_market_value).toFixed(2);
               mEl.className = 'ci-value' + (res.stock_market_value >= 0 ? ' positive' : ' negative');
+            }
+            var svEl = document.getElementById('stock_value_' + bid);
+            if (svEl) svEl.textContent = parseFloat(res.stock_market_value).toFixed(2);
+            var taEl = document.getElementById('total_assets_' + bid);
+            if (taEl) {
+              var avail = parseFloat(res.invested_principal || 0) - parseFloat(res.stock_cost_total || 0);
+              var totalAssets = parseFloat(res.stock_market_value) + avail;
+              taEl.textContent = totalAssets.toFixed(2);
             }
           })
           .catch(function() {
