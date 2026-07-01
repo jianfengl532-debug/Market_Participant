@@ -11,7 +11,7 @@
 <div class="container">  <!-- 块级容器: 内容居中布局 最大宽度210mm -->
 
     <h1>📁 网站项目架构</h1>  <!-- 一级标题: 页面主标题 -->
-    <div class="subhead">最后更新: 2026-06-30 · 全线升级 v4：券商/期货双模板、总资产落库、资金股票导入器</div>  <!-- 块级容器: 副标题/元信息 -->
+    <div class="subhead">最后更新: 2026-07-01 · 全线升级 v4：券商/期货双模板、总资产落库、资金股票导入器</div>  <!-- 块级容器: 副标题/元信息 -->
 
     <hr>  <!-- 水平分割线: 分隔内容段落 -->
 
@@ -407,6 +407,49 @@
             <tr><td><strong>字符集</strong></td><td>全部使用 <code>utf8mb4</code>，支持 emoji 和中文。</td></tr>
         </tbody>  <!-- 表格主体结束 -->
     </table>  <!-- 表格结束 -->
+
+    <hr>
+
+    <!-- 7. 数据样本路径 -->
+    <h2>7. 数据样本路径（数据导入）</h2>
+    <p>PerAcc 模块的原始数据 JSON 文件存放位置，用于导入管道和手动恢复。</p>
+    <pre><code>/share/PerAcc_Trade_Data/
+│
+├── 夏静（XJ · 华泰证券 · 666652375957）
+│   └── 320682198110300222_XJ/htsc_com_cn_666652375957/
+│       ├── 成交明细/          ← 股票成交明细（已导入 26 条）
+│       │   ├── 20260201_20260430.json
+│       │   └── 20260501_20260630.json
+│       ├── 资金股票/          ← 持仓快照（已导入 8 条）
+│       │   └── 20260630.json
+│       └── 资金明细/          ← 出入金记录（已导入 93 条）
+│           ├── 20260128-0227.json
+│           ├── 20260226-0430.json
+│           ├── 20260501-0628.json
+│           └── 20260629.json
+│
+├── 陆剑峰（LJF · 华鑫期货 · 912290608）
+│   └── 320602197802152512_LJF/investorservice_cfmmc_com_0130912290608/
+│       ├── 0130912290608_2026-05-21.json    （共 28 份日结文件）
+│       ├── ...
+│       └── 0130912290608_2026-06-30.json
+│
+└── 童广生（TGS · 新世纪期货 · 505510）
+    └── 370406198004207456_TGS/investorservice_cfmmc_com_0212505510/
+        ├── 0212505510_2026-06-24.json    （共 5 份日结文件）
+        ├── ...
+        └── 0212505510_2026-06-30.json</code></pre>
+    <p>导入命令（在 <code>/home/jefflu/api/PerAcc_Data/</code> 目录下执行）：</p>
+    <table>
+        <thead><tr><th>数据类型</th><th>命令</th></tr></thead>
+        <tbody>
+            <tr><td>全部类型</td><td><code>php import_api.php batch_all</code></td></tr>
+            <tr><td>期货日结</td><td><code>php import_api.php batch_futures</code></td></tr>
+            <tr><td>股票成交</td><td><code>php import_api.php batch_stocks</code></td></tr>
+            <tr><td>资金明细</td><td><code>php import_api.php batch_funds</code></td></tr>
+            <tr><td>资金股票</td><td><code>php import_api.php batch_holdings</code></td></tr>
+        </tbody>
+    </table>
 
 </div>  <!-- 容器结束 -->
 </body>  <!-- 文档主体结束 -->

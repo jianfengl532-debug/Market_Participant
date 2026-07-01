@@ -11,7 +11,7 @@
 <div class="container">
 
     <h1>🗄️ 数据库架构设计 — InvStrat_db</h1>
-    <div class="subhead">MariaDB 11.4 · 23 张表 · utf8mb4 · InnoDB · 最后更新: 2026-06-30 全线升级 v4</div>
+    <div class="subhead">MariaDB 11.4 · 23 张表 · utf8mb4 · InnoDB · 最后更新: 2026-07-01 全线升级 v4</div>
 
     <!-- 概览 -->
     <h2>概览</h2>
@@ -885,6 +885,133 @@ CREATE TABLE per_account_cash_flows (
     </table>
     <p><strong>后端服务地址：</strong><code>https://jefflu.tail9f69ce.ts.net</code>（生产） / <code>http://localhost:8000</code>（本地开发）<br>
     <strong>远程维护：</strong><code>ssh jefflu@100.105.237.93</code></p>
+
+    <hr>
+
+    <!-- ════════════════════════════════════════════════════════════
+         附录：前端 ↔ 数据库 ↔ 样本数据 字段映射
+         ════════════════════════════════════════════════════════════ -->
+    <h2>📎 附录：前端 ↔ 数据库 ↔ 样本数据 字段映射</h2>
+    <p>以 PerAcc 模块为例，展示页标签／录入页标签 → 数据库字段 → 原始 JSON 样本数据字段 的对应关系。</p>
+
+    <h3>一、基本信息</h3>
+    <table>
+        <thead><tr><th>前端标签</th><th>数据库字段</th><th>样本来源</th></tr></thead>
+        <tbody>
+            <tr><td>姓名</td><td><code>per_accounts.name</code></td><td>手动录入</td></tr>
+            <tr><td>身份证</td><td><code>per_accounts.id_number</code></td><td>手动录入 / 目录名</td></tr>
+            <tr><td>联系号码</td><td><code>per_accounts.phone</code></td><td>手动录入</td></tr>
+        </tbody>
+    </table>
+
+    <h3>二、券商账户（夏静 · 华泰证券）</h3>
+    <table>
+        <thead><tr><th>前端标签</th><th>数据库字段</th><th>样本数据字段</th></tr></thead>
+        <tbody>
+            <tr><td>开户公司名称</td><td><code>per_account_brokers.broker_name</code></td><td>自动匹配</td></tr>
+            <tr><td>账户号</td><td><code>per_account_brokers.account_no</code></td><td>资金股票JSON: <code>资金帐户</code></td></tr>
+            <tr><td>账户可用额度</td><td>计算: <code>total_assets − market_value</code></td><td>资金股票JSON: 总资产−股票市值</td></tr>
+            <tr><td>总资产</td><td><code>per_account_brokers.total_assets</code></td><td>资金股票JSON: <code>总资产</code></td></tr>
+            <tr><td>股票市值</td><td><code>per_account_brokers.market_value</code></td><td>资金股票JSON: <code>股票市值</code></td></tr>
+        </tbody>
+    </table>
+
+    <h3>三、券商持仓明细</h3>
+    <table>
+        <thead><tr><th>前端标签</th><th>数据库字段</th><th>样本数据字段</th></tr></thead>
+        <tbody>
+            <tr><td>名称</td><td><code>per_account_positions.variety</code></td><td>资金股票JSON: <code>positions[].证券名称</code></td></tr>
+            <tr><td>代码</td><td><code>per_account_positions.code</code></td><td>资金股票JSON: <code>positions[].证券代码</code></td></tr>
+            <tr><td>数量</td><td><code>per_account_positions.quantity</code></td><td>资金股票JSON: <code>positions[].股票余额</code></td></tr>
+            <tr><td>保本价</td><td><code>per_account_positions.cost_price</code></td><td>资金股票JSON: <code>positions[].成本价</code></td></tr>
+            <tr><td>最新价</td><td><code>per_account_positions.market_price</code></td><td>资金股票JSON: <code>positions[].市价</code></td></tr>
+            <tr><td>市值</td><td><code>= qty × market_price</code>（计算）</td><td>—</td></tr>
+            <tr><td>盈亏</td><td><code>= (mkt−cost) × qty</code>（计算）</td><td>—</td></tr>
+            <tr><td>持仓成本</td><td><code>= qty × cost_price</code>（计算）</td><td>—</td></tr>
+        </tbody>
+    </table>
+
+    <h3>四、券商成交汇总（只读）</h3>
+    <table>
+        <thead><tr><th>前端标签</th><th>数据库字段</th><th>样本数据字段</th></tr></thead>
+        <tbody>
+            <tr><td>日期</td><td><code>per_account_trade_records.trade_date</code></td><td>成交明细JSON: <code>成交日期</code></td></tr>
+            <tr><td>合约/代码</td><td><code>per_account_trade_records.contract_code</code></td><td>成交明细JSON: <code>证券代码</code></td></tr>
+            <tr><td>名称</td><td><code>per_account_trade_records.contract_name</code></td><td>成交明细JSON: <code>证券名称</code></td></tr>
+            <tr><td>方向</td><td><code>per_account_trade_records.direction</code></td><td>成交明细JSON: <code>操作</code></td></tr>
+            <tr><td>数量</td><td><code>per_account_trade_records.volume</code></td><td>成交明细JSON: <code>成交数量</code></td></tr>
+            <tr><td>成交价</td><td><code>per_account_trade_records.price</code></td><td>成交明细JSON: <code>成交均价</code></td></tr>
+            <tr><td>成交额</td><td><code>per_account_trade_records.amount</code></td><td>成交明细JSON: <code>成交金额</code></td></tr>
+            <tr><td>平仓盈亏</td><td><code>per_account_trade_records.realized_pnl</code></td><td>（期货日结有此字段）</td></tr>
+        </tbody>
+    </table>
+
+    <h3>五、出入金记录</h3>
+    <table>
+        <thead><tr><th>前端标签</th><th>数据库字段</th><th>样本数据字段</th></tr></thead>
+        <tbody>
+            <tr><td>日期</td><td><code>per_account_cash_flows.flow_date</code></td><td>资金明细JSON: <code>日期</code></td></tr>
+            <tr><td>金额</td><td><code>per_account_cash_flows.amount</code></td><td>资金明细JSON: <code>发生额</code></td></tr>
+            <tr><td>说明</td><td><code>per_account_cash_flows.note</code></td><td>资金明细JSON: <code>摘要</code></td></tr>
+            <tr><td>摘要分类</td><td><code>per_account_cash_flows.category</code></td><td>资金明细JSON: <code>摘要分类</code></td></tr>
+        </tbody>
+    </table>
+
+    <h3>六、期货账户（陆剑峰 · 华鑫期货）</h3>
+    <table>
+        <thead><tr><th>前端标签</th><th>数据库字段</th><th>样本数据字段</th></tr></thead>
+        <tbody>
+            <tr><td>开户公司名称</td><td><code>per_account_brokers.broker_name</code></td><td>自动匹配</td></tr>
+            <tr><td>账户号</td><td><code>per_account_brokers.account_no</code></td><td>期货日结JSON: <code>基本资料.客户期货期权内部资金账户</code></td></tr>
+            <tr><td>账户可用额度</td><td><code>per_account_brokers.available_amount</code></td><td>期货日结JSON: <code>资金状况.可用资金</code></td></tr>
+            <tr><td>账户权益</td><td><code>per_account_brokers.total_assets</code></td><td>期货日结JSON: <code>资金状况.客户权益</code></td></tr>
+            <tr><td>账户持仓权益</td><td><code>per_account_brokers.market_value</code></td><td>期货日结JSON: <code>资金状况.保证金占用</code></td></tr>
+        </tbody>
+    </table>
+
+    <h3>七、期货持仓明细</h3>
+    <table>
+        <thead><tr><th>前端标签</th><th>数据库字段</th><th>样本数据字段</th></tr></thead>
+        <tbody>
+            <tr><td>品种</td><td><code>per_account_positions.variety</code></td><td>期货日结JSON: <code>持仓明细[].品种</code></td></tr>
+            <tr><td>合约</td><td><code>per_account_positions.code</code></td><td>期货日结JSON: <code>持仓明细[].合约代码</code></td></tr>
+            <tr><td>数量</td><td><code>per_account_positions.quantity</code></td><td>期货日结JSON: <code>持仓明细[].持仓手数</code></td></tr>
+            <tr><td>杠杆</td><td><code>per_account_positions.leverage</code></td><td>手动填写</td></tr>
+            <tr><td>保证金率</td><td><code>per_account_positions.margin_rate</code></td><td>手动填写</td></tr>
+            <tr><td>成本价</td><td><code>per_account_positions.cost_price</code></td><td>期货日结JSON: <code>持仓明细[].持仓均价</code></td></tr>
+            <tr><td>最新价</td><td><code>per_account_positions.market_price</code></td><td>期货日结JSON: <code>持仓明细[].今结算价</code></td></tr>
+            <tr><td>浮动盈亏</td><td><code>per_account_positions.floating_pnl</code></td><td>期货日结JSON: <code>持仓明细[].浮动盈亏</code></td></tr>
+            <tr><td>保证金占用</td><td><code>per_account_positions.margin_used</code></td><td>期货日结JSON: <code>持仓明细[].交易保证金</code></td></tr>
+            <tr><td>持仓成本</td><td><code>= qty × cost_price</code>（计算）</td><td>—</td></tr>
+        </tbody>
+    </table>
+
+    <h3>八、期货每日资金快照</h3>
+    <table>
+        <thead><tr><th>API 字段</th><th>数据库字段</th><th>样本数据字段</th></tr></thead>
+        <tbody>
+            <tr><td>上日结存</td><td><code>per_account_futures_daily.prev_balance</code></td><td>期货日结JSON: <code>资金状况.上日结存</code></td></tr>
+            <tr><td>客户权益</td><td><code>per_account_futures_daily.client_equity</code></td><td>期货日结JSON: <code>资金状况.客户权益</code></td></tr>
+            <tr><td>可用资金</td><td><code>per_account_futures_daily.available_amount</code></td><td>期货日结JSON: <code>资金状况.可用资金</code></td></tr>
+            <tr><td>保证金占用</td><td><code>per_account_futures_daily.margin_used</code></td><td>期货日结JSON: <code>资金状况.保证金占用</code></td></tr>
+            <tr><td>浮动盈亏</td><td><code>per_account_futures_daily.floating_pnl</code></td><td>期货日结JSON: <code>资金状况.浮动盈亏</code></td></tr>
+            <tr><td>平仓盈亏</td><td><code>per_account_futures_daily.realized_pnl</code></td><td>期货日结JSON: <code>资金状况.平仓盈亏</code></td></tr>
+            <tr><td>手续费合计</td><td><code>per_account_futures_daily.fee_total</code></td><td>期货日结JSON: <code>资金状况.手续费</code></td></tr>
+            <tr><td>风险度</td><td><code>per_account_futures_daily.risk_degree</code></td><td>期货日结JSON: <code>资金状况.风险度</code></td></tr>
+            <tr><td>当日存取合计</td><td><code>per_account_futures_daily.deposit_withdraw</code></td><td>期货日结JSON: <code>资金状况.当日存取合计</code></td></tr>
+        </tbody>
+    </table>
+
+    <h3>九、展示页计算字段（stock_calc API）</h3>
+    <table>
+        <thead><tr><th>前端标签</th><th>计算逻辑</th><th>数据来源表</th></tr></thead>
+        <tbody>
+            <tr><td>投入本金</td><td><code>SUM(amount) WHERE category='银行存管转账'</code></td><td><code>per_account_cash_flows</code></td></tr>
+            <tr><td>总资产/权益</td><td><code>total_assets</code>（直接读取）</td><td><code>per_account_brokers</code></td></tr>
+            <tr><td>可用资产</td><td><code>total_assets − market_value</code></td><td>计算字段</td></tr>
+            <tr><td>持仓市值</td><td><code>market_value</code>（直接读取）</td><td><code>per_account_brokers</code></td></tr>
+        </tbody>
+    </table>
 
 </div>
 </body>
