@@ -26,10 +26,10 @@
 
     <p><strong>修改网页内容后 → 只需做这四步：</strong></p>
     <pre><code>cd /share/www</code></pre>
-    <pre><code>git add .</code></pre>
+    <pre><code>git add 你改动的文件路径</code></pre>
     <pre><code>git commit -m "改了什么东西"</code></pre>
-    <pre><code>git push -f origin master</code></pre>
-    <p>⚠️ 首次推送需配置认证方式（见第三节说明）。</p>
+    <pre><code>git push</code></pre>
+    <p>⚠️ 首次推送需配置认证方式（见第三节说明）。建议用 <code>git add</code> 精确指定文件，避免提交无关改动。</p>
 
     <p>以上两步涵盖了日常所有操作。以下为详细说明。</p>
 
@@ -72,20 +72,22 @@
     ================================================================ -->
     <h2>三、修改网页后推送（每次改完都要做）</h2>
 
-    <p>查看改了什么文件（可选）：</p>
+    <p>1. 进入前端仓库，查看改了什么文件：</p>
     <pre><code>cd /share/www</code></pre>
     <pre><code>git status</code></pre>
 
-    <p>添加所有改动到待提交列表：</p>
-    <pre><code>git add .</code></pre>
+    <p>2. 添加改动的文件（推荐精确指定，避免提交无关文件）：</p>
+    <pre><code>git add Data_Processing_Analysis/Finance/PerAcc/PerAcc.html</code></pre>
+    <p>如果改了多个文件，也可以用 <code>git add .</code> 添加全部。</p>
 
-    <p>提交本次改动，附上说明：</p>
-    <pre><code>git commit -m "这里写你改了什么东西"</code></pre>
+    <p>3. 提交本次改动，附上说明：</p>
+    <pre><code>git commit -m "PerAcc: 数据更新时间标注 + 列表姓名脱敏"</code></pre>
 
-    <p>推送到 GitHub（覆盖远程仓库）：</p>
-    <pre><code>git push -f origin master</code></pre>
+    <p>4. 推送到 GitHub（不要加 -f 参数，避免覆盖远程记录）：</p>
+    <pre><code>git push</code></pre>
+    <p>推送时会提示输入 GitHub 用户名和密码（密码用 Personal Access Token）。</p>
 
-    <p>等 1-2 分钟后刷新页面即可看到更新。</p>
+    <p>5. 等 1-2 分钟后刷新 GitHub Pages 页面即可看到更新。</p>
 
     <h3>⚠️ 首次推送 / 认证配置</h3>
 
