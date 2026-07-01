@@ -11,7 +11,7 @@
 <div class="container">
 
     <h1>🗄️ 数据库架构设计 — InvStrat_db</h1>
-    <div class="subhead">MariaDB 11.4 · 23 张表 · utf8mb4 · InnoDB · 最后更新: 2026-06-29 全线升级 v3</div>
+    <div class="subhead">MariaDB 11.4 · 23 张表 · utf8mb4 · InnoDB · 最后更新: 2026-06-30 全线升级 v4</div>
 
     <!-- 概览 -->
     <h2>概览</h2>
@@ -54,17 +54,22 @@
     <br><br>
     📥 PerAcc 自动导入管道（2026-06-29 全线投产）
     ─────────────────────────────────────────────
-    34 个 JSON 文件已导入（含 v2 重导入），167 条记录：
-    ├── 27 期货日结单（华鑫期货 · 陆剑峰 · 2026-05-21 ~ 06-29）
+    36 个 JSON 文件已导入，覆盖全部账户：
+    ├── 29 期货日结单（华鑫期货 · 陆剑峰 · 2026-05-21 ~ 06-30）
     │   ├── → per_account_futures_daily（27 条每日资金快照）
     │   ├── → per_account_futures_positions_daily（21 条每日持仓明细）
     │   ├── → per_account_positions（持仓更新 + 浮动盈亏/保证金）
     │   ├── → per_account_trade_records（逐笔交易记录）
     │   └── → per_account_cash_flows（出入金，category=银行存管转账）
-    ├── 6  股票成交明细（华泰证券 · 夏静 · 2026-02 ~ 06）
+    ├── 6  股票成交明细（华泰证券 · 夏静 · 2026-02 ~ 06）已停用，改用资金股票快照
     │   └── → per_account_trade_records（48 条交易记录）
-    └── 1  股票资金明细（华泰证券 · 夏静）
-        └── → per_account_cash_flows（83 条记录，含 category 分类）</code></pre>
+    └── 1  股票资金明细（华泰证券 · 夏静）89 条记录
+        └── → per_account_cash_flows（83 条记录，含 category 分类）
+    📥 资金股票导入管道（2026-06-30 新增）
+    ─────────────────────────────────────
+    1  资金股票快照（华泰证券 · 夏静 · 20260630）
+    ├── → per_account_brokers（更新 total_assets/market_value/available_amount）
+    └── → per_account_positions（7 条持仓，全量替换）</code></pre>
 
     <hr>
 
@@ -376,6 +381,9 @@ positions       cash_flows      (预留)
             <tr><td><code>person_id</code></td><td>BIGINT UNSIGNED FK</td><td>→ <code>per_accounts.id</code>（CASCADE 级联删除）</td></tr>
             <tr><td><code>broker_name</code></td><td>VARCHAR(100)</td><td>券商名称（如中信证券、华泰证券）</td></tr>
             <tr><td><code>account_no</code></td><td>VARCHAR(100)</td><td>账号</td></tr>
+            <tr><td><code>account_type</code></td><td>ENUM('stock','futures')</td><td>账户类型：券商/期货（2026-06-30 新增）</td></tr>
+            <tr><td><code>total_assets</code></td><td>DECIMAL(15,2)</td><td>总资产/权益（2026-06-30 新增）：券商取资金股票JSON，期货取日结单客户权益</td></tr>
+            <tr><td><code>market_value</code></td><td>DECIMAL(15,2)</td><td>持仓市值（2026-06-30 新增）：券商取股票市值，期货取保证金占用合计</td></tr>
             <tr><td><code>available_amount</code></td><td>DECIMAL(15,2)</td><td>可用资金</td></tr>
         </tbody>
     </table>

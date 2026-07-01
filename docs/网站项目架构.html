@@ -11,7 +11,7 @@
 <div class="container">  <!-- 块级容器: 内容居中布局 最大宽度210mm -->
 
     <h1>📁 网站项目架构</h1>  <!-- 一级标题: 页面主标题 -->
-    <div class="subhead">最后更新: 2026-06-29 · 全面升级 PerAcc 模块（v3）：导入面板、展示页重构、期货日表、数据库 23 表</div>  <!-- 块级容器: 副标题/元信息 -->
+    <div class="subhead">最后更新: 2026-06-30 · 全线升级 v4：券商/期货双模板、总资产落库、资金股票导入器</div>  <!-- 块级容器: 副标题/元信息 -->
 
     <hr>  <!-- 水平分割线: 分隔内容段落 -->
 
@@ -353,17 +353,17 @@
             <tr><td><strong>PerAcc 前端</strong></td><td>展示页 <code>Finance/PerAcc/PerAcc.html</code> 使用 <code>Finance.js</code> 中的 <code>PF</code> 命名空间（调用 <code>PF.init</code>），数据录入页使用独立的 <code>PerAcc_Data.js</code>（793 行），不共享 <code>DB.js</code>。</td></tr>
             <tr><td><strong>PerAcc 导入管道（2026-06-29 v1+v3）</strong></td>
                 <td>
-                    5 个 PHP 导入器，支持 JSON → DB 自动导入：<br>
+                    7 个 PHP 导入器，支持 JSON → DB 自动导入：<br>
                     &bull; <code>import_futures_daily.php</code> — 期货日结单导入（写入日快照表 + 逐笔成交 + 出入金）<br>
                     &bull; <code>import_stock_trades.php</code> — 股票成交明细导入（交易记录 + 持仓重建）<br>
                     &bull; <code>import_stock_funds.php</code> — 股票资金明细导入（含摘要分类 category）<br>
-                    &bull; <code>import_peracc_lib.php</code> — 共享库（券商匹配、SHA256 幂等检测）<br>
+                    &bull; <code>import_stock_holdings.php</code> — ⭐资金股票持仓快照导入（更新总资产/市值/持仓）<br>&bull; <code>import_peracc_lib.php</code> — 共享库（券商匹配、SHA256 幂等检测）<br>
                     &bull; <code>import_api.php</code> — 统一入口（CLI 批量 + HTTP 上传 + import_upload 端点）<br>
                     已导入 34 个文件（27 期货日结 + 6 股票成交 + 1 资金明细），167 条记录。<br>
                     v3 更新：录入页导入面板改为「文件选择器」+ 自动格式检测（识别期货/股票/资金三类）
                 </td>
             </tr>
-            <tr><td><strong>PerAcc 展示页重构（2026-06-29 v2）</strong></td>
+            <tr><td><strong>PerAcc 展示页重构（2026-06-30 v4 券商/期货双模板）</strong></td>
                 <td>
                     删除旧资产看板四卡；每个券商卡片新增 4 个实时计算字段：<br>
                     &bull; 投入本金（银行存管转账净额）&bull; 股票成本支出合计（证券买入-卖出）<br>

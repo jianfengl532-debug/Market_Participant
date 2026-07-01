@@ -247,7 +247,7 @@
     <h1>💳️ 个人账户 · 信息查询</h1>
     <p>
       <span class="update-time"><span class="emoji">📋</span> 账户持仓一览</span>
-      <span class="update-time"><span class="emoji">🕒</span> 更新: <span id="updateDate"><script>document.write(new Date().toLocaleDateString('zh-CN'));</script></span></span>
+      <span class="update-time"><span class="emoji">🕒</span> 数据更新: <span id="dataUpdateTime">—</span></span>
       <span class="market-badge"><a href="javascript:void(0)" class="db-link" onclick="openDbLink('http://192.168.0.105:8000/PerAcc_Data/PerAcc_Data.html')"><span class="emoji">🗄️</span> DB 接続・データ読み込み</a></span>
     </p>
   </div>
@@ -366,6 +366,14 @@
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
+  function maskName(name) {
+    if (!name) return '';
+    var s = String(name);
+    if (s.length <= 1) return s;
+    if (s.length === 2) return s.charAt(0) + '*';
+    return s.charAt(0) + '*' + s.slice(2);
+  }
+
   function $(id) { return document.getElementById(id); }
 
   function toast(text, type) {
@@ -475,6 +483,7 @@
     var area = $('accountInfoArea');
 
     if (!accounts.length) {
+      var duNo= $('dataUpdateTime'); if(duNo) duNo.textContent = '无数据';
       area.innerHTML = '<div class="no-person-selected"><div class="icon">🏦</div><p>该人员暂无账户信息</p></div>';
       return;
     }
@@ -488,6 +497,7 @@
       html += '<div class="acc-header">';
       html += '<span class="acc-name">🏦 ' + esc(acc.broker_name || '-') + '</span>';
       html += '<span class="acc-no">📄 ' + esc(acc.account_no || '-') + '</span>';
+      html += '<span class="acc-time" id="acc_time_' + brokerId + '" style="font-size:0.7rem;color:#8ba3bc;margin-left:8px;">⏳</span>';
       html += '</div>';
 
       // 计算区域（异步加载）
@@ -625,7 +635,13 @@
     area.innerHTML = html;
     toast('已加载「' + (person.name||'') + '」的账户信息', 'success');
 
+    // 重置数据更新时间显示（等 stock_calc 异步加载后更新）
+    var duEl = $('dataUpdateTime');
+    if (duEl) duEl.textContent = '加载中…';
+
     // ── 异步加载每个券商的计算字段 ──
+    var overallLatestTime = null;
+    var pendingCount = accounts.length;
     for (var i = 0; i < accounts.length; i++) {
       var acc = accounts[i];
       var brokerId = acc.id;
@@ -659,6 +675,19 @@
             var taEl = document.getElementById('total_assets_' + bid);
             if (taEl) {
               taEl.textContent = parseFloat(res.total_equity).toFixed(2);
+            }
+
+            // 更新该券商数据时间
+            var dtEl = document.getElementById('acc_time_' + bid);
+            if (dtEl) {
+              dtEl.textContent = res.last_data_time ? '📅 ' + res.last_data_time.slice(0, 10) : '—';
+            }
+
+            // 追踪所有券商中最新的数据时间
+            if (res.last_data_time && (!overallLatestTime || res.last_data_time > overallLatestTime)) {
+              overallLatestTime = res.last_data_time;
+              var dtHeader = $('dataUpdateTime');
+              if (dtHeader) dtHeader.textContent = overallLatestTime.slice(0, 10);
             }
           })
           .catch(function() {
@@ -746,7 +775,7 @@
       h += '<div class="record-card" data-id="'+rid+'">'
         + '<div class="record-header" onclick="PF.toggle(this)">'
         + '<span class="expand-icon">▶</span>'
-        + '<div class="rec-info"><div class="rec-title">'+esc(name)+' · '+esc(idNum)+'</div>'
+        + '<div class="rec-info"><div class="rec-title">'+esc(maskName(name))+' · '+esc(idNum)+'</div>'
         + '<div class="rec-meta">'
         + (createdAt?'<span>📅 '+esc(createdAt.slice(0,10))+'</span>':'')
         + '<span>📞 '+esc(phone)+'</span>'
