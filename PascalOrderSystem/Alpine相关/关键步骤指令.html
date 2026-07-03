@@ -11,7 +11,7 @@
 <div class="container">
 
     <h1>📋 项目维护 · 关键步骤指令</h1>
-    <div class="subhead">最后更新: 2026-06-30 &nbsp;|&nbsp; 点击 <code>代码块</code> 或 <code>命令</code> 即可自动复制</div>
+    <div class="subhead">最后更新: 2026-07-03 &nbsp;|&nbsp; 点击 <code>代码块</code> 或 <code>命令</code> 即可自动复制</div>
 
     <hr>
 
@@ -87,7 +87,16 @@
     <pre><code>git push</code></pre>
     <p>推送时会提示输入 GitHub 用户名和密码（密码用 Personal Access Token）。</p>
 
-    <p>5. 等 1-2 分钟后刷新 GitHub Pages 页面即可看到更新。</p>
+    <p>5. ⚠️ 如果遇到以下错误：</p>
+    <pre><code>fatal: The current branch main has no upstream branch.
+To push the current branch and set the remote as upstream, use:
+
+    git push --set-upstream origin main</code></pre>
+    <p>说明当前分支没有设置上游跟踪分支（常见于刚克隆或新建分支后第一次推送），执行：</p>
+    <pre><code>git push --set-upstream origin main</code></pre>
+    <p>这条命令会推送并自动建立跟踪关系，以后只需 <code>git push</code> 即可。</p>
+
+    <p>6. 等 1-2 分钟后刷新 GitHub Pages 页面即可看到更新。</p>
 
     <h3>⚠️ 首次推送 / 认证配置</h3>
 

@@ -529,18 +529,19 @@
         for (var pi = 0; pi < positions.length; pi++) {
           var pos = positions[pi];
           var qty = parseInt(pos.quantity||0);
-          var costPx = parseFloat(pos.cost_price||0);
+          var breakEvenPx = parseFloat(pos.break_even_price || pos.cost_price || 0);
+	          var costPx = parseFloat(pos.cost_price||0);
           var mktPx = parseFloat(pos.market_price||pos.cost_price||0);
           var ce  = (qty * costPx).toFixed(2);
           var mktVal = (qty * mktPx).toFixed(2);
 
           if (isStockAcc) {
-            var pnlPct = costPx > 0 ? ((mktPx - costPx) / costPx * 100) : 0;
+            var pnlPct = pos.pnl_percent != null ? parseFloat(pos.pnl_percent) : (breakEvenPx > 0 ? ((mktPx - breakEvenPx) / breakEvenPx * 100) : 0);
             html += '<tr>'
               + '<td>' + esc(pos.variety||'') + '</td>'
               + '<td>' + esc(pos.code||'') + '</td>'
               + '<td>' + qty + '</td>'
-              + '<td>' + costPx.toFixed(2) + '</td>'
+              + '<td>' + breakEvenPx.toFixed(2) + '</td>'
               + '<td>' + mktPx.toFixed(2) + '</td>'
               + '<td>' + mktVal + '</td>'
               + '<td style="' + (pnlPct >= 0 ? 'color:#28a06b' : 'color:#dc3545') + ';font-weight:700;">' + pnlPct.toFixed(2) + '%</td>'
@@ -556,7 +557,7 @@
               + '<td>' + qty + '</td>'
               + '<td>' + (parseInt(pos.leverage)||1) + '</td>'
               + '<td>' + (parseFloat(pos.margin_rate)||1).toFixed(4) + '</td>'
-              + '<td>' + costPx.toFixed(2) + '</td>'
+              + '<td>' + breakEvenPx.toFixed(2) + '</td>'
               + '<td>' + (pos.market_price ? mktPx.toFixed(2) : '—') + '</td>'
               + '<td style="' + (fp >= 0 ? 'color:#28a06b' : 'color:#dc3545') + ';font-weight:700;">' + fp.toFixed(2) + '</td>'
               + '<td>' + mg.toFixed(2) + '</td>'
