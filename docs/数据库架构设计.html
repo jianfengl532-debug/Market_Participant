@@ -891,7 +891,42 @@ CREATE TABLE per_account_cash_flows (
     <!-- ════════════════════════════════════════════════════════════
          附录：前端 ↔ 数据库 ↔ 样本数据 字段映射
          ════════════════════════════════════════════════════════════ -->
-    <h2>📎 附录：前端 ↔ 数据库 ↔ 样本数据 字段映射</h2>
+    <h2>🔁 服务重启指南（Alpine Linux）</h2>
+	         	    <p>服务器重启后，需要按以下顺序启动服务：</p>
+	    <table>
+	        <thead><tr><th>顺序</th><th>服务</th><th>命令</th><th>说明</th></tr></thead>
+	        <tbody>
+	            <tr><td>①</td><td>MariaDB 数据库</td><td><code>rc-service mariadb start</code></td><td>数据库启动后才能连 PHP</td></tr>
+	            <tr><td>②</td><td>PHP 后端（:8000）</td><td><code>cd /home/jefflu && sh start.sh start</code></td><td>自动启动 PHP + Python 前端</td></tr>
+	        </tbody>
+	    </table>
+
+	    <h3>⚠️ MariaDB 开机自启问题</h3>
+	    <p>MariaDB 已配置开机自启（<code>rc-update add mariadb default</code>），但重启后可能因启动顺序问题未能自动启动。若遇到数据库无法连接，先检查：</p>
+	    <pre><code># 检查数据库是否运行
+	rc-service mariadb status
+
+	# 如果未运行，手动启动
+	rc-service mariadb start
+
+	# 验证 PHP 能连接数据库
+	php -r "require '/home/jefflu/api/db_config.php'; \$p = getDB(); echo '✅ DB OK\n';"</code></pre>
+
+	    <p><strong>完整恢复流程（重启后）：</strong></p>
+	    <pre><code># 1. 启动数据库
+	rc-service mariadb start
+
+	# 2. 启动前后端服务（PHP + Python）
+	cd /home/jefflu && sh start.sh start
+
+	# 3. 确认所有服务运行
+	ps aux | grep -E 'mariadb|php|python' | grep -v grep</code></pre>
+
+	    <hr>
+
+	    <!-- ════════════════════════════════════════════════════════════
+	         📎 附录：前端 ↔ 数据库 ↔ 样本数据 字段映射
+	    <h2>📎 附录：前端 ↔ 数据库 ↔ 样本数据 字段映射
     <p>以 PerAcc 模块为例，展示页标签／录入页标签 → 数据库字段 → 原始 JSON 样本数据字段 的对应关系。</p>
 
     <h3>一、基本信息</h3>

@@ -11,7 +11,7 @@
 <div class="container">  <!-- 块级容器: 内容居中布局 最大宽度210mm -->
 
     <h1>📁 网站项目架构</h1>  <!-- 一级标题: 页面主标题 -->
-    <div class="subhead">最后更新: 2026-07-01 · 全线升级 v4：券商/期货双模板、总资产落库、资金股票导入器</div>  <!-- 块级容器: 副标题/元信息 -->
+    <div class="subhead">最后更新: 2026-07-03 · 全线升级 v4：券商/期货双模板、总资产落库、资金股票导入器、盈亏比显示</div>  <!-- 块级容器: 副标题/元信息 -->
 
     <hr>  <!-- 水平分割线: 分隔内容段落 -->
 
@@ -123,8 +123,11 @@
 ├── DB.css                                        ← 数据录入页面样式（含 CSS 设计令牌）
 ├── submit.php                                    ← [已弃用] 旧版 GeoEnv 提交接口
 ├── ping.php                                      ← 健康检查端点
-├── schema.sql                                    ← 完整数据库 DDL（18 张表）
+├── schema.sql                                    ← 完整数据库 DDL（含 23 表，含 v2 保本价/盈亏比字段）
 ├── migrate_unique.sql                            ← 唯一性约束迁移脚本（代码/身份证去重）
+	├── migrate_holdings_v2.php                       ← 资金股票 v2 数据库迁移（加 break_even_price / pnl_percent）
+	├── deploy_holdings_v2.sh                         ← 资金股票 v2 一键部署（迁移 + 导入）
+	│
 │
 ├── GeoEnv_Data/                                  ← 🌍 地缘政治 - 数据录入
 │   ├── GeoEnv_Data.html                          ← 录入页面
@@ -360,7 +363,17 @@
                     &bull; <code>import_stock_holdings.php</code> — ⭐资金股票持仓快照导入（更新总资产/市值/持仓）<br>&bull; <code>import_peracc_lib.php</code> — 共享库（券商匹配、SHA256 幂等检测）<br>
                     &bull; <code>import_api.php</code> — 统一入口（CLI 批量 + HTTP 上传 + import_upload 端点）<br>
                     已导入 34 个文件（27 期货日结 + 6 股票成交 + 1 资金明细），167 条记录。<br>
-                    v3 更新：录入页导入面板改为「文件选择器」+ 自动格式检测（识别期货/股票/资金三类）
+                    v3 更新：录入页导入面板改为「文件选择器」+ 自动格式检测（识别期货/股票/资金/资金股票四类）
+	                </td>
+	            </tr>
+	            <tr><td><strong>PerAcc 资金股票 v2（2026-07-03）</strong></td>
+	                <td>
+	                    &bull; 数据库 <code>per_account_positions</code> 新增 <code>break_even_price</code>（保本价）和 <code>pnl_percent</code>（盈亏比例(%)）字段<br>
+	                    &bull; <code>import_stock_holdings.php</code> 升级——导入时存储保本价和盈亏比例到数据库<br>
+	                    &bull; 前端格式检测新增「资金股票」类型识别（<code>PerAcc_Data.js</code>）<br>
+	                    &bull; 展示页（PerAcc.html）+ 数据录入页（PerAcc_Data.js）：证券持仓「盈亏」列改为「盈亏比(%)」<br>
+	                    &bull; 盈亏比优先读取数据库 <code>pnl_percent</code>，无数据时由保本价回退计算<br>
+	                    &bull; 保本价列优先读取 <code>break_even_price</code>，无数据时回退到 <code>cost_price</code>
                 </td>
             </tr>
             <tr><td><strong>PerAcc 展示页重构（2026-06-30 v4 券商/期货双模板）</strong></td>
@@ -420,8 +433,9 @@
 │       ├── 成交明细/          ← 股票成交明细（已导入 26 条）
 │       │   ├── 20260201_20260430.json
 │       │   └── 20260501_20260630.json
-│       ├── 资金股票/          ← 持仓快照（已导入 8 条）
-│       │   └── 20260630.json
+│       ├── 资金股票/          ← 持仓快照（已导入 8 条 + 20260702 v2 含保本价/盈亏比）
+│       │   ├── 20260630.json
+	│       │   └── 20260702.json
 │       └── 资金明细/          ← 出入金记录（已导入 93 条）
 │           ├── 20260128-0227.json
 │           ├── 20260226-0430.json
