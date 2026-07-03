@@ -11,7 +11,7 @@
 <div class="container">
 
     <h1>📋 项目维护 · 关键步骤指令</h1>
-    <div class="subhead">最后更新: 2026-07-03 &nbsp;|&nbsp; 点击 <code>代码块</code> 或 <code>命令</code> 即可自动复制</div>
+    <div class="subhead">最后更新: 2026-07-03 (v2) &nbsp;|&nbsp; 点击 <code>代码块</code> 或 <code>命令</code> 即可自动复制</div>
 
     <hr>
 
@@ -27,12 +27,11 @@
     <p>⚠️ 第1步数据库可能已经自启（<code>rc-service mariadb status</code> 检查），如已启动可跳过。<br>
     全部完成后访问 <code>https://jefflu.tail9f69ce.ts.net/ping.php</code> 验证链路（需带 API Key）。</p>
 
-    <p><strong>修改网页内容后 → 只需做这四步：</strong></p>
+    <p><strong>修改网页内容后 → 只需做这三步：</strong></p>
     <pre><code>cd /share/www</code></pre>
-    <pre><code>git add 你改动的文件路径</code></pre>
-    <pre><code>git commit -m "改了什么东西"</code></pre>
-    <pre><code>git push</code></pre>
-    <p>⚠️ 首次推送需配置认证方式（见第三节说明）。建议用 <code>git add</code> 精确指定文件，避免提交无关改动。</p>
+    <pre><code>git add -A</code></pre>
+    <pre><code>git commit -m "改了什么东西" && git push</code></pre>
+    <p>⚠️ 已配置 SSH 密钥，全程无需输密码。推完后等 1-2 分钟 GitHub Pages 自动部署。</p>
 
     <p>以上两步涵盖了日常所有操作。以下为详细说明。</p>
 
@@ -71,57 +70,42 @@
     <hr>
 
     <!-- ================================================================
-         三、修改网页后推送
+         三、修改网页后推送（核心）
     ================================================================ -->
     <h2>三、修改网页后推送（每次改完都要做）</h2>
 
-    <p>1. 进入前端仓库，查看改了什么文件：</p>
+    <p><strong>当前配置（2026-07-03 最终版）：</strong></p>
+    <table>
+        <tr><td>远程地址</td><td><code>git@github.com:jianfengl532-debug/Market_Participant.git</code></td><td>SSH 协议</td></tr>
+        <tr><td>默认分支</td><td><code>main</code></td><td>已删除 master</td></tr>
+        <tr><td>认证方式</td><td>SSH 密钥</td><td>无需输密码</td></tr>
+        <tr><td>部署源</td><td>GitHub Pages → <code>main</code> 分支</td><td>推完自动部署</td></tr>
+    </table>
+
+    <p><strong>操作步骤：</strong></p>
+
+    <p>1. 进入前端仓库：</p>
     <pre><code>cd /share/www</code></pre>
-    <pre><code>git status</code></pre>
 
-    <p>2. 添加改动的文件（推荐精确指定，避免提交无关文件）：</p>
-    <pre><code>git add Data_Processing_Analysis/Finance/PerAcc/PerAcc.html</code></pre>
-    <p>如果改了多个文件，也可以用 <code>git add .</code> 添加全部。</p>
+    <p>2. 添加所有改动并提交：</p>
+    <pre><code>git add -A
+git commit -m "改了什么东西，简单写清楚"</code></pre>
 
-    <p>3. 提交本次改动，附上说明：</p>
-    <pre><code>git commit -m "PerAcc: 数据更新时间标注 + 列表姓名脱敏"</code></pre>
-
-    <p>4. 推送到 GitHub（不要加 -f 参数，避免覆盖远程记录）：</p>
+    <p>3. 推送到 GitHub：</p>
     <pre><code>git push</code></pre>
-    <p>推送时会提示输入 GitHub 用户名和密码（密码用 Personal Access Token）。</p>
+    <p>✅ SSH 已配置，不会提示输密码，不会 SSL 报错，在任何网络下（家/公司/公共 Wi-Fi）均可推送。</p>
 
-    <p>5. ⚠️ 如果遇到以下错误：</p>
-    <pre><code>fatal: The current branch main has no upstream branch.
-To push the current branch and set the remote as upstream, use:
+    <p>4. 等 1-2 分钟，打开页面 <strong>Ctrl+Shift+R</strong> 硬刷新即可看到更新。</p>
 
-    git push --set-upstream origin main</code></pre>
-    <p>说明当前分支没有设置上游跟踪分支（常见于刚克隆或新建分支后第一次推送），执行：</p>
-    <pre><code>git push --set-upstream origin main</code></pre>
-    <p>这条命令会推送并自动建立跟踪关系，以后只需 <code>git push</code> 即可。</p>
+    <h3>⚠️ 仅首次部署需要（已完成）</h3>
+    <p>如果以后在其他设备上第一次使用，需要：</p>
+    <ol>
+        <li>生成 SSH 密钥：<code>ssh-keygen -t ed25519 -C "your_email"</code></li>
+        <li>添加到 GitHub：<code>cat ~/.ssh/id_ed25519.pub</code> → 复制内容 → 去 https://github.com/settings/keys 添加</li>
+        <li>设置 remote：<code>git remote set-url origin git@github.com:jianfengl532-debug/Market_Participant.git</code></li>
+    </ol>
 
-    <p>6. 等 1-2 分钟后刷新 GitHub Pages 页面即可看到更新。</p>
-
-    <h3>⚠️ 首次推送 / 认证配置</h3>
-
-    <p>GitHub 已于 2021 年禁用密码认证，必须使用 <strong>Personal Access Token (PAT)</strong> 或 SSH。</p>
-
-    <p><strong>1. 设置 Remote URL</strong>（如未配置过）：</p>
-    <pre><code>git remote set-url origin https://jianfengl532-debug@github.com/jianfengl532-debug/Market_Participant.git</code></pre>
-
-    <p><strong>2. 生成 Personal Access Token：</strong><br>
-    GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)<br>
-    点「Generate new token (classic)」→ 勾选 <code>repo</code> 全部权限 → 生成并复制 token。</p>
-
-    <p><strong>3. 推送时输入 token：</strong><br>
-    执行 <code>git push</code> 后提示输入密码，<strong>粘贴刚才的 token</strong>（不是 GitHub 登录密码）。<br>
-    验证成功后会显示：</p>
-    <pre><code>Enumerating objects: ...
-remote: Resolving deltas: 100% (...), completed ...
-To https://github.com/jianfengl532-debug/Market_Participant.git
-   xxxxxx..xxxxxx  master -> master</code></pre>
-
-    <p><strong> 免密推送（可选）：</strong>运行一次以下命令，之后不再询问密码：</p>
-    <pre><code>git config --global credential.helper store</code></pre>
+    <p>做完一次，永久生效。</p>
 
     <hr>
 
@@ -191,9 +175,7 @@ curl -s --header "X-API-Key: mk_jfl_a8f3c9e2b7d4p6q5r1" https://jefflu.tail9f69c
     <h3>第6步：推送未完成的 git 提交（如有）</h3>
     <pre><code>cd /share/www
 git push</code></pre>
-    <p>如果提示 <code>no upstream branch</code>，执行：</p>
-    <pre><code>git push --set-upstream origin main</code></pre>
-    <p>👉 推送时提示输密码，输入 <strong>Personal Access Token (PAT)</strong>，不是 GitHub 登录密码。</p>
+    <p>已配置 SSH 密钥，无需输密码。</p>
 
     <h3>📌 汇总命令（一条执行所有）</h3>
     <pre><code>rc-service mariadb start && \
@@ -217,10 +199,19 @@ echo "✅ 重启恢复完成"</code></pre>
             <tr><td>⚙️ 后端 API</td><td><code>https://jefflu.tail9f69ce.ts.net/</code></td></tr>
             <tr><td>💻 本地开发</td><td><code>http://localhost:8080</code></td></tr>
             <tr><td>🗄️ 本地 API</td><td><code>http://localhost:8000</code></td></tr>
-            <tr><td>📦 GitHub</td><td><code>https://github.com/jianfengl532-debug/Market_Participant</code></td></tr>
-            <tr><td>🔑 SSH</td><td><code>ssh jefflu@100.105.237.93</code></td></tr>
+            <tr><td>📦 GitHub 仓库</td><td><code>https://github.com/jianfengl532-debug/Market_Participant</code></td></tr>
+            <tr><td>🔑 SSH 维护</td><td><code>ssh jefflu@100.105.237.93</code></td></tr>
+            <tr><td>⚙️ GitHub Pages 设置</td><td><code>https://github.com/.../Market_Participant/settings/pages</code></td></tr>
         </tbody>
     </table>
+
+    <hr>
+
+    <!-- ================================================================
+         附：项目概述
+    ================================================================ -->
+    <h2>📎 附：项目概述</h2>
+    <p>个人投资研究与数据分析平台。部署模式：前端 GitHub Pages + 后端 Tailscale Funnel。涉及修改后推送 git 的操作均通过 SSH 协议，一次配置永久使用。</p>
 
 </div>
 </body>
