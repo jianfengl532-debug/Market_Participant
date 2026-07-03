@@ -522,7 +522,7 @@
       if (positions.length > 0) {
         html += '<table class="pos-mini-table">';
         if (isStockAcc) {
-          html += '<thead><tr><th>名称</th><th>代码</th><th>数量</th><th>保本价</th><th>最新价</th><th>市值</th><th>盈亏</th><th>持仓成本</th></tr></thead><tbody>';
+          html += '<thead><tr><th>名称</th><th>代码</th><th>数量</th><th>保本价</th><th>最新价</th><th>市值</th><th>盈亏比(%)</th><th>持仓成本</th></tr></thead><tbody>';
         } else {
           html += '<thead><tr><th>品种</th><th>合约</th><th>数量</th><th>杠杆</th><th>保证金率</th><th>成本价</th><th>最新价</th><th>浮动盈亏</th><th>保证金占用</th><th>持仓成本</th></tr></thead><tbody>';
         }
@@ -535,7 +535,7 @@
           var mktVal = (qty * mktPx).toFixed(2);
 
           if (isStockAcc) {
-            var pnl = (mktPx - costPx) * qty;
+            var pnlPct = costPx > 0 ? ((mktPx - costPx) / costPx * 100) : 0;
             html += '<tr>'
               + '<td>' + esc(pos.variety||'') + '</td>'
               + '<td>' + esc(pos.code||'') + '</td>'
@@ -543,7 +543,7 @@
               + '<td>' + costPx.toFixed(2) + '</td>'
               + '<td>' + mktPx.toFixed(2) + '</td>'
               + '<td>' + mktVal + '</td>'
-              + '<td style="' + (pnl >= 0 ? 'color:#28a06b' : 'color:#dc3545') + ';font-weight:700;">' + pnl.toFixed(2) + '</td>'
+              + '<td style="' + (pnlPct >= 0 ? 'color:#28a06b' : 'color:#dc3545') + ';font-weight:700;">' + pnlPct.toFixed(2) + '%</td>'
               + '<td>' + ce + '</td>'
               + '</tr>';
           } else {
