@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>前后端数据对应关系 · PerAcc 模块</title>
+<style>
+/* ===== 全局 ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f4f7fc;
+    color: #2d3748;
+    line-height: 1.7;
+    padding: 20px;
+}
+.container { max-width: 1000px; margin: 0 auto; }
+
+/* ===== 标题 ===== */
+h1 {
+    font-size: 1.6rem;
+    color: #1e3a5f;
+    border-left: 5px solid #b8860b;
+    padding-left: 14px;
+    margin-bottom: 6px;
+}
+.subhead {
+    font-size: 0.85rem;
+    color: #6b83a0;
+    margin-bottom: 24px;
+    padding-left: 19px;
+}
+.meta-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    padding: 10px 16px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    font-size: 0.8rem;
+    color: #5b6f86;
+}
+.meta-bar .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+.tag-new { background: #c6f6d5; color: #22543d; }
+.tag-update { background: #fefcbf; color: #744210; }
+.tag-info { background: #bee3f8; color: #2a4365; }
+
+/* ===== 区块 ===== */
+.section {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    padding: 20px 24px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.section h2 {
+    font-size: 1.15rem;
+    color: #1e3a5f;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #eef2f7;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.section h3 {
+    font-size: 0.95rem;
+    color: #b8860b;
+    margin: 14px 0 10px;
+}
+.section h4 {
+    font-size: 0.88rem;
+    color: #2c7da0;
+    margin: 12px 0 6px;
+}
+
+/* ===== 表格 ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin: 10px 0;
+}
+th {
+    background: #eef4fa;
+    color: #2d4a6e;
+    font-weight: 600;
+    padding: 7px 10px;
+    text-align: left;
+    font-size: 0.78rem;
+    border-bottom: 2px solid #dce2ec;
+    white-space: nowrap;
+}
+td {
+    padding: 6px 10px;
+    border-bottom: 1px solid #eef2f7;
+    vertical-align: top;
+}
+tr:hover td { background: #fdf8ee; }
+code {
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 0.78rem;
+    background: #f0f4f8;
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: #2d3748;
+}
+.dim { color: #8ba3bc; font-size: 0.76rem; }
+
+/* ===== 树状图 ===== */
+.tree {
+    font-family: "JetBrains Mono", "Consolas", "Noto Sans SC", monospace;
+    font-size: 0.82rem;
+    line-height: 1.9;
+    padding: 12px 16px;
+    background: #fafcff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow-x: auto;
+    white-space: pre;
+    margin: 8px 0;
+}
+.tree .hl-db { color: #2b6cb0; }
+.tree .hl-calc { color: #38a169; }
+.tree .hl-new { color: #b8860b; font-weight: 700; }
+.tree .hl-fallback { color: #8ba3bc; font-size: 0.78rem; }
+.tree .arrow { color: #a0aec0; }
+.tree .label { color: #6b83a0; font-size: 0.75rem; }
+
+/* ===== 总览图 ===== */
+.flow-overview {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+}
+.flow-layer {
+    padding: 14px 18px;
+    border-radius: 12px;
+    margin-bottom: 4px;
+    position: relative;
+}
+.flow-layer .layer-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+.flow-layer .layer-content {
+    font-size: 0.82rem;
+    line-height: 1.8;
+    font-family: "JetBrains Mono", "Consolas", monospace;
+}
+.layer-source { background: #fffbeb; border: 1px solid #fde68a; }
+.layer-source .layer-title { color: #92400e; }
+.layer-db { background: #eff6ff; border: 1px solid #bfdbfe; }
+.layer-db .layer-title { color: #1e40af; }
+.layer-frontend { background: #f0fdf4; border: 1px solid #bbf7d0; }
+.layer-frontend .layer-title { color: #166534; }
+.flow-arrow-down {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #94a3b8;
+    padding: 2px 0;
+}
+
+/* ===== 图解 ===== */
+.legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin: 10px 0;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border-radius: 10px;
+    font-size: 0.78rem;
+}
+.legend span { display: flex; align-items: center; gap: 5px; }
+.legend .dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+.dot-db { background: #2b6cb0; }
+.dot-calc { background: #38a169; }
+.dot-new { background: #b8860b; }
+
+/* ===== 状态卡片 ===== */
+.status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+@media (max-width: 600px) { .status-grid { grid-template-columns: 1fr; } }
+.stat-card {
+    padding: 12px 14px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+.stat-card .stat-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #6b83a0;
+    text-transform: uppercase;
+}
+.stat-card .stat-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-top: 2px;
+}
+
+/* ===== 页脚 ===== */
+.footer {
+    text-align: center;
+    font-size: 0.72rem;
+    color: #8ba3bc;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* ===== 打印 ===== */
+@media print {
+    body { background: #fff; padding: 0; }
+    .section { break-inside: avoid; box-shadow: none; border: 1px solid #ddd; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+    <!-- ============================================================
+         标题
+         ============================================================ -->
+    <h1>🗺️ 前后端数据对应关系</h1>
+    <div class="subhead">PerAcc 个人账户模块 · 前端展示 ↔ 数据库 ↔ 样本数据 JSON</div>
+
+    <div class="meta-bar">
+        <span>📅 生成: 2026-07-03</span>
+        <span class="tag tag-update">v4 券商/期货双模板</span>
+        <span class="tag tag-new">v2 资金股票保本价/盈亏比</span>
+        <span class="tag tag-info">23 表 · InvStrat_db</span>
+    </div>
+
+    <!-- ============================================================
+         项目全景
+         ============================================================ -->
+    <div class="section">
+        <h2>📋 项目全景速览</h2>
+        <div class="status-grid">
+            <div class="stat-card">
+                <div class="stat-label">架构</div>
+                <div class="stat-value">前端 <code>/share/www/</code> → PHP API → MariaDB</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">部署</div>
+                <div class="stat-value">GitHub Pages (前端) + Tailscale Funnel (后端)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">数据库</div>
+                <div class="stat-value">InvStrat_db · 23 表 · InnoDB · utf8mb4</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">数据导入</div>
+                <div class="stat-value">36+ JSON 文件已导入 · SHA256 幂等 · 4 类导入器</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">最新变更 (v2)</div>
+                <div class="stat-value"><code>per_account_positions</code> 新增 <code>break_even_price</code> / <code>pnl_percent</code></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">前端改动</div>
+                <div class="stat-value">「盈亏」列 → 「盈亏比(%)」· 优先读 <code>pnl_percent</code></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         图 A：前端 ↔ 数据库
+         ============================================================ -->
+    <div class="section">
+        <h2>🌳 图 A：前端显示 ↔ 数据库 数据对应关系</h2>
+        <div class="legend">
+            <span><span class="dot dot-db"></span> 数据库字段</span>
+            <span><span class="dot dot-calc"></span> 前端计算字段</span>
+            <span><span class="dot dot-new"></span> v2 新增字段</span>
+            <span>♻️ 优先读 DB，无数据回退计算</span>
+        </div>
+
+        <!-- A1: 券商 -->
+        <h3>A1 ─ 券商账户卡片（夏静 · 华泰证券 666652375957）</h3>
+        <div class="tree">┌─ 券商卡片（前端）───────────────────────────────────────────────┐
+│                                                                       │
+│  ├─ 开户公司名称  ←── <span class="hl-db">per_account_brokers.broker_name</span>
+│  ├─ 账户号        ←── <span class="hl-db">per_account_brokers.account_no</span>
+│  ├─ 总资产        ←── <span class="hl-db">per_account_brokers.total_assets</span>
+│  ├─ 可用资产      ←── <span class="hl-calc">计算: total_assets − market_value</span>
+│  ├─ 股票市值      ←── <span class="hl-db">per_account_brokers.market_value</span>
+│  ├─ 投入本金      ←── <span class="hl-calc">计算: SUM(cash_flows) WHERE category='银行存管转账'</span>
+│                                                                       │
+│  ├─ ▼ 券商持仓明细表 ────────────────────────────────────────────── │
+│  │  ├─ 名称 / 代码 ──←─ <span class="hl-db">per_account_positions.variety / .code</span>
+│  │  ├─ 数量         ──←─ <span class="hl-db">per_account_positions.quantity</span>
+│  │  ├─ 保本价 ♻️    ──←─ <span class="hl-db hl-new">per_account_positions.break_even_price</span>
+│  │  │                  <span class="hl-fallback">(回退: cost_price)</span>
+│  │  ├─ 最新价       ──←─ <span class="hl-db">per_account_positions.market_price</span>
+│  │  ├─ 市值         ──←─ <span class="hl-calc">计算: quantity × market_price</span>
+│  │  ├─ 盈亏比(%) ♻️ ──←─ <span class="hl-db hl-new">per_account_positions.pnl_percent</span>
+│  │  │                  <span class="hl-fallback">(回退: (mkt−break_even)/break_even×100)</span>
+│  │  └─ 持仓成本     ──←─ <span class="hl-calc">计算: quantity × cost_price</span>
+│                                                                       │
+│  ├─ ▼ 成交汇总 ─────────────────────────────────────────────────── │
+│  │  ├─ 日期         ──←─ <span class="hl-db">per_account_trade_records.trade_date</span>
+│  │  ├─ 合约/代码    ──←─ <span class="hl-db">per_account_trade_records.contract_code</span>
+│  │  ├─ 名称         ──←─ <span class="hl-db">per_account_trade_records.contract_name</span>
+│  │  ├─ 方向         ──←─ <span class="hl-db">per_account_trade_records.direction</span>
+│  │  ├─ 数量         ──←─ <span class="hl-db">per_account_trade_records.volume</span>
+│  │  ├─ 成交价       ──←─ <span class="hl-db">per_account_trade_records.price</span>
+│  │  └─ 成交金额     ──←─ <span class="hl-db">per_account_trade_records.amount</span>
+│                                                                       │
+│  └─ ▼ 出入金记录 ───────────────────────────────────────────────── │
+│     ├─ 日期         ──←─ <span class="hl-db">per_account_cash_flows.flow_date</span>
+│     ├─ 金额         ──←─ <span class="hl-db">per_account_cash_flows.amount</span>
+│     ├─ 摘要         ──←─ <span class="hl-db">per_account_cash_flows.note</span>
+│     └─ 摘要分类     ──←─ <span class="hl-db">per_account_cash_flows.category</span>
+│                                                                       │
+└───────────────────────────────────────────────────────────────────────┘</div>
+
+        <!-- A2: 期货 -->
+        <h3>A2 ─ 期货账户卡片（陆剑峰 · 华鑫期货 912290608）</h3>
+        <div class="tree">┌─ 期货卡片（前端）───────────────────────────────────────────────┐
+│                                                                       │
+│  ├─ 开户公司名称  ←── <span class="hl-db">per_account_brokers.broker_name</span>
+│  ├─ 账户号        ←── <span class="hl-db">per_account_brokers.account_no</span>
+│  ├─ 账户权益      ←── <span class="hl-db">per_account_brokers.total_assets</span>
+│  ├─ 可用资金      ←── <span class="hl-db">per_account_brokers.available_amount</span>
+│  ├─ 持仓权益      ←── <span class="hl-db">per_account_brokers.market_value</span>
+│                                                                       │
+│  ├─ ▼ 资金快照 ──────────────────────────────────────────────────── │
+│  │  ├─ 日期         ──←─ <span class="hl-db">per_account_futures_daily.trade_date</span>
+│  │  ├─ 上日结存     ──←─ <span class="hl-db">per_account_futures_daily.prev_balance</span>
+│  │  ├─ 客户权益     ──←─ <span class="hl-db">per_account_futures_daily.client_equity</span>
+│  │  ├─ 可用资金     ──←─ <span class="hl-db">per_account_futures_daily.available_amount</span>
+│  │  ├─ 保证金占用   ──←─ <span class="hl-db">per_account_futures_daily.margin_used</span>
+│  │  ├─ 浮动盈亏     ──←─ <span class="hl-db">per_account_futures_daily.floating_pnl</span>
+│  │  ├─ 平仓盈亏     ──←─ <span class="hl-db">per_account_futures_daily.realized_pnl</span>
+│  │  ├─ 手续费合计   ──←─ <span class="hl-db">per_account_futures_daily.fee_total</span>
+│  │  ├─ 风险度       ──←─ <span class="hl-db">per_account_futures_daily.risk_degree</span>
+│  │  └─ 当日存取合计 ──←─ <span class="hl-db">per_account_futures_daily.deposit_withdraw</span>
+│                                                                       │
+│  └─ ▼ 期货持仓明细 ────────────────────────────────────────────── │
+│     ├─ 品种 / 合约  ──←─ <span class="hl-db">per_account_positions.variety / .code</span>
+│     ├─ 多/空方向     ──←─ <span class="hl-db">per_account_positions.product_type</span>
+│     ├─ 持仓手数      ──←─ <span class="hl-db">per_account_positions.quantity</span>
+│     ├─ 持仓均价      ──←─ <span class="hl-db">per_account_positions.cost_price</span>
+│     ├─ 今结算价      ──←─ <span class="hl-db">per_account_positions.market_price</span>
+│     ├─ 浮动盈亏      ──←─ <span class="hl-db">per_account_positions.floating_pnl</span>
+│     ├─ 保证金占用    ──←─ <span class="hl-db">per_account_positions.margin_used</span>
+│     ├─ 合约乘数      ──←─ <span class="hl-db">per_account_positions.contract_multiplier</span>
+│     └─ 交易所        ──←─ <span class="hl-db">per_account_positions.exchange</span>
+│                                                                       │
+└───────────────────────────────────────────────────────────────────────┘</div>
+
+        <h4>补充说明</h4>
+        <table>
+            <thead><tr><th>展示页计算字段 (stock_calc API)</th><th>计算逻辑</th><th>数据来源表</th></tr></thead>
+            <tbody>
+                <tr><td><code>投入本金</code></td><td><code>SUM(amount) WHERE category='银行存管转账'</code></td><td><code>per_account_cash_flows</code></td></tr>
+                <tr><td><code>总资产/权益</code></td><td>直接读取 <code>total_assets</code></td><td><code>per_account_brokers</code></td></tr>
+                <tr><td><code>可用资产</code></td><td><code>total_assets − market_value</code></td><td>计算字段</td></tr>
+                <tr><td><code>持仓市值</code></td><td>直接读取 <code>market_value</code></td><td><code>per_account_brokers</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ============================================================
+         图 B：数据库 ↔ 数据样本
+         ============================================================ -->
+    <div class="section">
+        <h2>🌳 图 B：数据库 ↔ 数据样本 变迁关系</h2>
+        <div class="legend">
+            <span><span class="dot dot-db"></span> 数据库字段</span>
+            <span><span class="dot dot-new"></span> v2 新增字段</span>
+            <span>║ 附带同步更新到关联表</span>
+        </div>
+
+        <!-- B1: 期货日结单 -->
+        <h3>B1 ─ 期货日结单 JSON → 数据库（陆剑峰 · 30 个文件）</h3>
+        <div class="tree">期货日结单 JSON 字段                数据库 (InvStrat_db)
+═══════════════════════════════════════════════════════════════════
+<span class="label">基本资料</span>
+├─ 期货公司名称        ──→  <span class="hl-db">per_account_brokers.broker_name</span>
+├─ 客户期货期权内部    ──→  <span class="hl-db">per_account_brokers.account_no</span>
+│  资金账户
+├─ 客户名称            ──→  <span class="hl-db">per_accounts.name</span>
+├─ 交易日期            ──→  <span class="hl-db">per_account_futures_daily.trade_date</span>
+
+<span class="label">资金状况</span>
+├─ 上日结存            ──→  <span class="hl-db">per_account_futures_daily.prev_balance</span>
+├─ 客户权益            ──→  <span class="hl-db">per_account_futures_daily.client_equity</span>
+│                      ║  → 同步: <span class="hl-db">per_account_brokers.total_assets</span>
+├─ 可用资金            ──→  <span class="hl-db">per_account_futures_daily.available_amount</span>
+├─ 保证金占用          ──→  <span class="hl-db">per_account_futures_daily.margin_used</span>
+│                      ║  → 同步: <span class="hl-db">per_account_brokers.market_value</span>
+├─ 浮动盈亏            ──→  <span class="hl-db">per_account_futures_daily.floating_pnl</span>
+├─ 平仓盈亏            ──→  <span class="hl-db">per_account_futures_daily.realized_pnl</span>
+├─ 手续费              ──→  <span class="hl-db">per_account_futures_daily.fee_total</span>
+├─ 风险度              ──→  <span class="hl-db">per_account_futures_daily.risk_degree</span>
+├─ 当日存取合计        ──→  <span class="hl-db">per_account_futures_daily.deposit_withdraw</span>
+
+<span class="label">出入金明细[]</span>
+└─ 日期 / 金额         ──→  <span class="hl-db">per_account_cash_flows</span>
+                           (category='银行存管转账')
+
+<span class="label">成交汇总[]</span>
+└─ 逐笔                ──→  <span class="hl-db">per_account_trade_records</span>
+   ├─ 合约/买卖/成交价   ├─ contract_code/direction/price
+   ├─ 成交量/成交额      ├─ volume/amount
+   ├─ 平仓盈亏/手续费    ├─ realized_pnl/fee
+   └─ 开平/委托编号      └─ open_close/order_id
+
+<span class="label">持仓汇总[]</span>
+└─ 逐合约              ──→  <span class="hl-db">per_account_futures_positions_daily</span>
+   ├─ 合约              ├─ contract_code
+   ├─ 买/卖持仓          ├─ direction + volume
+   ├─ 买/卖均价          ├─ avg_price
+   ├─ 昨结算价/今结算价   ├─ settlement_prev / settlement_current
+   ├─ 浮动盈亏           ├─ floating_pnl
+   └─ 交易保证金         └─ margin_used
+                      ║  → 最新持仓同步: <span class="hl-db">per_account_positions</span>
+
+<span class="label">幂等化</span>
+└─ SHA256 文件哈希      ──→  <span class="hl-db">per_account_import_logs</span>
+                           (import_type='futures_daily')</div>
+
+        <!-- B2: 股票成交明细 -->
+        <h3>B2 ─ 股票成交明细 JSON → 数据库（夏静 · 2 个文件）</h3>
+        <div class="tree">成交明细 JSON 字段                  数据库 (InvStrat_db)
+═══════════════════════════════════════════════════════════════════
+{ 股东姓名, 资金帐户 }   ──→  匹配 <span class="hl-db">per_accounts</span> + <span class="hl-db">per_account_brokers</span>
+
+transactions[]
+├─ 成交日期            ──→  <span class="hl-db">per_account_trade_records.trade_date</span>
+├─ 证券代码            ──→  <span class="hl-db">per_account_trade_records.contract_code</span>
+├─ 证券名称            ──→  <span class="hl-db">per_account_trade_records.contract_name</span>
+├─ 操作(买入/卖出)      ──→  <span class="hl-db">per_account_trade_records.direction</span>
+├─ 成交数量            ──→  <span class="hl-db">per_account_trade_records.volume</span>
+├─ 成交均价            ──→  <span class="hl-db">per_account_trade_records.price</span>
+├─ 成交金额            ──→  <span class="hl-db">per_account_trade_records.amount</span>
+├─ 市场类别            ──→  (参考)
+├─ 股东代码            ──→  (参考)
+└─ 委托编号            ──→  <span class="hl-db">per_account_trade_records.order_id</span>
+
+幂等化                  ──→  <span class="hl-db">per_account_import_logs</span>
+(SHA256)                     (import_type='stock_trades')</div>
+
+        <!-- B3: 资金股票 ⭐ -->
+        <h3>B3 ─ 资金股票 JSON → 数据库（夏静 · 2 个文件 <span class="tag-new">⭐ v2</span>）</h3>
+        <div class="tree">资金股票 JSON 字段                  数据库 (InvStrat_db)
+═══════════════════════════════════════════════════════════════════
+{ 股东姓名, 资金帐户 }   ──→  匹配 <span class="hl-db">per_accounts</span> + <span class="hl-db">per_account_brokers</span>
+
+顶层字段
+├─ 总资产              ──→  <span class="hl-db">per_account_brokers.total_assets</span>
+├─ 股票市值            ──→  <span class="hl-db">per_account_brokers.market_value</span>
+├─ 资金余额            ──→  <span class="hl-db">per_account_brokers.available_amount</span>
+
+positions[]              ──→  <span class="hl-db">per_account_positions</span> (全量替换)
+├─ 证券代码            ──→  .code
+├─ 证券名称            ──→  .variety
+├─ 股票余额            ──→  .quantity
+├─ 成本价              ──→  .cost_price <span class="hl-fallback">(回退)</span>
+├─ <span class="hl-new">保本价</span>  🆕          ──→  <span class="hl-db hl-new">.break_even_price</span>
+├─ 市价                ──→  .market_price
+├─ <span class="hl-new">盈亏比例(%)</span> 🆕      ──→  <span class="hl-db hl-new">.pnl_percent</span>
+├─ 可用余额            ──→  (清理冻结量用)
+└─ 卖出冻结数量        ──→  (参考)</div>
+
+        <!-- B4: 资金明细 -->
+        <h3>B4 ─ 资金明细 JSON → 数据库（夏静 · 4 个文件）</h3>
+        <div class="tree">资金明细 JSON 字段                  数据库 (InvStrat_db)
+═══════════════════════════════════════════════════════════════════
+{ 文件名 }              ──→  <span class="hl-db">per_account_import_logs.source_file</span>
+
+记录[]
+├─ 日期                ──→  <span class="hl-db">per_account_cash_flows.flow_date</span>
+├─ 摘要                ──→  <span class="hl-db">per_account_cash_flows.note</span>
+│  自动分类推导          ──→  <span class="hl-db">per_account_cash_flows.category</span>
+│  ════════════════
+│  "银行转存"     → 银行存管转账
+│  "证券买入"     → 证券买入
+│  "证券卖出"     → 证券卖出
+│  "基金资金拨入" → 基金资金拨入
+│  "基金资金拨出" → 基金资金拨出
+│
+├─ 收入（正金额）      ──→  <span class="hl-db">per_account_cash_flows.amount</span> (+)
+├─ 支出（负金额）      ──→  <span class="hl-db">per_account_cash_flows.amount</span> (−)
+└─ 余额                ──→  (仅参考，不落库)</div>
+    </div>
+
+    <!-- ============================================================
+         数据变迁总览图
+         ============================================================ -->
+    <div class="section">
+        <h2>📊 数据变迁关系总览图</h2>
+
+        <div class="flow-overview">
+            <div class="flow-layer layer-source">
+                <div class="layer-title">📁 数据样本 (JSON)</div>
+                <div class="layer-content">
+│  期货日结单 ──────────────→  期货资金快照 + 持仓日明细<br>
+│  (LJF × 30)                + 逐笔交易 + 出入金<br>
+│<br>
+│  股票成交明细 ────────────→  逐笔交易记录 (无平仓盈亏)<br>
+│  (XJ × 2)<br>
+│<br>
+│  资金股票 🆕 ─────────────→  券商账户 (总资产/市值/可用)<br>
+│  (XJ × 2)                ─→  持仓明细 (全量替换, 含保本价/盈亏比)<br>
+│<br>
+│  资金明细 ───────────────→  出入金记录 (含摘要分类)
+                </div>
+            </div>
+            <div class="flow-arrow-down">⬇ ⬇ ⬇</div>
+            <div class="flow-layer layer-db">
+                <div class="layer-title">🗄️ 数据库 InvStrat_db</div>
+                <div class="layer-content">
+│  per_accounts (人员主表)<br>
+│  └── per_account_brokers (券商账户)<br>
+│       ├── per_account_positions (持仓明细, 含 v2 新字段)<br>
+│       ├── per_account_cash_flows (出入金)<br>
+│       ├── per_account_trade_records (逐笔交易)<br>
+│       ├── per_account_futures_daily (期货资金快照)<br>
+│       ├── per_account_futures_positions_daily (期货持仓日明细)<br>
+│       └── per_account_import_logs (导入日志, SHA256 幂等)
+                </div>
+            </div>
+            <div class="flow-arrow-down">⬇ ⬇ ⬇</div>
+            <div class="flow-layer layer-frontend">
+                <div class="layer-title">🖥️ 前端展示 PerAcc.html</div>
+                <div class="layer-content">
+│  券商卡片 (总资产/市值/可用/投入本金)<br>
+│  ├── 持仓明细表 (保本价/最新价/市值/<span class="hl-new">盈亏比%</span>)<br>
+│  ├── 成交汇总表 (只读)<br>
+│  └── 出入金记录 (筛选银行存管转账)<br>
+│<br>
+│  期货卡片 (权益/可用/持仓权益)<br>
+│  ├── 资金快照表 (日结单摘要)<br>
+│  └── 期货持仓明细 (浮动盈亏/保证金)
+                </div>
+            </div>
+        </div>
+
+        <div class="legend" style="margin-top: 12px;">
+            <span>🔄 数据流向: JSON 文件 → 导入器(PHP) → 数据库 → API(PHP) → 前端展示</span>
+        </div>
+    </div>
+
+    <!-- ===========================================================
+         附录：文件位置
+         ============================================================ -->
+    <div class="section">
+        <h2>📎 附录：关键文件位置</h2>
+        <table>
+            <thead><tr><th>位置</th><th>路径</th><th>说明</th></tr></thead>
+            <tbody>
+                <tr><td><strong>展示页</strong></td>
+                    <td><code>/share/www/Data_Processing_Analysis/Finance/PerAcc/PerAcc.html</code></td>
+                    <td>账户持仓查询展示</td></tr>
+                <tr><td><strong>数据录入页</strong></td>
+                    <td><code>/home/jefflu/api/PerAcc_Data/PerAcc_Data.html</code></td>
+                    <td>CRUD + 文件导入</td></tr>
+                <tr><td><strong>录入页 JS</strong></td>
+                    <td><code>/home/jefflu/api/PerAcc_Data/PerAcc_Data.js</code></td>
+                    <td>含格式检测/持仓渲染</td></tr>
+                <tr><td><strong>API</strong></td>
+                    <td><code>/home/jefflu/api/PerAcc_Data/api.php</code></td>
+                    <td>CRUD + stock_calc 计算</td></tr>
+                <tr><td><strong>期货日结导入器</strong></td>
+                    <td><code>/home/jefflu/api/PerAcc_Data/import_futures_daily.php</code></td>
+                    <td>期货日结单 JSON → DB</td></tr>
+                <tr><td><strong>股票成交导入器</strong></td>
+                    <td><code>/home/jefflu/api/PerAcc_Data/import_stock_trades.php</code></td>
+                    <td>成交明细 JSON → DB</td></tr>
+                <tr><td><strong>资金明细导入器</strong></td>
+                    <td><code>/home/jefflu/api/PerAcc_Data/import_stock_funds.php</code></td>
+                    <td>资金明细 JSON → DB</td></tr>
+                <tr><td><strong>资金股票导入器</strong></td>
+                    <td><code>/home/jefflu/api/PerAcc_Data/import_stock_holdings.php</code></td>
+                    <td>资金股票 JSON → DB (v2 保本价/盈亏比)</td></tr>
+                <tr><td><strong>统一导入入口</strong></td>
+                    <td><code>/home/jefflu/api/PerAcc_Data/import_api.php</code></td>
+                    <td>CLI 批量 + HTTP 上传</td></tr>
+                <tr><td><strong>数据库 DDL</strong></td>
+                    <td><code>/home/jefflu/api/schema.sql</code></td>
+                    <td>完整 23 表建表语句</td></tr>
+                <tr><td><strong>数据库文档</strong></td>
+                    <td><code>/share/www/docs/数据库架构设计.html</code></td>
+                    <td>完整字段说明</td></tr>
+                <tr><td><strong>项目架构文档</strong></td>
+                    <td><code>/share/www/docs/网站项目架构.html</code></td>
+                    <td>架构/部署/导入管道</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer">
+        生成于 2026-07-03 · InvStrat_db · PerAcc 模块 v4 + 资金股票 v2
+    </div>
+
+</div>
+</body>
+</html>
