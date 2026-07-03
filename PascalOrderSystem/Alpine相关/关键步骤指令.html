@@ -20,9 +20,12 @@
     ================================================================ -->
     <h2>⚡ 日常维护速查</h2>
 
-    <p><strong>笔记本重启后 → 只需做这两步：</strong></p>
+    <p><strong>笔记本重启后 → 按顺序做这三步：</strong></p>
+    <pre><code>rc-service mariadb start</code></pre>
     <pre><code>cd /home/jefflu && sh start.sh start</code></pre>
     <pre><code>nohup tailscale funnel 8000 > /dev/null 2>&1 &</code></pre>
+    <p>⚠️ 第1步数据库可能已经自启（<code>rc-service mariadb status</code> 检查），如已启动可跳过。<br>
+    全部完成后访问 <code>https://jefflu.tail9f69ce.ts.net/ping.php</code> 验证链路（需带 API Key）。</p>
 
     <p><strong>修改网页内容后 → 只需做这四步：</strong></p>
     <pre><code>cd /share/www</code></pre>
@@ -142,6 +145,61 @@ To https://github.com/jianfengl532-debug/Market_Participant.git
 
     <p>测试 API 连通性（带 Key）：</p>
     <pre><code>wget -q -O- --header="X-API-Key: mk_jfl_a8f3c9e2b7d4p6q5r1" "https://jefflu.tail9f69ce.ts.net/GeoEnv_Data/api.php?action=list"</code></pre>
+
+    <hr>
+
+    <!-- ================================================================
+         六、服务器重启完整恢复流程
+    ================================================================ -->
+    <h2>🔁 六、服务器重启完整恢复流程</h2>
+
+    <p>服务器（Alpine Linux）重启后，所有服务都会停止。按以下顺序逐步恢复：</p>
+
+    <h3>第1步：检查互联网连通</h3>
+    <pre><code>ping -c 2 8.8.8.8</code></pre>
+    <p>有回复说明网络正常。如果 ping 不通，先检查网线/路由器。</p>
+
+    <h3>第2步：启动 MariaDB 数据库</h3>
+    <pre><code>rc-service mariadb start</code></pre>
+    <p>MariaDB 已配置开机自启，但偶尔不会随系统自动启动，需要手动确认：</p>
+    <pre><code>rc-service mariadb status</code></pre>
+    <p>显示 <code>* status: started</code> 即可。</p>
+
+    <h3>第3步：启动 PHP 后端 + Python 前端</h3>
+    <pre><code>cd /home/jefflu && sh start.sh start</code></pre>
+    <p>这会同时启动：</p>
+    <ul>
+        <li><strong>PHP 后端</strong>（数据录入页 + API）→ <code>localhost:8000</code></li>
+        <li><strong>Python 前端</strong>（本地开发用展示页）→ <code>localhost:8080</code></li>
+    </ul>
+
+    <h3>第4步：开放外网访问（Tailscale Funnel）</h3>
+    <pre><code>nohup tailscale funnel 8000 > /dev/null 2>&1 &</code></pre>
+    <p>这条命令让 GitHub Pages 能通过 Funnel 域名访问到后端的 PHP API。</p>
+
+    <h3>第5步：验证全链路</h3>
+    <pre><code># 检查数据库
+rc-service mariadb status
+
+# 检查本地 API 是否响应
+curl -s --header "X-API-Key: mk_jfl_a8f3c9e2b7d4p6q5r1" http://localhost:8000/ping.php
+
+# 检查外网 API 是否响应
+curl -s --header "X-API-Key: mk_jfl_a8f3c9e2b7d4p6q5r1" https://jefflu.tail9f69ce.ts.net/ping.php</code></pre>
+    <p>全部返回 <code>{"status":"ok", "db":true}</code> 说明链路通畅，GitHub Pages 前端即可正常显示数据。</p>
+
+    <h3>第6步：推送未完成的 git 提交（如有）</h3>
+    <pre><code>cd /share/www
+git push</code></pre>
+    <p>如果提示 <code>no upstream branch</code>，执行：</p>
+    <pre><code>git push --set-upstream origin main</code></pre>
+    <p>👉 推送时提示输密码，输入 <strong>Personal Access Token (PAT)</strong>，不是 GitHub 登录密码。</p>
+
+    <h3>📌 汇总命令（一条执行所有）</h3>
+    <pre><code>rc-service mariadb start && \
+cd /home/jefflu && sh start.sh start && \
+nohup tailscale funnel 8000 > /dev/null 2>&1 & && \
+echo "✅ 重启恢复完成"</code></pre>
 
     <hr>
 
