@@ -10,220 +10,144 @@
     <link rel="stylesheet" href="../InvStrat.css">
     <script src="../../../js/config.js"></script>
 </head>
-<body class="dashboard-page">
-<div class="dashboard-container">
-    <!-- 主标题：日文要求，所有图标已转换为 Emoji -->
-    <div class="main-header">
-        <h1>為替レート、金利、株債等資本市場分析</h1>
-        <p>
-            <span class="update-time"><span class="emoji">📈</span> データクレンジング・整備</span>
-            <span class="update-time"><span class="emoji">🕒</span> 更新: 2026年6月15日 09:30 JST</span>
-            <span class="market-badge"><a href="javascript:void(0)" class="db-link" onclick="openDbLink('http://192.168.0.105:8000/FxCap_Data/FxCap_Data.html')"><span class="emoji">🗄️</span> DB 接続・データ読み込み</a></span>
-        </p>
-    </div>
+<body>
+<div class="app-layout-sidebar">
 
-    <!-- 左右两大板块：左边「汇率・利率分析」 | 右边「股票・债券分析」 -->
-    <div class="two-columns">
-        <!-- 左侧板块：匯率 + 利率 (事件列表/标题顺序延续) -->
-        <div class="section-card">
-            <div class="section-title">
-                <span class="emoji">🌏</span>
-                <span>為替・金利分析</span>
-            </div>
-            <div class="sub-block">
-                <div class="sub-header">
-                    <h3><span class="emoji">💱</span> 汇率/利率市场</h3>
-                </div>
-                <!-- 动态事件列表区域：按标题事件顺序排列、支持延续追加 -->
-                <div class="analysis-text" id="forexRateAnalysis">
-                    <ul class="event-list" id="forexEventList">
-                        <!-- 初始事件条目 (按时间顺序排列，所有图标均为 Emoji) -->
-                        <li>
-                            <div class="event-icon">📈</div>
-                            <div class="event-content">
-                                <a href="FX_Rates/20260615_当前重点监控的系统性脆弱点.html" class="event-title" >当前重点监控的系统性脆弱点</a>
-                                <span class="event-date">2026年6月15日 • </span>
-                            </div>
-                        </li>
-                        
-                        <li>
-                            <div class="event-icon">💵</div>
-                            <div class="event-content">
-                                <a href="#" class="event-title" >待输入</a>
-                                <span class="event-date">2026年6月12日</span>
-                            </div>
-                        </li>
+    <!-- ====================== 左侧导航栏 ====================== -->
+    <aside class="sidebar-panel">
+        <div class="sidebar-title">💱 FxCap<br><span style="font-size:0.7rem;font-weight:400;color:#6b8ba8;">為替・資本市場分析</span></div>
 
-                        <li>
-                            <div class="event-icon">📘</div>
-                            <div class="event-content">
-                                <a href="/share/www/InvStrat/FxCap/FX_Rates/市场生存手册.html" class="event-title" >📘 待输入</a>
-                                <span class="event-date">********</span>
-                            </div>
-                        </li>
-                        
-                    </ul>
-                </div>
+        <div class="sidebar-section-label">导航</div>
+        <nav>
+            <a href="../../../index.html">🏠 返回仪表板</a>
+            <a href="../GeoEnv/GeoEnv.html">🌍 地政環境分析</a>
+            <a href="../FxCap/FxCap.html" class="active">💱 為替・資本市場分析</a>
+            <a href="../IndBiz/IndBiz.html">💹 産業景気分析</a>
+        </nav>
+
+        <div class="sidebar-section-label">分析板块</div>
+        <nav>
+            <a href="#forex-section">🌏 為替・金利分析</a>
+            <a href="#stock-section">⚡ 株式・債券分析</a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span>📖 只读板块</span>
+        </div>
+    </aside>
+
+    <!-- ====================== 右侧主要内容 ====================== -->
+    <main class="main-panel">
+
+        <div class="dashboard-container">
+
+            <!-- 主标题 -->
+            <div class="main-header">
+                <h1>為替レート、金利、株債等資本市場分析</h1>
+                <p>
+                    <span class="update-time"><span class="emoji">📈</span> データクレンジング・整備</span>
+                    <span class="update-time"><span class="emoji">🕒</span> 更新: 2026年6月15日 09:30 JST</span>
+                </p>
             </div>
+
+            <!-- 左右两大板块：左边「汇率・利率分析」 | 右边「股票・债券分析」 -->
+            <div class="two-columns">
+
+                <!-- 左侧板块：匯率 + 利率 -->
+                <div class="section-card" id="forex-section">
+                    <div class="section-title">
+                        <span class="emoji">🌏</span>
+                        <span>為替・金利分析</span>
+                    </div>
+                    <div class="sub-block">
+                        <div class="sub-header">
+                            <h3><span class="emoji">💱</span> 汇率/利率市场</h3>
+                        </div>
+                        <div class="analysis-text" id="forexRateAnalysis">
+                            <ul class="event-list" id="forexEventList">
+                                <li>
+                                    <div class="event-icon">📈</div>
+                                    <div class="event-content">
+                                        <a href="FX_Rates/20260615_当前重点监控的系统性脆弱点.html" class="event-title" >当前重点监控的系统性脆弱点</a>
+                                        <span class="event-date">2026年6月15日 • </span>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="event-icon">💵</div>
+                                    <div class="event-content">
+                                        <a href="#" class="event-title" >待输入</a>
+                                        <span class="event-date">2026年6月12日</span>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="event-icon">📘</div>
+                                    <div class="event-content">
+                                        <a href="/share/www/InvStrat/FxCap/FX_Rates/市场生存手册.html" class="event-title" >📘 待输入</a>
+                                        <span class="event-date">********</span>
+                                    </div>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧板块：股票 + 债券 -->
+                <div class="section-card" id="stock-section">
+                    <div class="section-title">
+                        <span class="emoji">⚡</span>
+                        <span>株式・債券分析</span>
+                    </div>
+                    <div class="sub-block">
+                        <div class="sub-header">
+                            <h3><span class="emoji">📊</span> 股票/债券市场</h3>
+                        </div>
+                        <div class="analysis-text" id="stockBondAnalysis">
+
+                            <ul class="event-list" id="stockBondEventList">
+                                <li>
+                                   <div class="link-icon">📄</div>
+                                   <div>
+                                        <a href="Equity_Bond/神农集团605296vs 巨星农牧603477.html" class="event-title" target="_blank">神農集団 vs 巨星農牧 分析</a>
+                                        <span class="event-date"> 2026-06-16 </span>
+                                   </div>
+                                </li>
+
+                                <li>
+                                    <div class="event-icon">📉</div>
+                                    <div class="event-content">
+                                        <a href="#" class="event-title" >待输入</a>
+                                        <span class="event-date">2026年6月13日</span>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="event-icon">🥧</div>
+                                    <div class="event-content">
+                                        <a href="#" class="event-title" >待输入</a>
+                                        <span class="event-date">2026年6月12日</span>
+                                    </div>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <footer>
+                <span class="emoji">📈</span> 資本市場分析ダッシュボード• 為替・金利・株債の動向を可視化
+                <br style="display: none;" class="mobile-break">
+                <span>表示データは市場シミュレーション及びイベント予定に基づく。リンクは分析用資料を示します。</span>
+            </footer>
+
         </div>
 
-        <!-- 右侧板块：股票 + 债券 (事件顺序延续) -->
-        <div class="section-card">
-            <div class="section-title">
-                <span class="emoji">⚡</span>
-                <span>株式・債券分析</span>
-            </div>
-            <div class="sub-block">
-                <div class="sub-header">
-                    <h3><span class="emoji">📊</span> 股票/债券市场</h3>
-                </div>
-                <div class="analysis-text" id="stockBondAnalysis">
-                    
-                    <ul class="event-list" id="stockBondEventList">
-                        <li>
-                           <div class="link-icon">📄</div>
-                           <div>
-                                <a href="Equity_Bond/神农集团605296vs 巨星农牧603477.html" class="event-title" target="_blank">神農集団 vs 巨星農牧 分析</a>
-                                <span class="event-date"> 2026-06-16 </span>
-                           </div>
-                        </li>
+    </main>
 
-                        <li>
-                            <div class="event-icon">📉</div>
-                            <div class="event-content">
-                                <a href="#" class="event-title" >待输入</a>
-                                <span class="event-date">2026年6月13日</span>
-                            </div>
-                        </li>
-
-                        <li>
-                            <div class="event-icon">🥧</div>
-                            <div class="event-content">
-                                <a href="#" class="event-title" >待输入</a>
-                                <span class="event-date">2026年6月12日</span>
-                            </div>
-                        </li>
-
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== DB 登録情報（自动从数据库读取，置于下方避免干扰浏览） ===== -->
-    <div class="section-card" id="dbRecordsCard" style="margin-bottom:1.8rem;display:none;">
-        <div class="section-title">
-            <span class="emoji">🗄️</span>
-            <span>DB 登録情報</span>
-            <span class="extra-note" style="margin-left:auto;font-size:0.8rem;" id="dbRecordsCount"></span>
-        </div>
-        <div class="sub-block" id="dbRecordsList">
-            <div style="padding:1rem;text-align:center;color:#8ba0b8;">🔄 読み込み中…</div>
-        </div>
-    </div>
-
-    <footer>
-        <span class="emoji">📈</span> 資本市場分析ダッシュボード• 為替・金利・株債の動向を可視化
-        <br style="display: none;" class="mobile-break">
-        <span>表示データは市場シミュレーション及びイベント予定に基づく。リンクは分析用資料を示します。</span>
-    </footer>
 </div>
-
-<script>
-(function() {
-  var links = document.querySelectorAll('.db-link');
-  var cfg = window.API_CONFIG || { baseUrl: 'http://' + (window.location.hostname || 'localhost') + ':8000', apiKey: '' };
-  var apiBase = cfg.baseUrl.replace(/\/+$/, '');
-  var apiKey = cfg.apiKey;
-  links.forEach(function(a) {
-    a.href = a.href.replace(/http:\/\/[^:]+:8000\//, apiBase + '/');
-  });
-
-  // ── DB からデータを取得して表示 ──
-  fetch(apiBase + '/FxCap_Data/api.php?action=list', { headers: { 'X-API-Key': apiKey } })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      var records = data.records || data.data || [];
-      if (!records.length) return;
-
-      var card = document.getElementById('dbRecordsCard');
-      var list = document.getElementById('dbRecordsList');
-      var count = document.getElementById('dbRecordsCount');
-      if (!card || !list) return;
-
-      card.style.display = 'block';
-      count.textContent = records.length + ' 件';
-
-      var html = '<ul class="event-list" style="margin:0;">';
-      records.forEach(function(r) {
-        var d = r.data || r;
-        var title = d.title || '(無題)';
-        var time = (d.event_time || '').slice(0, 10);
-        var source = d.source || '';
-        var region = d.region || '';
-        var tags = d.tags || '';
-        var desc = d.description || d.raw_content || '';
-        var descShort = desc.length > 120 ? desc.slice(0, 120) + '…' : desc;
-
-        // 利率变动信息
-        var ratesHtml = '';
-        var rates = d.interest_rates || [];
-        if (rates.length) {
-          ratesHtml = '<div style="margin-top:4px;font-size:0.8rem;color:#4b6a8b;">';
-          rates.forEach(function(ir) {
-            ratesHtml += '📊 ' + (ir.country || '') + ' ' + (ir.rate_type || '') + ': '
-              + (ir.rate_before != null ? ir.rate_before : '?') + '% → '
-              + (ir.rate_after != null ? ir.rate_after : '?') + '%'
-              + (ir.bps_change != null ? ' (' + ir.bps_change + 'bp)' : '')
-              + '<br>';
-          });
-          ratesHtml += '</div>';
-        }
-
-        // 汇率变动信息
-        var fxHtml = '';
-        var exchanges = d.exchange_rates || [];
-        if (exchanges.length) {
-          fxHtml = '<div style="margin-top:4px;font-size:0.8rem;color:#4b6a8b;">';
-          exchanges.forEach(function(fx) {
-            fxHtml += '💱 ' + (fx.currency_pair || '') + ': '
-              + (fx.rate_before != null ? fx.rate_before : '?') + ' → '
-              + (fx.rate_after != null ? fx.rate_after : '?')
-              + (fx.change_percent != null ? ' (' + fx.change_percent + '%)' : '')
-              + '<br>';
-          });
-          fxHtml += '</div>';
-        }
-
-        html += '<li style="padding:10px 0;">'
-          + '<div class="event-icon">📄</div>'
-          + '<div class="event-content">'
-          + '<div class="event-title" style="cursor:default;">' + escapeHtml(title) + '</div>'
-          + '<span class="event-date">'
-          + (time ? '📅 ' + time + ' • ' : '')
-          + (source ? '📰 ' + escapeHtml(source) + ' • ' : '')
-          + (region ? '📍 ' + escapeHtml(region) : '')
-          + '</span>'
-          + '<div style="font-size:0.8rem;color:#475569;margin-top:4px;">' + escapeHtml(descShort) + '</div>'
-          + ratesHtml + fxHtml
-          + (tags ? '<div style="margin-top:4px;">' + tags.split(',').map(function(t) {
-              return '<span class="summary-tag" style="font-size:0.7rem;padding:1px 6px;margin:1px 2px;">#' + escapeHtml(t.trim()) + '</span>';
-            }).join('') + '</div>' : '')
-          + '</div></li>';
-      });
-      html += '</ul>';
-      list.innerHTML = html;
-    })
-    .catch(function(err) {
-      // API 不可达时不显示（CORS 或网络问题）
-      console.log('DB fetch skipped:', err);
-    });
-
-  function escapeHtml(s) {
-    if (!s) return '';
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
-})();
-</script>
 </body>
 </html>
