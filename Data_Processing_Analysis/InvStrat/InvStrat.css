@@ -1017,7 +1017,70 @@ body.geoenv-page {
 }
 
 /* ==================================================================
-   8. SIDEBAR LAYOUT — 左侧导航 + 右侧内容
+   8. SIDEBAR — 可折叠分类导航
+   用于 GeoEnv / FxCap / IndBiz 三个展示页面的左侧分类面板
+   ================================================================== */
+
+.sidebar-category {
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.sidebar-category summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.55rem 1.2rem;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #94a3b8;
+    transition: all 0.15s;
+    list-style: none;
+    user-select: none;
+}
+
+.sidebar-category summary::-webkit-details-marker {
+    display: none;
+}
+
+.sidebar-category summary::before {
+    content: '▶';
+    font-size: 0.6rem;
+    color: #4b6a8b;
+    transition: transform 0.2s;
+    display: inline-block;
+    width: 12px;
+}
+
+.sidebar-category[open] summary::before {
+    transform: rotate(90deg);
+}
+
+.sidebar-category summary:hover {
+    background: rgba(255,255,255,0.06);
+    color: #e2e8f0;
+}
+
+.sidebar-category .sub-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.4rem 1.2rem 0.4rem 2.2rem;
+    color: #6b8ba8;
+    text-decoration: none;
+    font-size: 0.78rem;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+}
+
+.sidebar-category .sub-link:hover {
+    background: rgba(255,255,255,0.04);
+    color: #cbd5e1;
+    border-left-color: #3b82f6;
+}
+
+/* ==================================================================
+   9. SIDEBAR LAYOUT — 左侧导航 + 右侧内容
    用于 GeoEnv / FxCap / IndBiz 三个展示页面
    ================================================================== */
 
