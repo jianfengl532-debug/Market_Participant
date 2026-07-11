@@ -1093,8 +1093,8 @@ body.geoenv-page {
 /* ---- 左侧导航面板 ---- */
 
 .sidebar-panel {
-    width: 220px;
-    min-width: 220px;
+    width: 280px;
+    min-width: 280px;
     background: #1e2a3a;
     color: #cbd5e1;
     padding: 1.5rem 0;

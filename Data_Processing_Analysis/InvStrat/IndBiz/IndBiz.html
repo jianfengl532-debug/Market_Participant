@@ -7,6 +7,43 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../InvStrat.css">
     <script src="../../../js/config.js"></script>
+    <style>
+        .content-frame {
+            width: 100%;
+            height: calc(100vh - 3rem);
+            border: none;
+            border-radius: 16px;
+            background: #ffffff;
+        }
+        .no-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - 3rem);
+            color: #94a3b8;
+            font-size: 1rem;
+            text-align: center;
+        }
+        .main-panel {
+            padding: 0;
+            max-width: 100%;
+        }
+        .main-panel .dashboard-container {
+            max-width: 100%;
+            margin: 0;
+            padding: 1.5rem 2rem;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .main-header {
+            margin-bottom: 1rem;
+        }
+        #content-area {
+            flex: 1;
+            min-height: 0;
+        }
+    </style>
 </head>
 <body>
 <div class="app-layout-sidebar">
@@ -15,67 +52,55 @@
     <aside class="sidebar-panel">
         <div class="sidebar-title">🏭 IndBiz<br><span style="font-size:0.7rem;font-weight:400;color:#6b8ba8;">産業景気分析</span></div>
 
-        <div class="sidebar-section-label">产业分类（可折叠）</div>
+        <div class="sidebar-section-label">产业分类</div>
         <nav>
-            <details class="sidebar-category" open>
+            <details class="sidebar-category">
                 <summary>🏅 贵金属</summary>
-                <a href="#" class="sub-link">黄金 · 白银 · 铂钯</a>
             </details>
-            <details class="sidebar-category" open>
+            <details class="sidebar-category">
                 <summary>🟤 有色金属</summary>
-                <a href="#" class="sub-link">铜 · 铝 · 锌 · 铅 · 镍 · 锡</a>
             </details>
-            <details class="sidebar-category" open>
+            <details class="sidebar-category">
                 <summary>⚫ 黑色金属</summary>
-                <a href="#" class="sub-link">螺纹钢 · 热卷 · 铁矿石 · 硅锰</a>
             </details>
-            <details class="sidebar-category" open>
-                <summary>🪨 煤炭</summary>
-                <a href="#" class="sub-link">动力煤 · 焦煤 · 焦炭</a>
+            <details class="sidebar-category">
+                <summary>⛏️ 煤炭</summary>
             </details>
-            <details class="sidebar-category" open>
+            <details class="sidebar-category">
                 <summary>📄 轻工</summary>
-                <a href="#" class="sub-link">纸浆 · 玻璃 · 橡胶 · 木材</a>
             </details>
-            <details class="sidebar-category" open>
+            <details class="sidebar-category">
                 <summary>🛢️ 石油</summary>
-                <a href="#" class="sub-link">原油 · 燃料油 · 沥青 · 液化气</a>
             </details>
-            <details class="sidebar-category" open>
+            <details class="sidebar-category">
                 <summary>🧪 化工</summary>
-                <a href="#" class="sub-link">甲醇 · PTA · 乙二醇 · 苯乙烯 · 尿素 · 纯碱</a>
             </details>
-            <details class="sidebar-category" open>
+            <details class="sidebar-category">
                 <summary>🌱 油脂油料</summary>
-                <a href="#" class="sub-link">豆粕 · 豆油 · 菜粕 · 菜油 · 棕榈油</a>
+                <a href="javascript:void(0)" class="sub-link" onclick="loadPage('IndBiz_Report/yzy.html')">📄 养殖业行业分析</a>
             </details>
-            <details class="sidebar-category" open>
+            <details class="sidebar-category">
                 <summary>🌾 谷物</summary>
-                <a href="#" class="sub-link">玉米 · 小麦 · 稻谷 · 大豆</a>
             </details>
             <details class="sidebar-category" open>
                 <summary>🍬 软商品</summary>
-                <a href="#" class="sub-link">白糖 · 棉花 · 橡胶 · 咖啡 · 可可</a>
+                <a href="javascript:void(0)" class="sub-link" onclick="loadPage('IndBiz_Report/SR.html')">📄 白糖期货（SR）交易员视角分析</a>
             </details>
             <details class="sidebar-category" open>
                 <summary>🧑‍🌾 农副</summary>
-                <a href="#" class="sub-link">鸡蛋 · 生猪 · 苹果 · 红枣 · 花生</a>
+                <a href="javascript:void(0)" class="sub-link" onclick="loadPage('IndBiz_Report/CJ.html')">📄 红枣期货（CJ）市场全景报告</a>
             </details>
-            <details class="sidebar-category" open>
+            <details class="sidebar-category">
                 <summary>🚢 航运</summary>
-                <a href="#" class="sub-link">集运指数 · 波罗的海干散货</a>
             </details>
-            <details class="sidebar-category" open>
+            <details class="sidebar-category">
                 <summary>⚡ 电力（算力）</summary>
-                <a href="#" class="sub-link">电力交易 · 算力基建 · 数据中心</a>
             </details>
-            <details class="sidebar-category" open>
+            <details class="sidebar-category">
                 <summary>🏥 医疗</summary>
-                <a href="#" class="sub-link">医药 · 器械 · 生物技术</a>
             </details>
-            <details class="sidebar-category" open>
-                <summary>🪖 军工</summary>
-                <a href="#" class="sub-link">国防装备 · 航空航天 · 船舶</a>
+            <details class="sidebar-category">
+                <summary>🛡️ 军工</summary>
             </details>
         </nav>
 
@@ -86,61 +111,36 @@
 
     <!-- ====================== 右侧主要内容 ====================== -->
     <main class="main-panel">
-
         <div class="dashboard-container">
-
-            <!-- ========== 主标题 ========== -->
             <div class="main-header">
                 <h1>🏭 産業景気分析 <span style="font-weight:400;font-size:1.1rem;color:#4b6a8b;letter-spacing:0;">(IndBiz)</span></h1>
                 <p>
                     <span class="update-time"><span class="emoji">📊</span> データクレンジング・整備</span>
-                    <span class="update-time"><span class="emoji">🕒</span> 更新: 2026年6月16日</span>
+                    <span class="update-time"><span class="emoji">🕒</span> 更新: 2026年7月10日</span>
                 </p>
             </div>
-
-            <!-- ========== 産業景気分析报告 ========== -->
-            <div class="section-card" id="ind-reports">
-                <div class="section-title">
-                    <span class="emoji">📌</span>
-                    <span>産業景気分析报告</span>
-                </div>
-                <div class="sub-block">
-                    <ul class="link-list">
-                        <li>
-                            <div class="link-icon">📄</div>
-                            <div>
-                                <a href="IndBiz_Report/yzy.html" class="link-title" target="_blank">养殖业行业分析</a>
-                                <span class="link-meta">2026-06-16 • 業界分析</span>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="link-icon">📄</div>
-                            <div>
-                                <a href="IndBiz_Report/CJ.html" class="link-title" target="_blank">红枣期货（CJ）市场全景报告</a>
-                                <span class="link-meta">2026-07-10 • 红枣市场分析</span>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="link-icon">📄</div>
-                            <div>
-                                <a href="IndBiz_Report/SR.html" class="link-title" target="_blank">白糖期货（SR2609）交易员视角分析报告</a>
-                                <span class="link-meta">2026-07-10 • 白糖期货交易策略</span>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
+            <div id="content-area">
+                <div class="no-content" id="no-content-msg">← 点击左侧分类查看文章</div>
+                <iframe id="content-frame" class="content-frame" style="display:none;"></iframe>
             </div>
-
-            <!-- ========== フッター ========== -->
-            <footer>
-                <span class="emoji">📊</span> 産業景気分析ダッシュボード • 各業種の動向をワンストップで
-                <span style="margin-left:0.5rem;">表示リンクは分析用資料を示します</span>
-            </footer>
-
         </div>
-
     </main>
 
 </div>
+
+<script>
+(function() {
+    // 默认加载最新文章
+    loadPage('IndBiz_Report/SR.html');
+})();
+
+function loadPage(url) {
+    var frame = document.getElementById('content-frame');
+    var msg = document.getElementById('no-content-msg');
+    if (msg) msg.style.display = 'none';
+    frame.style.display = 'block';
+    frame.src = url;
+}
+</script>
 </body>
 </html>
