@@ -179,11 +179,36 @@
       "Bash(git push *)",
       "Bash(wget -q -O- --timeout=5 \"https://github.com/jianfengl532-debug/Market_Participant\")",
       "Bash(wget -q -O- --timeout=5 \"https://jefflu.tail9f69ce.ts.net/ping.php\" --header=\"X-API-Key: mk_jfl_a8f3c9e2b7d4p6q5r1\")",
-      "Bash(/bin/ls /share/www/lucifer/)"
+      "Bash(/bin/ls /share/www/lucifer/)",
+      "Bash(mysql -u jefflu -pJefli_1127\\\\$ -h 127.0.0.1 InvStrat_db -e \"SHOW TABLES;\")",
+      "Bash(cat /home/jefflu/api/db_config.php 2>/dev/null | head -30)",
+      "Read(//home/jefflu/api/**)",
+      "Bash(mkdir -p /share/www/lucifer/css /share/www/lucifer/js)",
+      "Bash(chown -R jefflu:jefflu /share/www/lucifer/css /share/www/lucifer/js)",
+      "Bash(chown -R jefflu:jefflu /share/www/lucifer/gamedownloading/project/asses/img)",
+      "Bash(mariadb -u jefflu -p780503 -h 127.0.0.1 InvStrat_db --skip-ssl -e \"SHOW TABLES;\")",
+      "Bash(mariadb -u jefflu -p780503 -h 127.0.0.1 InvStrat_db --skip-ssl)",
+      "Bash(mariadb -u jefflu -p780503 -h 127.0.0.1 InvStrat_db --skip-ssl -e \"SHOW FULL COLUMNS FROM lucifer_tools;\")",
+      "Bash(mariadb -u jefflu -p780503 -h 127.0.0.1 InvStrat_db --skip-ssl --default-character-set=utf8mb4)",
+      "Bash(mkdir -p /home/jefflu/api/Lucifer_Data)",
+      "Bash(chown jefflu:jefflu /home/jefflu/api/Lucifer_Data)",
+      "Bash(mariadb -u jefflu -p780503 -h 127.0.0.1 InvStrat_db --skip-ssl -e \"DELETE FROM lucifer_unlock_codes WHERE status='pending'; SELECT COUNT\\(*\\) AS 解锁码总数 FROM lucifer_unlock_codes;\")",
+      "Bash(mariadb -u jefflu -p780503 -h 127.0.0.1 InvStrat_db --skip-ssl -e \"DELETE FROM lucifer_unlock_codes; SELECT COUNT\\(*\\) AS 解锁码总数 FROM lucifer_unlock_codes; SELECT name, download_count FROM lucifer_tools WHERE id=1;\")",
+      "Bash(mariadb -u jefflu -p780503 -h 127.0.0.1 InvStrat_db --skip-ssl -e \"UPDATE lucifer_tools SET download_count = 128 WHERE id = 1;\")",
+      "Bash(curl -s -H \"X-API-Key: mk_jfl_a8f3c9e2b7d4p6q5r1\" \"http://localhost:8000/Lucifer_Data/get_tool.php?action=list\")",
+      "Bash(curl -s -H \"X-API-Key: mk_jfl_a8f3c9e2b7d4p6q5r1\" \"http://localhost:8000/Lucifer_Data/get_tool.php?action=detail&name=PDF%20%E5%90%88%E5%B9%B6%E5%8A%A9%E6%89%8B\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('✅ 成功, 名称:', d['tool']['name'], ', 截图:', len\\(d['tool']['screenshots']\\), '张'\\)\")",
+      "Bash(curl -s -X POST -H \"X-API-Key: mk_jfl_a8f3c9e2b7d4p6q5r1\" -H \"Content-Type: application/json\" -d '{\"tool_id\":1}' \"http://localhost:8000/Lucifer_Data/get_tool.php?action=request_code\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('✅ 解锁码:', d['unlock_code'], '有效期:', d['expires_at']\\)\")",
+      "Bash(mariadb -u jefflu -p780503 -h 127.0.0.1 InvStrat_db --skip-ssl -e \"DELETE FROM lucifer_unlock_codes;\")",
+      "Bash(mariadb -u jefflu -p780503 -h 127.0.0.1 InvStrat_db --skip-ssl -e \"SELECT COUNT\\(*\\) AS 工具总数 FROM lucifer_tools; SELECT name, icon, LEFT\\(version,10\\) AS ver, rating, download_count FROM lucifer_tools ORDER BY id;\")",
+      "Bash(chown jefflu:jefflu /share/www/lucifer/gamedownloading/project/index.html /share/www/lucifer/gamedownloading/project/detail.html /share/www/lucifer/gamedownloading/project/js/script.js)",
+      "Bash(chmod 644 /share/www/lucifer/gamedownloading/project/index.html /share/www/lucifer/gamedownloading/project/detail.html /share/www/lucifer/gamedownloading/project/css/style.css /share/www/lucifer/gamedownloading/project/js/script.js)"
     ],
     "additionalDirectories": [
       "/home/jefflu/api",
-      "/tmp"
+      "/tmp",
+      "/share/www/lucifer"
     ]
   }
 }

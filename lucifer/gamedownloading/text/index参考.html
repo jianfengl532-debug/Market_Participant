@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的小工具库</title>
+    <!-- 样式 -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container">
+
+    <!-- 导航 -->
+    <nav class="navbar">
+        <div class="logo">⚙️我的工具库</div>
+        <div class="nav-links">
+            <a href="#">首页</a>
+            <a href="#">全部工具</a>
+            <a href="#">关于</a>
+        </div>
+    </nav>
+
+    <!-- 头部统计 -->
+    <div class="hero">
+        <div class="hero-stats">
+            <span><strong>12</strong>个小工具</span>
+            <span><strong>6</strong>个分类</span>
+            <span><strong>1,280</strong> 次下载</span>
+        </div>
+        <div class="hero-tagline">
+            <em>✨ 专为行业场景打造</em> · 所有工具完全免费 · 持续更新
+        </div>
+    </div>
+
+    <!-- ========== 双栏布局 ========== -->
+    <div class="content-wrapper">
+        <!-- 左侧：工具卡片区域 -->
+        <div class="main-content">
+            <div class="tool-grid" id="toolGrid">
+                <!-- 由 JavaScript 动态渲染 -->
+            </div>
+        </div>
+
+        <!-- 右侧：固定侧边分类栏 -->
+        <aside class="sidebar">
+            <h3 class="sidebar-title">分类</h3>
+            <ul class="category-list">
+                <li class="category-item">
+                    <img src="asses/icon/瞄准 (1).png" alt="动作" class="category-icon">
+                    <span>动作</span>
+                </li>
+                <li class="category-item">
+                    <img src="asses/icon/剑.png" alt="RPG" class="category-icon">
+                    <span>RPG</span>
+                </li>
+                <li class="category-item">
+                    <img src="asses/icon/城堡1.png" alt="策略" class="category-icon">
+                    <span>策略</span>
+                </li>
+            </ul>
+        </aside>
+    </div>
+
+    <!-- 页脚 -->
+    <div class="footer">
+        本页面仅用于演示样式 · 所有工具均为示例
+    </div>
+</div>
+
+<!-- 下载弹窗 -->
+<div class="modal-overlay" id="downloadModal">
+    <div class="modal-box">
+        <button class="modal-close" id="modalCloseBtn">✕</button>
+        <div class="modal-title" id="modalToolName">工具名称</div>
+        <div class="modal-sub">点击下方链接即可前往网盘下载</div>
+        <div class="modal-link-box">
+            <a href="#" id="modalLink" target="_blank">网盘链接</a>
+        </div>
+        <div class="modal-extract" id="modalExtract">提取码：xxxx</div>
+        <div class="modal-qr">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23ffffff'/%3E%3Crect x='30' y='30' width='60' height='60' fill='%23000000'/%3E%3Crect x='110' y='30' width='60' height='60' fill='%23000000'/%3E%3Crect x='30' y='110' width='60' height='60' fill='%23000000'/%3E%3Crect x='110' y='110' width='60' height='60' fill='%23000000'/%3E%3C/svg%3E" alt="收款二维码示例">
+            <div class="modal-qr-text">
+                <strong>☕ 支持作者</strong><br>
+                如果工具对你有帮助，欢迎请我喝杯咖啡
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 固定侧边收款按钮 -->
+<div class="donate-side" id="donateSideBtn">
+    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23ffffff'/%3E%3Crect x='30' y='30' width='60' height='60' fill='%23000000'/%3E%3Crect x='110' y='30' width='60' height='60' fill='%23000000'/%3E%3Crect x='30' y='110' width='60' height='60' fill='%23000000'/%3E%3Crect x='110' y='110' width='60' height='60' fill='%23000000'/%3E%3C/svg%3E" alt="赞赏">
+    <span>支持作者</span>
+</div>
+
+<!-- 脚本 -->
+<script src="js/script.js"></script>
+</body>
+</html>

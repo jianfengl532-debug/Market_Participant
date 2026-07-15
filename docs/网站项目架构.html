@@ -465,6 +465,181 @@
         </tbody>
     </table>
 
+<hr>  <!-- 水平分割线: 分隔内容段落 -->
+
+<!-- 8. Claude Code Skills -->
+<h2>8. Claude Code Skills 技能索引</h2>
+<p>以下为 <code>/home/jefflu/.claude/skills/</code> 中所有可用技能的调用路径、触发方式及功能说明。</p>
+
+<h3>8.1 调用方式速查</h3>
+<table>
+	<thead><tr><th>调用方式</th><th>说明</th><th>示例</th></tr></thead>
+	<tbody>
+		<tr><td><strong>自动触发</strong></td><td>Claude 根据对话内容自动匹配并调用技能</td><td>说「帮我写一个 PPT」→ 自动触发 pptx 技能</td></tr>
+		<tr><td><code>/&lt;skill-name&gt;</code></td><td>直接通过斜杠命令调用</td><td><code>/Humanizer-zh 请润色这段文字</code></td></tr>
+		<tr><td><code>parent:child</code></td><td>父技能下的子技能，用冒号分隔</td><td><code>/superpowers:test-driven-development</code></td></tr>
+		<tr><td><code>plugin:sub</code></td><td>插件命名空间下的子技能</td><td><code>planning-with-files:plan-zh</code></td></tr>
+	</tbody>
+</table>
+
+<h3>8.2 技能详表</h3>
+<table>
+	<thead><tr><th>分类</th><th>技能名称</th><th>磁盘路径</th><th>功能说明</th><th>触发关键词</th></tr></thead>
+	<tbody>
+		<tr><td rowspan="5">📄 文档/办公</td>
+			<td><strong>docx</strong></td>
+			<td><code>skills/docx/SKILL.md</code></td>
+			<td>创建/编辑 Word(.docx) 文档，支持表格、图片、目录、页眉页脚、修订跟踪</td>
+			<td>Word文档、.docx、报告、备忘录</td></tr>
+		<tr>
+			<td><strong>pptx</strong></td>
+			<td><code>skills/pptx/SKILL.md</code></td>
+			<td>创建/编辑/分析 PPT，支持模板编辑或从零创建，含视觉 QA 流程</td>
+			<td>幻灯片、PPT、deck、presentation</td></tr>
+		<tr>
+			<td><strong>xlsx</strong></td>
+			<td><code>skills/xlsx/SKILL.md</code></td>
+			<td>创建/编辑 Excel，支持公式、格式化、图表、财务模型，零公式错误交付</td>
+			<td>.xlsx、CSV、电子表格、财务模型</td></tr>
+		<tr>
+			<td><strong>pdf</strong></td>
+			<td><code>skills/pdf/SKILL.md</code></td>
+			<td>PDF 全套处理：合并/拆分/旋转/提取/OCR/水印/加解密/填写表单</td>
+			<td>.pdf、PDF文件、扫描件</td></tr>
+		<tr>
+			<td><strong>slack-gif-creator</strong></td>
+			<td><code>skills/slack-gif-creator/SKILL.md</code></td>
+			<td>创建 Slack 优化动画 GIF（128×128 表情/480×480 消息）</td>
+			<td>Slack GIF、动画表情、make a GIF</td></tr>
+
+		<tr><td rowspan="5">🎨 设计/艺术</td>
+			<td><strong>frontend-design</strong></td>
+			<td><code>skills/frontend-design/SKILL.md</code></td>
+			<td>创建高品质前端界面，避免 AI 模板化审美，强调独创性排版/色彩/动效</td>
+			<td>网页、React组件、前端、界面设计</td></tr>
+		<tr>
+			<td><strong>canvas-design</strong></td>
+			<td><code>skills/canvas-design/SKILL.md</code></td>
+			<td>创建海报/艺术画/视觉设计，先写设计哲学再输出 PDF/PNG</td>
+			<td>海报、设计、艺术画、视觉设计</td></tr>
+		<tr>
+			<td><strong>algorithmic-art</strong></td>
+			<td><code>skills/algorithmic-art/SKILL.md</code></td>
+			<td>p5.js 生成式算法艺术（流场、粒子系统），先写算法哲学再实现</td>
+			<td>算法艺术、生成艺术、p5.js、粒子系统</td></tr>
+		<tr>
+			<td><strong>theme-factory</strong></td>
+			<td><code>skills/theme-factory/SKILL.md</code></td>
+			<td>10 套预设主题（Ocean Depths/Sunset Boulevard 等）或自定义主题</td>
+			<td>主题、配色、美化幻灯片</td></tr>
+		<tr>
+			<td><strong>brand-guidelines</strong></td>
+			<td><code>skills/brand-guidelines/SKILL.md</code></td>
+			<td>应用 Anthropic 品牌色彩（#d97757 橙 / #6a9bcc 蓝）和 Poppins/Lora 字体</td>
+			<td>品牌配色、Anthropic 风格、公司视觉规范</td></tr>
+
+		<tr><td rowspan="6">🛠️ 开发工具</td>
+			<td><strong>claude-api</strong></td>
+			<td><code>skills/claude-api/SKILL.md</code></td>
+			<td>构建 Claude API / Anthropic SDK 应用，含提示缓存、思考模式、Managed Agents</td>
+			<td>Claude API、Anthropic SDK</td></tr>
+		<tr>
+			<td><strong>mcp-builder</strong></td>
+			<td><code>skills/mcp-builder/SKILL.md</code></td>
+			<td>创建 MCP 服务器让 LLM 调用外部服务，推荐 TypeScript + Streamable HTTP</td>
+			<td>MCP 服务器、Model Context Protocol</td></tr>
+		<tr>
+			<td><strong>web-artifacts-builder</strong></td>
+			<td><code>skills/web-artifacts-builder/SKILL.md</code></td>
+			<td>React + TypeScript + Tailwind + shadcn/ui 构建复杂 HTML 工件并打包为单文件</td>
+			<td>HTML 工件、React 组件、shadcn/ui</td></tr>
+		<tr>
+			<td><strong>skill-creator</strong></td>
+			<td><code>skills/skill-creator/SKILL.md</code></td>
+			<td>创建/修改/优化 Claude 技能，含评估测试、基准分析、描述优化</td>
+			<td>创建技能、修改 skill、评估性能</td></tr>
+		<tr>
+			<td><strong>webapp-testing</strong></td>
+			<td><code>skills/webapp-testing/SKILL.md</code></td>
+			<td>Playwright 测试 Web 应用，支持截图/DOM检查/日志/多服务管理</td>
+			<td>测试网页、Playwright、浏览器自动化</td></tr>
+		<tr>
+			<td><strong>dataviz</strong></td>
+			<td>内置技能</td>
+			<td>创建图表/可视化/仪表板/统计卡片，品牌中性预设调色板</td>
+			<td>图表、数据可视化、仪表板</td></tr>
+
+		<tr><td rowspan="3">✍️ 写作/沟通</td>
+			<td><strong>internal-comms</strong></td>
+			<td><code>skills/internal-comms/SKILL.md</code></td>
+			<td>编写内部通讯（3P更新、简讯、FAQ、状态报告、领导层更新、事故报告）</td>
+			<td>内部通讯、周报、3P更新、公司简讯</td></tr>
+		<tr>
+			<td><strong>doc-coauthoring</strong></td>
+			<td><code>skills/doc-coauthoring/SKILL.md</code></td>
+			<td>三阶段协作撰写文档：收集上下文 → 逐节迭代 → 新 Claude 读者测试</td>
+			<td>写文档、起草提案、PRD、RFC</td></tr>
+		<tr>
+			<td><strong>Humanizer-zh</strong></td>
+			<td><code>skills/Humanizer-zh/SKILL.md</code></td>
+			<td>去除中文 AI 痕迹（24种模式），使文本自然如人写</td>
+			<td>去AI痕迹、人性化、润色文本</td></tr>
+
+		<tr><td rowspan="2">🧩 综合系统</td>
+			<td><strong>superpowers</strong></td>
+			<td><code>skills/superpowers/CLAUDE.md</code></td>
+			<td>15 个子技能：头脑风暴、代码审查、TDD、计划编写、Git 工作树、系统调试等</td>
+			<td><code>/superpowers:brainstorming</code> 等子命令</td></tr>
+		<tr>
+			<td><strong>planning-with-files</strong></td>
+			<td><code>skills/planning-with-files/</code></td>
+			<td>Manus 模式文件规划系统，多语言（中/英/德/西/阿）多 IDE（17+平台）支持</td>
+			<td><code>planning-with-files:plan-zh</code> 等子命令</td></tr>
+	</tbody>
+</table>
+
+<h3>8.3 superpowers 子技能一览</h3>
+<table>
+	<thead><tr><th>子技能</th><th>功能说明</th></tr></thead>
+	<tbody>
+		<tr><td><code>brainstorming</code></td><td>启动头脑风暴流程</td></tr>
+		<tr><td><code>dispatching-parallel-agents</code></td><td>并行分发子代理任务</td></tr>
+		<tr><td><code>executing-plans</code></td><td>执行已编写的计划</td></tr>
+		<tr><td><code>finishing-a-development-branch</code></td><td>完成开发分支收尾工作</td></tr>
+		<tr><td><code>receiving-code-review</code></td><td>接收代码审查</td></tr>
+		<tr><td><code>requesting-code-review</code></td><td>请求代码审查</td></tr>
+		<tr><td><code>subagent-driven-development</code></td><td>子代理驱动的开发模式</td></tr>
+		<tr><td><code>systematic-debugging</code></td><td>系统调试流程</td></tr>
+		<tr><td><code>test-driven-development</code></td><td>测试驱动开发</td></tr>
+		<tr><td><code>using-git-worktrees</code></td><td>使用 Git Worktree 隔离开发</td></tr>
+		<tr><td><code>using-superpowers</code></td><td>Superpowers 入门引导</td></tr>
+		<tr><td><code>verification-before-completion</code></td><td>完成前验证检查</td></tr>
+		<tr><td><code>writing-plans</code></td><td>编写开发计划</td></tr>
+		<tr><td><code>writing-skills</code></td><td>编写技能文件</td></tr>
+	</tbody>
+</table>
+
+<h3>8.4 planning-with-files 子技能一览</h3>
+<table>
+	<thead><tr><th>子技能</th><th>语言</th><th>说明</th></tr></thead>
+	<tbody>
+		<tr><td><code>planning-with-files:plan</code></td><td>English</td><td>英文规划流程</td></tr>
+		<tr><td><code>planning-with-files:plan-zh</code></td><td>简体中文</td><td>中文规划流程</td></tr>
+		<tr><td><code>planning-with-files:plan-de</code></td><td>Deutsch</td><td>德语规划流程</td></tr>
+		<tr><td><code>planning-with-files:plan-es</code></td><td>Español</td><td>西班牙语规划流程</td></tr>
+		<tr><td><code>planning-with-files:plan-ar</code></td><td>العربية</td><td>阿拉伯语规划流程</td></tr>
+		<tr><td><code>planning-with-files:status</code></td><td>—</td><td>查看当前规划状态</td></tr>
+		<tr><td><code>planning-with-files:planning-with-files</code></td><td>English</td><td>主入口（英文）</td></tr>
+		<tr><td><code>planning-with-files:planning-with-files-zh</code></td><td>简体中文</td><td>主入口（中文）</td></tr>
+		<tr><td><code>planning-with-files:planning-with-files-zht</code></td><td>繁體中文</td><td>主入口（繁体中文）</td></tr>
+		<tr><td><code>planning-with-files:planning-with-files-de</code></td><td>Deutsch</td><td>主入口（德语）</td></tr>
+		<tr><td><code>planning-with-files:planning-with-files-es</code></td><td>Español</td><td>主入口（西班牙语）</td></tr>
+		<tr><td><code>planning-with-files:planning-with-files-ar</code></td><td>العربية</td><td>主入口（阿拉伯语）</td></tr>
+	</tbody>
+</table>
+
+<p class="subhead" style="margin-top:16px;">Skills 根路径：<code>/home/jefflu/.claude/skills/</code> · 共计 18 个核心技能 + 30+ 个子技能 · 文档生成于 2026-07-13</p>
+
 </div>  <!-- 容器结束 -->
 </body>  <!-- 文档主体结束 -->
 </html>  <!-- HTML根标签结束 -->
