@@ -69,10 +69,26 @@
             <div class="modal-title">请先支付</div>
             <div class="modal-sub">扫描下方二维码付款后，点击下方按钮获取下载链接</div>
             <div class="pay-qr" style="text-align:center; margin: 20px 0;">
-                <!-- 替换为你自己的收款二维码图片 -->
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23ffffff'/%3E%3Crect x='30' y='30' width='60' height='60' fill='%23000000'/%3E%3Crect x='110' y='30' width='60' height='60' fill='%23000000'/%3E%3Crect x='30' y='110' width='60' height='60' fill='%23000000'/%3E%3Crect x='110' y='110' width='60' height='60' fill='%23000000'/%3E%3C/svg%3E" alt="收款二维码" style="width:180px; height:180px; background:#fff; border-radius:12px; padding:10px;">
+                <img src="asses/img/75409c7cf4297e30628fdbd74bacee1e.jpg" alt="收款二维码" style="width:180px; height:180px; background:#fff; border-radius:12px; padding:10px; object-fit:contain;">
             </div>
-            <button id="mockPayBtn" style="background: #2e7d32; border: none; color: #fff; padding: 10px 30px; border-radius: 30px; font-size: 16px; font-weight: 600; cursor: pointer; display: block; margin: 0 auto 10px;">✅ 我已支付，获取下载链接</button>
+            <button id="mockPayBtn" style="background: #2e7d32; border: none; color: #fff; padding: 10px 30px; border-radius: 30px; font-size: 16px; font-weight: 600; cursor: pointer; display: block; margin: 0 auto 10px;">✅ 我已支付，获取解锁码</button>
+        </div>
+
+        <!-- 解锁码展示区（支付成功后显示） -->
+        <div id="unlockSection" style="display:none;">
+            <div class="modal-title">🎉 支付成功！</div>
+            <div class="modal-sub">您的解锁码已生成，输入后即可获取下载链接</div>
+            <div style="text-align:center; margin: 15px 0; font-size:14px; color:#9aa6bf;">
+                解锁码已发送至下方，请复制后粘贴到输入框
+            </div>
+            <div style="text-align:center; margin: 10px 0;">
+                <span id="unlockCodeDisplay" style="font-size:24px; font-weight:700; color:#5b7cfa; letter-spacing:3px; background:#0f151e; padding:12px 24px; border-radius:10px; border:1px solid #2a3342; display:inline-block; user-select:all;">--------</span>
+            </div>
+            <div style="display:flex; gap:10px; margin: 15px 0;">
+                <input type="text" id="unlockInput" placeholder="粘贴解锁码" style="flex:1; padding:10px; border-radius:8px; border:1px solid #334155; background:#0f151e; color:#d0d7e6; font-size:16px; text-align:center; letter-spacing:2px; text-transform:uppercase;">
+                <button id="verifyUnlockBtn" style="background: #2d3b4f; border: none; color: #dae2f0; padding: 10px 24px; border-radius:30px; font-size:16px; font-weight:500; cursor:pointer; white-space:nowrap;">验证</button>
+            </div>
+            <div id="unlockError" style="color:#e74c3c; text-align:center; font-size:14px; min-height:24px;"></div>
         </div>
 
         <!-- 下载区域（初始隐藏） -->
@@ -90,7 +106,7 @@
 
 <!-- 固定侧边收款按钮 -->
 <div class="donate-side" id="donateSideBtn">
-    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23ffffff'/%3E%3Crect x='30' y='30' width='60' height='60' fill='%23000000'/%3E%3Crect x='110' y='30' width='60' height='60' fill='%23000000'/%3E%3Crect x='30' y='110' width='60' height='60' fill='%23000000'/%3E%3Crect x='110' y='110' width='60' height='60' fill='%23000000'/%3E%3C/svg%3E" alt="赞赏">
+    <img src="asses/img/75409c7cf4297e30628fdbd74bacee1e.jpg" alt="赞赏" style="object-fit:cover;">
     <span>支持作者</span>
 </div>
 
