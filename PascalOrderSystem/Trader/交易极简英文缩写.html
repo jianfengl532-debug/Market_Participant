@@ -6,12 +6,111 @@
     <title>交易极简英文缩写</title>
     <link rel="stylesheet" href="../../css/style.css">
     <script src="../../js/main.js"></script>
+    <style>
+        /* 搜索栏样式 */
+        #search-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            margin: 12px 0 8px 0;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        #search-bar .search-icon { font-size: 18px; }
+        #search-input {
+            flex: 1;
+            min-width: 180px;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        #search-input:focus {
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 2px rgba(74,144,217,0.15);
+        }
+        #search-bar button {
+            padding: 7px 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            background: #fff;
+            transition: background 0.2s;
+        }
+        #search-bar button:hover { background: #e9ecef; }
+        #search-btn {
+            background: #4a90d9 !important;
+            color: #fff;
+            border-color: #4a90d9 !important;
+            font-weight: 600;
+        }
+        #search-btn:hover { background: #357abd !important; }
+        .search-nav { padding: 7px 10px !important; font-size: 12px !important; }
+        #search-info {
+            font-size: 13px;
+            color: #666;
+            min-width: 80px;
+        }
+        #search-clear {
+            padding: 7px 10px !important;
+            color: #999;
+            border: none !important;
+            background: transparent !important;
+            font-size: 16px !important;
+        }
+        #search-clear:hover { color: #333 !important; background: transparent !important; }
+
+        /* 搜索结果高亮 */
+        .search-highlight {
+            background-color: #fff3cd !important;
+            outline: 2px solid #ffc107;
+            outline-offset: 2px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .search-match-row {
+            background-color: #fef9e7 !important;
+        }
+        /* 暗色适配 */
+        @media (prefers-color-scheme: dark) {
+            #search-bar { background: #2d2d2d; border-color: #444; }
+            #search-input { background: #1e1e1e; color: #e0e0e0; border-color: #555; }
+            #search-input:focus { border-color: #6a9bcc; box-shadow: 0 0 0 2px rgba(106,155,204,0.2); }
+            #search-bar button { background: #333; color: #e0e0e0; border-color: #555; }
+            #search-bar button:hover { background: #444; }
+            #search-btn { background: #357abd !important; border-color: #357abd !important; }
+            #search-btn:hover { background: #2868a8 !important; }
+            #search-info { color: #aaa; }
+            #search-clear { color: #777; }
+            #search-clear:hover { color: #ccc !important; }
+            .search-highlight { background-color: #3d3520 !important; outline-color: #b8960f; }
+            .search-match-row { background-color: #2a2515 !important; }
+        }
+    </style>
 </head>
 <body>
 <div class="container">
 
     <h1>📝 交易笔记极简英文缩写/短句</h1>
     <div class="subhead">分大类，适配你的复盘伪代码风格，全是短线/金融圈通用简写</div>
+
+    <!-- 🔍 搜索栏 -->
+    <div id="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="输入英文缩写或关键词（模糊搜索，自动跳转）" autocomplete="off">
+        <button id="search-btn">确定</button>
+        <button id="search-prev" class="search-nav" title="上一个匹配">◀</button>
+        <button id="search-next" class="search-nav" title="下一个匹配">▶</button>
+        <span id="search-info"></span>
+        <button id="search-clear" title="清除搜索">✕</button>
+    </div>
 
     <hr>
 
@@ -264,5 +363,197 @@
     <p class="subhead" style="margin-top:16px;">总计：11 张缩写表 + 3 组速记句式 · 适配复盘伪代码风格</p>
 
 </div>
+
+<!-- 🔍 搜索功能 JavaScript -->
+<script>
+(function() {
+    'use strict';
+
+    // ── 1. 构建搜索索引 ──────────────────────────────────
+    const items = [];
+    const seen = new Set();
+
+    /** 模糊匹配：query 的每个字符按顺序出现在 text 中即可（不要求连续） */
+    function fuzzyMatch(query, text) {
+        if (!query || !text) return false;
+        query = query.toLowerCase().trim();
+        text = text.toLowerCase();
+        let qi = 0;
+        for (let ti = 0; ti < text.length && qi < query.length; ti++) {
+            if (text[ti] === query[qi]) qi++;
+        }
+        return qi === query.length;
+    }
+
+    /** 提取表格行的英文搜索文本（第一、二列） */
+    function indexTable(tr) {
+        const cells = tr.querySelectorAll('td');
+        if (cells.length < 2) return;
+        const eng1 = cells[0]?.textContent.trim() || '';
+        const eng2 = cells[1]?.textContent.trim() || '';
+        const allText = Array.from(cells).map(c => c.textContent.trim()).join(' ');
+        const key = eng1 + '|' + eng2;
+        if (seen.has(key)) return;  // 去重
+        seen.add(key);
+        items.push({
+            el: tr,
+            eng1: eng1,
+            eng2: eng2,
+            searchText: eng1 + ' ' + eng2 + ' ' + allText,
+            parent: tr.closest('table')?.previousElementSibling?.textContent || ''
+        });
+    }
+
+    /** 提取列表项的搜索文本 */
+    function indexListItem(li) {
+        const text = li.textContent.trim();
+        if (!text || seen.has(text)) return;
+        seen.add(text);
+        items.push({
+            el: li,
+            eng1: text,
+            eng2: '',
+            searchText: text,
+            parent: li.closest('ol')?.previousElementSibling?.textContent || ''
+        });
+    }
+
+    // 索引所有表格行
+    document.querySelectorAll('table tbody tr').forEach(indexTable);
+
+    // 索引所有有序列表项
+    document.querySelectorAll('ol li').forEach(indexListItem);
+
+    // ── 2. DOM 引用 ─────────────────────────────────────
+    const input     = document.getElementById('search-input');
+    const btn       = document.getElementById('search-btn');
+    const prevBtn   = document.getElementById('search-prev');
+    const nextBtn   = document.getElementById('search-next');
+    const info      = document.getElementById('search-info');
+    const clearBtn  = document.getElementById('search-clear');
+
+    let matchedItems = [];
+    let currentIndex = -1;
+    let currentHighlight = null;
+
+    // ── 3. 高亮 / 滚动 ──────────────────────────────────
+    function clearHighlight() {
+        document.querySelectorAll('.search-highlight, .search-match-row')
+            .forEach(el => el.classList.remove('search-highlight', 'search-match-row'));
+        currentHighlight = null;
+    }
+
+    function jumpTo(index) {
+        clearHighlight();
+        if (!matchedItems.length || index < 0 || index >= matchedItems.length) {
+            info.textContent = matchedItems.length ? '' : '未找到匹配';
+            return;
+        }
+        currentIndex = index;
+        const item = matchedItems[index];
+        const target = item.el;
+
+        // 高亮目标行
+        target.classList.add('search-highlight');
+        // 同一表格其他匹配行也标淡色
+        const table = target.closest('table');
+        if (table) {
+            table.querySelectorAll('tbody tr').forEach(tr => {
+                if (matchedItems.some(m => m.el === tr)) {
+                    tr.classList.add('search-match-row');
+                }
+            });
+        }
+
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        info.textContent = '共 ' + matchedItems.length + ' 个匹配，当前第 ' + (index + 1) + ' 个';
+    }
+
+    // ── 4. 搜索执行 ─────────────────────────────────────
+    function doSearch(goToFirst) {
+        const query = input.value.trim();
+        clearHighlight();
+
+        if (!query) {
+            matchedItems = [];
+            currentIndex = -1;
+            info.textContent = '';
+            return;
+        }
+
+        matchedItems = items.filter(item => fuzzyMatch(query, item.searchText));
+
+        if (matchedItems.length === 0) {
+            info.textContent = '❌ 未找到匹配 "' + query + '"';
+            currentIndex = -1;
+            return;
+        }
+
+        if (goToFirst !== false) {
+            jumpTo(0);
+        }
+    }
+
+    // ── 5. 事件绑定 ─────────────────────────────────────
+    // 确定按钮
+    btn.addEventListener('click', function() { doSearch(true); });
+
+    // 输入实时搜索（300ms 防抖）
+    let debounceTimer;
+    input.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function() { doSearch(true); }, 300);
+    });
+
+    // Enter → 跳转到下一个匹配 / 首次搜索
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (matchedItems.length > 0) {
+                jumpTo((currentIndex + 1) % matchedItems.length);
+            } else {
+                doSearch(true);
+            }
+        }
+    });
+
+    // 上一个 / 下一个
+    prevBtn.addEventListener('click', function() {
+        if (matchedItems.length === 0) { doSearch(true); return; }
+        jumpTo((currentIndex - 1 + matchedItems.length) % matchedItems.length);
+    });
+    nextBtn.addEventListener('click', function() {
+        if (matchedItems.length === 0) { doSearch(true); return; }
+        jumpTo((currentIndex + 1) % matchedItems.length);
+    });
+
+    // 清除
+    clearBtn.addEventListener('click', function() {
+        input.value = '';
+        matchedItems = [];
+        currentIndex = -1;
+        clearHighlight();
+        info.textContent = '';
+        input.focus();
+    });
+
+    // 快捷键 Ctrl+F / Cmd+F 聚焦搜索框
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+            // 如果按的是 Ctrl+F 且焦点不在搜索框，聚焦到我们的搜索框
+            if (document.activeElement !== input) {
+                e.preventDefault();
+                input.focus();
+                input.select();
+            }
+        }
+    });
+
+    // 页面加载完成后，把之前可能的高亮清理掉
+    clearHighlight();
+
+    console.log('[搜索] 已索引 ' + items.length + ' 个条目，搜索功能已就绪');
+})();
+</script>
 </body>
 </html>
