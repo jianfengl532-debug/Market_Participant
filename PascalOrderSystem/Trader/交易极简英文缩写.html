@@ -104,7 +104,7 @@
     <!-- 🔍 搜索栏 -->
     <div id="search-bar">
         <span class="search-icon">🔍</span>
-        <input type="text" id="search-input" placeholder="输入英文缩写或关键词（模糊搜索，自动跳转）" autocomplete="off">
+        <input type="text" id="search-input" placeholder="输入英文缩写或关键词（精确匹配，自动跳转）" autocomplete="off">
         <button id="search-btn">确定</button>
         <button id="search-prev" class="search-nav" title="上一个匹配">◀</button>
         <button id="search-next" class="search-nav" title="下一个匹配">▶</button>
@@ -373,16 +373,12 @@
     const items = [];
     const seen = new Set();
 
-    /** 模糊匹配：query 的每个字符按顺序出现在 text 中即可（不要求连续） */
-    function fuzzyMatch(query, text) {
+    /** 精确子串匹配：query 必须作为连续子串出现在 text 中（大小写不敏感） */
+    function preciseMatch(query, text) {
         if (!query || !text) return false;
         query = query.toLowerCase().trim();
         text = text.toLowerCase();
-        let qi = 0;
-        for (let ti = 0; ti < text.length && qi < query.length; ti++) {
-            if (text[ti] === query[qi]) qi++;
-        }
-        return qi === query.length;
+        return text.includes(query);
     }
 
     /** 提取表格行的英文搜索文本（第一、二列） */
@@ -481,7 +477,7 @@
             return;
         }
 
-        matchedItems = items.filter(item => fuzzyMatch(query, item.searchText));
+        matchedItems = items.filter(item => preciseMatch(query, item.searchText));
 
         if (matchedItems.length === 0) {
             info.textContent = '❌ 未找到匹配 "' + query + '"';
