@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>交易极简英文缩写</title>
+    <title>交易极简英文缩写【近义词分组完整版】</title>
     <link rel="stylesheet" href="../../css/style.css">
     <script src="../../js/main.js"></script>
     <style>
@@ -93,13 +93,55 @@
             .search-highlight { background-color: #3d3520 !important; outline-color: #b8960f; }
             .search-match-row { background-color: #2a2515 !important; }
         }
+
+        /* 回到顶部按钮 */
+        #back-to-top {
+            position: fixed;
+            bottom: 40px;
+            right: 30px;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: #4a90d9;
+            color: #fff;
+            border: none;
+            font-size: 22px;
+            line-height: 46px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s, transform 0.2s;
+            z-index: 999;
+        }
+        #back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        #back-to-top:hover {
+            transform: translateY(-3px);
+            background: #357abd;
+        }
+        @media (prefers-color-scheme: dark) {
+            #back-to-top { background: #357abd; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+            #back-to-top:hover { background: #4a90d9; }
+        }
+        table{width:100%;border-collapse:collapse;margin:10px 0 24px 0;}
+        th,td{border:1px solid #ddd;padding:9px 12px;text-align:left;word-break:break-word;overflow-wrap:break-word;}
+        th{background:#f1f3f5;}
+        @media (prefers-color-scheme: dark) {
+            th{background:#383838;}
+            th,td{border-color:#444;}
+        }
+        .diff-tag{color:#c0392b;font-weight:500}
     </style>
 </head>
 <body>
 <div class="container">
 
-    <h1>📝 交易笔记极简英文缩写/短句</h1>
-    <div class="subhead">分大类，适配你的复盘伪代码风格，全是短线/金融圈通用简写</div>
+    <h1>📝 交易笔记极简英文缩写【近义词分组完整版】</h1>
+    <div class="subhead">股票/期货/外汇/加密通用，近义词归类辨析，适配复盘伪代码风格</div>
 
     <!-- 🔍 搜索栏 -->
     <div id="search-bar">
@@ -114,257 +156,365 @@
 
     <hr>
 
-    <!-- ════════════════════════════════════════════════ -->
-    <!-- 一、行情趋势类 -->
-    <!-- ════════════════════════════════════════════════ -->
-    <h2>一、行情趋势类（dip/dump/rally专用）</h2>
+    <!-- 一、趋势大类【近义词整合】 -->
+    <h2>一、趋势状态类（UPT / DNT / RNG 分组）</h2>
     <table>
         <thead>
-            <tr><th>完整英文</th><th>极简简写/速记句</th><th>中文含义</th></tr>
+            <tr><th>缩写</th><th>完整英文</th><th>中文释义</th><th>边界区分</th></tr>
         </thead>
         <tbody>
-            <tr><td>Volatile</td><td>VOL</td><td>波动剧烈</td></tr>
-            <tr><td>Trend up</td><td>TU</td><td>趋势上行</td></tr>
-            <tr><td>Trend down</td><td>TD</td><td>趋势下行</td></tr>
-            <tr><td>Spike / Pump</td><td>SP / PMP</td><td>暴力拉盘、急拉</td></tr>
-            <tr><td>Sideways / Range bound</td><td>RNG / SID</td><td>横盘震荡</td></tr>
-            <tr><td>Rally / Rebound</td><td>RLY / RB</td><td>反弹拉升</td></tr>
-            <tr><td>Divergent market</td><td>DIV</td><td>行情分化、各走各的</td></tr>
-            <tr><td>Dump / Panic sell-off</td><td>DUMP / PD</td><td>恐慌砸盘暴跌</td></tr>
-            <tr><td>Dip (minor pullback)</td><td>DIP</td><td>小幅回调</td></tr>
-            <tr><td>Crash / Collapse</td><td>CR</td><td>崩盘大跌</td></tr>
+            <tr><td>UPT</td><td>Uptrend</td><td>上升趋势</td><td>主趋势，价格持续抬高高低点</td></tr>
+            <tr><td>DNT</td><td>Downtrend</td><td>下跌趋势</td><td>主趋势，价格持续降低高低点</td></tr>
+            <tr><td>SID / RNG</td><td>Sideways / Range</td><td>横盘 / 区间震荡</td><td>无明确单边趋势</td></tr>
+            <tr><td>FLAT</td><td>Flat Market</td><td>长期窄幅横盘</td><td class="diff-tag">数月级别静态震荡，区别于短期CON</td></tr>
+            <tr><td>CON</td><td>Consolidation</td><td>短期整理盘整</td><td class="diff-tag">趋势中继，几小时~数日缩量休整</td></tr>
+            <tr><td>DIV / DIS</td><td>Divergence</td><td>分化 / 指标背离</td><td>品种分化/价格与指标走势背离</td></tr>
+            <tr><td>CONV</td><td>Convergence</td><td>走势收敛同步</td><td>多品种/指标趋向一致运行</td></tr>
+            <tr><td>VOL</td><td>Volatile</td><td>高波动行情</td><td>宽幅剧烈震荡，多空博弈激烈</td></tr>
         </tbody>
     </table>
-
-    <!-- ════════════════════════════════════════════════ -->
-    <!-- 二、资金与操作行为缩写 -->
-    <!-- ════════════════════════════════════════════════ -->
-    <h2>二、资金与操作行为缩写</h2>
-    <table>
-        <thead>
-            <tr><th>完整英文</th><th>简写</th><th>释义</th></tr>
-        </thead>
-        <tbody>
-            <tr><td>Take profit</td><td>TP</td><td>止盈</td></tr>
-            <tr><td>Stop loss</td><td>SL</td><td>止损</td></tr>
-            <tr><td>Scoop cheap chips</td><td>SCP</td><td>低位捡筹码</td></tr>
-            <tr><td>Sell the rally</td><td>STR</td><td>反弹高点止盈做空</td></tr>
-            <tr><td>Position sizing</td><td>PS</td><td>仓位管理</td></tr>
-            <tr><td>Liquidate / Dump holdings</td><td>LIQ</td><td>清仓抛售</td></tr>
-            <tr><td>Hold cash</td><td>HC</td><td>持币观望</td></tr>
-            <tr><td>Catch falling knife</td><td>CFK</td><td>接下跌飞刀（高危抄底）</td></tr>
-            <tr><td>Buy the panic</td><td>BTP</td><td>恐慌暴跌抄底</td></tr>
-            <tr><td>Buy the dip</td><td>BTD</td><td>逢小幅回调低吸</td></tr>
-            <tr><td>Accumulate</td><td>ACC</td><td>分批吸筹、建仓</td></tr>
-        </tbody>
-    </table>
-
-    <!-- ════════════════════════════════════════════════ -->
-    <!-- 三、政策/宏观相关 -->
-    <!-- ════════════════════════════════════════════════ -->
-    <h2>三、政策/宏观相关（匹配政府干预句子）</h2>
-    <table>
-        <thead>
-            <tr><th>完整英文</th><th>简写短句</th><th>释义</th></tr>
-        </thead>
-        <tbody>
-            <tr><td>Stimulus</td><td>STIM</td><td>刺激政策</td></tr>
-            <tr><td>Regulatory policy</td><td>REG POL</td><td>监管政策</td></tr>
-            <tr><td>No gov intervention → DIV market</td><td>No GOV INT → DIV</td><td>无政府干预→行情分化</td></tr>
-            <tr><td>Government intervention</td><td>GOV INT</td><td>政府干预市场</td></tr>
-            <tr><td>Fed / Central bank</td><td>CB</td><td>央行</td></tr>
-        </tbody>
-    </table>
-
-    <!-- ════════════════════════════════════════════════ -->
-    <!-- 四、逻辑伪代码速记 -->
-    <!-- ════════════════════════════════════════════════ -->
-    <h2>四、逻辑伪代码速记（和 <code>if...elif...else</code> 配套）</h2>
-    <ol>
-        <li>If TD or RNG → PANIC; If RLY → HC<br>行情下跌/震荡→谨慎恐慌；反弹拉升→持币观望</li>
-        <li>No GOV INT → DIV<br>无政府干预，行情分化各行其是</li>
-        <li>If DUMP → CFK (High Risk)<br>恐慌砸盘抄底=接飞刀，高风险</li>
-        <li>If DIP → BTD (Small Pos)<br>小幅回调轻仓低吸</li>
-    </ol>
-
-    <!-- ════════════════════════════════════════════════ -->
-    <!-- 五、风险、盘面通用缩写 -->
-    <!-- ════════════════════════════════════════════════ -->
-    <h2>五、风险、盘面通用缩写</h2>
-    <table>
-        <thead>
-            <tr><th>缩写</th><th>全称</th><th>意思</th></tr>
-        </thead>
-        <tbody>
-            <tr><td>VOL</td><td>Volume</td><td>成交量</td></tr>
-            <tr><td>WH</td><td>Whale</td><td>大户、巨鲸资金</td></tr>
-            <tr><td>Sup</td><td>Support</td><td>支撑位</td></tr>
-            <tr><td>Short</td><td>S</td><td>做空</td></tr>
-            <tr><td>RSI</td><td>RSI Indicator</td><td>相对强弱指标</td></tr>
-            <tr><td>Res</td><td>Resistance</td><td>压力位</td></tr>
-            <tr><td>OI</td><td>Open Interest</td><td>持仓量（期货）</td></tr>
-            <tr><td>Long</td><td>L</td><td>做多</td></tr>
-            <tr><td>Flat</td><td>F</td><td>空仓</td></tr>
-        </tbody>
-    </table>
-
-    <!-- ════════════════════════════════════════════════ -->
-    <!-- 六、超短一句话速记模板 -->
-    <!-- ════════════════════════════════════════════════ -->
-    <h2>六、超短一句话速记模板（直接复制写笔记）</h2>
-    <ol>
-        <li>No GOV INT → DIV market<br>无政府干预，市场行情分化</li>
-        <li>If TD/RNG → PANIC; RLY → WATCH<br>下跌/震荡则警惕，上涨反弹仅观望</li>
-        <li>PD = High CFK Risk<br>恐慌砸盘行情，抄底属于高危接飞刀</li>
-        <li>DIP = BTD small pos<br>小幅回调可小仓位低吸</li>
-        <li>PMP → STR top out<br>暴力拉盘，逢高止盈离场</li>
-    </ol>
 
     <hr>
 
-    <!-- ════════════════════════════════════════════════════════════════ -->
-    <!-- 第二部分：交易笔记英文缩写大全 -->
-    <!-- ════════════════════════════════════════════════════════════════ -->
-    <h1>📝 交易笔记英文缩写大全</h1>
-    <div class="subhead">分4大类，复盘随手速记专用，适配你的伪代码笔记风格</div>
+    <!-- 二、拉升/冲高类近义词 -->
+    <h2>二、拉升、脉冲上涨行情（PMP / SP / RLY 近义词组）</h2>
+    <table>
+        <thead>
+            <tr><th>缩写</th><th>完整英文</th><th>中文释义</th><th>边界区分</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>PMP</td><td>Pump</td><td>主动拉盘、资金扫货拉升</td><td>主力主动买盘推动上涨</td></tr>
+            <tr><td>RLY</td><td>Rally</td><td>持续性多头上涨</td><td class="diff-tag">可持续波段上涨，趋势反转性质</td></tr>
+            <tr><td>SP</td><td>Spike</td><td>瞬间脉冲冲高</td><td class="diff-tag">短时插针式快速拉升，持续性弱</td></tr>
+            <tr><td>FOMO RLY</td><td>FOMO Rally</td><td>踏空情绪追涨行情</td><td>散户情绪驱动拉升，警惕见顶</td></tr>
+        </tbody>
+    </table>
 
     <hr>
 
-    <!-- ════════════════════════════════════════════════ -->
-    <!-- 第二部分 一、行情走势简写 -->
-    <!-- ════════════════════════════════════════════════ -->
-    <h2>一、行情走势简写（K线/盘面状态）</h2>
+    <!-- 三、下跌/砸盘近义词组 -->
+    <h2>三、下跌、砸盘、恐慌抛售（DUMP / PD / CL 近义词组）</h2>
     <table>
         <thead>
-            <tr><th>缩写</th><th>完整单词</th><th>中文释义</th></tr>
+            <tr><th>缩写</th><th>完整英文</th><th>中文释义</th><th>边界区分</th></tr>
         </thead>
         <tbody>
-            <tr><td>UPT</td><td>Uptrend</td><td>上升趋势</td></tr>
-            <tr><td>TT</td><td>Top touch</td><td>触顶</td></tr>
-            <tr><td>SW</td><td>Swing</td><td>波段行情</td></tr>
-            <tr><td>PB</td><td>Pullback</td><td>小幅回调（同dip）</td></tr>
-            <tr><td>FLAT</td><td>Flat market</td><td>横盘走平</td></tr>
-            <tr><td>DNT</td><td>Downtrend</td><td>下跌趋势</td></tr>
-            <tr><td>DIS</td><td>Divergence</td><td>走势分化、背离</td></tr>
-            <tr><td>CONV</td><td>Convergence</td><td>走势收敛同步</td></tr>
-            <tr><td>CON</td><td>Consolidation</td><td>区间盘整（同range）</td></tr>
-            <tr><td>CL</td><td>Collapse</td><td>崩盘暴跌</td></tr>
-            <tr><td>BRK</td><td>Breakout</td><td>突破行情</td></tr>
-            <tr><td>BKD</td><td>Breakdown</td><td>破位下跌</td></tr>
-            <tr><td>BT</td><td>Bottom touch</td><td>探底</td></tr>
+            <tr><td>DUMP</td><td>Dump</td><td>主力集中砸盘出货</td><td>大户主动抛售筹码</td></tr>
+            <tr><td>CR</td><td>Crash</td><td>突发性崩盘大跌</td><td class="diff-tag">短时极速断崖式下跌</td></tr>
+            <tr><td>CL</td><td>Collapse</td><td>全面瓦解暴跌</td><td>趋势彻底崩盘，持续下行</td></tr>
+            <tr><td>FUD</td><td>Fear / Uncertainty / Doubt</td><td>恐慌情绪氛围 阴跌</td><td class="diff-tag">持续性悲观环境；极致时 → CPR 割肉投降</td></tr>
+            <tr><td>PD</td><td>Panic sell-off</td><td>市场恐慌踩踏杀跌</td><td class="diff-tag">全市场情绪化不计成本抛售</td></tr>
+            <tr><td>CPR</td><td>Capitulation</td><td>恐慌割肉投降抛售</td><td>FUD极致后的集中割肉事件，常临近底部</td></tr>
         </tbody>
     </table>
 
-    <!-- ════════════════════════════════════════════════ -->
-    <!-- 第二部分 二、操作交易动作简写 -->
-    <!-- ════════════════════════════════════════════════ -->
-    <h2>二、操作交易动作简写（开仓/平仓/仓位）</h2>
+    <hr>
+
+    <!-- 四、回调-深度分级【重点近义词】 -->
+    <h2>四、回调-深度分级</h2>
     <table>
         <thead>
-            <tr><th>缩写</th><th>完整短语</th><th>中文释义</th></tr>
+            <tr><th>缩写</th><th>完整英文</th><th>中文释义</th><th>边界区分</th></tr>
         </thead>
         <tbody>
-            <tr><td>TAP</td><td>Tap out</td><td>分批止盈离场</td></tr>
-            <tr><td>SZ</td><td>Size</td><td>仓位大小</td></tr>
-            <tr><td>S</td><td>Short</td><td>做空</td></tr>
-            <tr><td>SP</td><td>Small position</td><td>轻仓</td></tr>
-            <tr><td>RED</td><td>Reduce position</td><td>减仓</td></tr>
-            <tr><td>OP</td><td>Open position</td><td>开仓</td></tr>
-            <tr><td>MP</td><td>Main position</td><td>底仓</td></tr>
-            <tr><td>L</td><td>Long</td><td>做多</td></tr>
-            <tr><td>FLT</td><td>Flat</td><td>空仓、无持仓</td></tr>
-            <tr><td>FULL</td><td>Full position</td><td>满仓</td></tr>
-            <tr><td>DCA</td><td>Dollar Cost Average</td><td>分批定投摊薄成本</td></tr>
-            <tr><td>CLS</td><td>Close position</td><td>平仓</td></tr>
-            <tr><td>ADD</td><td>Add position</td><td>加仓</td></tr>
+            <tr><td>DIP</td><td>Dip</td><td>小幅浅回调、盘中回落</td><td class="diff-tag">微型回撤，上涨趋势良性浅踩</td></tr>
+            <tr><td>PB</td><td>Pullback</td><td>波段回档</td><td>中等回调，趋势内常规回撤<br>(2||4-Wave)</td></tr>
+            <tr><td>DRP</td><td>Drop</td><td>短时快速跳水回落</td><td>急速下跌，介于回调与暴跌之间<br>(2->A||4->A)</td></tr>
+            <tr><td>COR</td><td>Correction</td><td>中级深度调整</td><td>大级别行情结束后的深度修正<br>(6-Wave)</td></tr>
         </tbody>
     </table>
 
-    <!-- ════════════════════════════════════════════════ -->
-    <!-- 第二部分 三、资金、盘口、情绪缩写 -->
-    <!-- ════════════════════════════════════════════════ -->
-    <h2>三、资金、盘口、情绪缩写</h2>
+    <hr>
+
+    <!-- 五、反弹-修复分级近义词 -->
+    <h2>五、反弹-修复分级</h2>
     <table>
         <thead>
-            <tr><th>缩写</th><th>全称</th><th>释义</th></tr>
+            <tr><th>缩写</th><th>完整英文</th><th>中文释义</th><th>边界区分</th></tr>
         </thead>
         <tbody>
-            <tr><td>WH</td><td>Whale</td><td>大户、巨鲸资金</td></tr>
-            <tr><td>SF</td><td>Sell flow</td><td>卖出资金流</td></tr>
-            <tr><td>RET</td><td>Retail</td><td>散户</td></tr>
-            <tr><td>MF</td><td>Money flow</td><td>资金流向</td></tr>
-            <tr><td>INST</td><td>Institution</td><td>机构资金</td></tr>
-            <tr><td>FUD</td><td>Fear Uncertainty Doubt</td><td>恐慌看空情绪</td></tr>
-            <tr><td>FOMO</td><td>Fear of Missing Out</td><td>踏空恐慌、追涨情绪</td></tr>
-            <tr><td>DISTR</td><td>Distribution</td><td>出货、高位派发</td></tr>
-            <tr><td>CPR</td><td>Capitulation</td><td>恐慌割肉抛售</td></tr>
-            <tr><td>BF</td><td>Buy flow</td><td>买入资金流</td></tr>
-            <tr><td>ACC</td><td>Accumulation</td><td>吸筹、底部建仓</td></tr>
+            <tr><td>RB</td><td>Rebound</td><td>短命脉冲反抽</td><td class="diff-tag">1~3天，下跌趋势短暂反抽，极易回落</td></tr>
+            <tr><td>DCB</td><td>Dead Cat Bounce</td><td>死猫反弹</td><td>大跌后短暂反弹，不改变下跌趋势<br>(B-Wave)</td></tr>
+            <tr><td>RR</td><td>Relief(REL)  Rally (RLY)</td><td>中级修复反弹</td><td>数周波段修复，压力仍存<br>(D-Wave)</td></tr>
+            <tr><td>REC</td><td>Recovery</td><td>趋势性修复回升</td><td class="diff-tag">筑底完成，缓慢修复上行<br>(D³-Wave)</td></tr>
         </tbody>
     </table>
 
-    <!-- ════════════════════════════════════════════════ -->
-    <!-- 第二部分 四、风控、指标、关键价位 -->
-    <!-- ════════════════════════════════════════════════ -->
-    <h2>四、风控、指标、关键价位</h2>
+    <hr>
+
+    <!-- 六、突破 / 破位 近义词 -->
+    <h2>六、突破与破位（BRK / BKD / Fake BRK）</h2>
     <table>
         <thead>
-            <tr><th>缩写</th><th>全称</th><th>释义</th></tr>
+            <tr><th>缩写</th><th>完整英文</th><th>中文释义</th><th>边界区分</th></tr>
         </thead>
         <tbody>
-            <tr><td>VOL</td><td>Volume</td><td>成交量</td></tr>
-            <tr><td>TP</td><td>Take Profit</td><td>止盈位</td></tr>
-            <tr><td>SUP</td><td>Support</td><td>支撑位</td></tr>
-            <tr><td>SL</td><td>Stop Loss</td><td>止损位</td></tr>
-            <tr><td>RR</td><td>Risk Reward</td><td>盈亏比</td></tr>
-            <tr><td>RISK</td><td>Risk exposure</td><td>风险敞口</td></tr>
-            <tr><td>RSI</td><td>Relative Strength Index</td><td>相对强弱指标</td></tr>
-            <tr><td>RES</td><td>Resistance</td><td>压力位</td></tr>
-            <tr><td>MA</td><td>Moving Average</td><td>均线</td></tr>
-            <tr><td>MACD</td><td>MACD</td><td>趋势指标</td></tr>
-            <tr><td>LIQ</td><td>Liquidity</td><td>流动性</td></tr>
-            <tr><td>BE</td><td>Break Even</td><td>盈亏平衡线</td></tr>
+            <tr><td>BRK</td><td>Breakout</td><td>向上有效突破</td><td>突破压力位，多头信号</td></tr>
+            <tr><td>BKD</td><td>Breakdown</td><td>向下有效破位</td><td>跌破支撑位，空头信号</td></tr>
+            <tr><td>Fake BRK</td><td>Fake Breakout</td><td>假突破 / 诱多诱空</td><td class="diff-tag">短暂刺穿关键位，迅速重回区间</td></tr>
+            <tr><td>TST</td><td>Test</td><td>试探关键价位</td><td>反复测试支撑/压力，等待确认</td></tr>
         </tbody>
     </table>
 
-    <!-- ════════════════════════════════════════════════ -->
-    <!-- 第二部分 五、宏观政策类 -->
-    <!-- ════════════════════════════════════════════════ -->
-    <h2>五、宏观政策类（适配政府干预相关笔记）</h2>
+    <hr>
+
+    <!-- 七、吸筹 & 派发近义词 -->
+    <h2>七、资金行为：吸筹 / 派发（ACC / DISTR）</h2>
     <table>
         <thead>
-            <tr><th>简写短句</th><th>完整表达</th><th>中文</th></tr>
+            <tr><th>缩写</th><th>完整英文</th><th>中文释义</th><th>边界区分</th></tr>
         </thead>
         <tbody>
-            <tr><td>STIM</td><td>Stimulus policy</td><td>刺激政策</td></tr>
-            <tr><td>QT</td><td>Quantitative Tightening</td><td>缩表收紧</td></tr>
-            <tr><td>QE</td><td>Quantitative Easing</td><td>量化宽松</td></tr>
-            <tr><td>REG</td><td>Regulation</td><td>监管政策</td></tr>
-            <tr><td>GOV INT</td><td>Government Intervention</td><td>政府市场干预</td></tr>
-            <tr><td>CB</td><td>Central Bank</td><td>央行</td></tr>
+            <tr><td>ACC</td><td>Accumulation</td><td>底部吸筹、分批建仓</td><td>机构低位持续收集筹码</td></tr>
+            <tr><td>DISTR</td><td>Distribution</td><td>高位派发、出货</td><td>高位逐步卖出筹码</td></tr>
+            <tr><td>SCP</td><td>Scoop cheap chips</td><td>低位捡筹码</td><td>短线低位快速吸纳筹码</td></tr>
         </tbody>
     </table>
 
-    <!-- ════════════════════════════════════════════════ -->
-    <!-- 第二部分 六、极简逻辑速记句式 -->
-    <!-- ════════════════════════════════════════════════ -->
-    <h2>六、极简逻辑速记句式（直接复制到复盘笔记）</h2>
+    <hr>
+
+    <!-- 八、交易操作动作（开仓平仓仓位） -->
+    <h2>八、交易操作动作（开仓、平仓、仓位管理）</h2>
+    <table>
+        <thead>
+            <tr><th>缩写</th><th>完整英文</th><th>中文释义</th><th>边界区分</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>L</td><td>Long</td><td>做多、多头持仓</td><td>看涨头寸</td></tr>
+            <tr><td>S</td><td>Short</td><td>做空、空头持仓</td><td>看跌头寸</td></tr>
+            <tr><td>OP</td><td>Open position</td><td>开仓</td><td>通用中性术语</td></tr>
+            <tr><td>CLS</td><td>Close position</td><td>平仓</td><td>了结全部头寸</td></tr>
+            <tr><td>ADD</td><td>Add position</td><td>加仓</td><td>原有头寸增加仓位</td></tr>
+            <tr><td>RED</td><td>Reduce position</td><td>减仓</td><td>降低持仓规模</td></tr>
+            <tr><td>FLT</td><td>Flat</td><td>空仓</td><td>无任何持仓头寸</td></tr>
+            <tr><td>SML</td><td>Small position</td><td>轻仓试单</td><td>小仓位测试行情</td></tr>
+            <tr><td>MP</td><td>Main position</td><td>底仓/主力仓位</td><td>核心持仓</td></tr>
+            <tr><td>FULL</td><td>Full position</td><td>满仓</td><td>资金全部开仓</td></tr>
+            <tr><td>ENT</td><td>Entry</td><td>入场点位</td><td>开仓价格区域</td></tr>
+            <!-- 新增 BTD 与 BTP 入场策略 -->
+            <tr><td>BTD</td><td>Buy the Dip</td><td>小幅回调逢低吸纳</td><td>关联：DIP / PB（浅回调）；<span class="diff-tag">温和顺势低吸，非恐慌性抄底</span></td></tr>
+            <tr><td>BTP</td><td>Buy the Panic</td><td>恐慌性杀跌时抄底</td><td>关联：PD / CPR / 恐慌抛售；<span class="diff-tag">高风险逆势，注意仓位控制</span></td></tr>
+            <tr><td>LAD IN</td><td>Ladder In</td><td>阶梯分批入场</td><td>多层价位分批挂单买入</td></tr>
+            <tr><td>LAD OUT</td><td>Ladder Out</td><td>阶梯分批离场</td><td>多层压力位逐步减仓</td></tr>
+            <tr><td>TAP</td><td>Tap out</td><td>分批止盈离场</td><td>行情上涨过程逐步兑现利润</td></tr>
+            <tr><td>DCA</td><td>Dollar Cost Average</td><td>定投摊薄成本</td><td>下跌过程分批加仓摊成本</td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- 九、风控关键价位与止盈止损 -->
+    <h2>九、风控、关键价位、盈亏管理</h2>
+    <table>
+        <thead>
+            <tr><th>缩写</th><th>完整英文</th><th>中文释义</th><th>边界区分</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>TP</td><td>Take Profit</td><td>止盈</td><td></td></tr>
+            <tr><td>SL</td><td>Stop Loss</td><td>止损</td><td></td></tr>
+            <tr><td>TGT</td><td>Target</td><td>价格目标位</td><td></td></tr>
+            <tr><td>SUP</td><td>Support</td><td>支撑位</td><td></td></tr>
+            <tr><td>RES</td><td>Resistance</td><td>压力位</td><td></td></tr>
+            <tr><td>FLP ZN</td><td>Flip Zone</td><td>支撑压力转换区</td><td></td></tr>
+            <tr><td>RR</td><td>Risk Reward</td><td>盈亏比</td><td></td></tr>
+            <tr><td>BE</td><td>Break Even</td><td>盈亏平衡线</td><td></td></tr>
+            <tr><td>RISK</td><td>Risk exposure</td><td>风险敞口</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- 十、盘口资金、情绪术语（扩充） -->
+    <h2>十、资金、盘口、市场情绪术语</h2>
+    <table>
+        <thead>
+            <tr><th>缩写</th><th>完整英文</th><th>中文释义</th><th>边界区分</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>WH</td><td>Whale</td><td>大户、巨鲸资金</td><td></td></tr>
+            <tr><td>INST</td><td>Institution</td><td>机构资金</td><td></td></tr>
+            <tr><td>RTL</td><td>Retail</td><td>散户资金</td><td></td></tr>
+            <tr><td>MF</td><td>Money flow</td><td>资金流向</td><td></td></tr>
+            <tr><td>BF</td><td>Buy flow</td><td>主动买入流</td><td></td></tr>
+            <tr><td>SF</td><td>Sell flow</td><td>主动卖出流</td><td></td></tr>
+            <tr><td>FUD</td><td>Fear Uncertainty Doubt</td><td>恐慌看空情绪</td><td></td></tr>
+            <tr><td>FOMO</td><td>Fear of Missing Out</td><td>踏空追涨情绪</td><td></td></tr>
+            <tr><td>WHP</td><td>Whipsaw</td><td>来回插针、洗盘拉锯</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- 十一、新增：订单流&ICT机构盘口术语【扩充专业内容】 -->
+    <h2>十一、订单流 / ICT 机构盘口专业缩写（新增）</h2>
+    <table>
+        <thead>
+            <tr><th>缩写</th><th>完整英文</th><th>中文释义</th><th>边界区分</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>OB</td><td>Order Block</td><td>订单块（机构集中成交区）</td><td></td></tr>
+            <tr><td>IMB</td><td>Imbalance</td><td>流动性失衡缺口</td><td></td></tr>
+            <tr><td>LH</td><td>Liquidity Hunt</td><td>流动性猎杀、扫止损</td><td></td></tr>
+            <tr><td>POI</td><td>Point of Interest</td><td>重点观察价位区域</td><td></td></tr>
+            <tr><td>SSL</td><td>Smart Money Liquidity</td><td>聪明资金流动性</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- 十二、期货/保证金专用扩充术语 -->
+    <h2>十二、期货、保证金交易专用术语（新增扩充）</h2>
+    <table>
+        <thead>
+            <tr><th>缩写</th><th>完整英文</th><th>中文释义</th><th>边界区分</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>OI</td><td>Open Interest</td><td>持仓量</td><td></td></tr>
+            <tr><td>LIQ</td><td>Liquidation</td><td>强制平仓、爆仓</td><td></td></tr>
+            <tr><td>MC</td><td>Margin Call</td><td>追加保证金通知</td><td></td></tr>
+            <tr><td>MTM</td><td>Mark-to-Market</td><td>逐日盯市、盯市盈亏</td><td></td></tr>
+            <tr><td>SWP</td><td>Swap</td><td>隔夜利息/掉期</td><td></td></tr>
+            <tr><td>ROL</td><td>Rollover</td><td>移仓换月</td><td></td></tr>
+            <tr><td>LOCK</td><td>Lock Position</td><td>锁仓</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- 十三、期权术语 新增 -->
+    <h2>十三、期权交易缩写（新增专业板块）</h2>
+    <table>
+        <thead>
+            <tr><th>缩写</th><th>完整英文</th><th>中文释义</th><th>边界区分</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>CALL</td><td>Call Option</td><td>看涨期权</td><td></td></tr>
+            <tr><td>PUT</td><td>Put Option</td><td>看跌期权</td><td></td></tr>
+            <tr><td>STK</td><td>Strike Price</td><td>行权价</td><td></td></tr>
+            <tr><td>IV</td><td>Implied Volatility</td><td>隐含波动率</td><td></td></tr>
+            <tr><td>EXP</td><td>Expiry</td><td>到期日</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- 十四、宏观政策术语 -->
+    <h2>十四、宏观、政策相关术语</h2>
+    <table>
+        <thead>
+            <tr><th>缩写</th><th>完整英文</th><th>中文释义</th><th>边界区分</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>QE</td><td>Quantitative Easing</td><td>量化宽松</td><td></td></tr>
+            <tr><td>QT</td><td>Quantitative Tightening</td><td>缩表收紧</td><td></td></tr>
+            <tr><td>STIM</td><td>Stimulus policy</td><td>刺激政策</td><td></td></tr>
+            <tr><td>REG</td><td>Regulation</td><td>监管政策</td><td></td></tr>
+            <tr><td>GOV INT</td><td>Government Intervention</td><td>政府市场干预</td><td></td></tr>
+            <tr><td>CB</td><td>Central Bank</td><td>央行</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- 十五、周期波浪体系 -->
+    <h2>十五、波浪周期 / 时间限定术语</h2>
+    <table>
+        <thead>
+            <tr><th>缩写</th><th>完整英文</th><th>中文释义</th><th>边界区分</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>DY</td><td>Day</td><td>日、日线</td><td>DY CON 日线盘整</td></tr>
+            <tr><td>WK</td><td>Week</td><td>周、周线</td><td>WK SUP 周线支撑</td></tr>
+            <tr><td>MN</td><td>Month</td><td>月、月线</td><td>MN RES 月线压力</td></tr>
+            <tr><td>HR</td><td>Hour</td><td>小时</td><td>4HR RNG 4小时区间</td></tr>
+            <tr><td>CYCL</td><td>Cycle</td><td>完整一轮行情周期</td><td></td></tr>
+            <tr><td>UPT CYCL</td><td>Uptrend Cycle</td><td>完整上涨周期（1-5浪成型）</td><td></td></tr>
+            <tr><td>DNT CYCL</td><td>Downtrend Cycle</td><td>完整下跌周期（A-C浪成型）</td><td></td></tr>
+            <tr><td>LT</td><td>Longer-term</td><td>中长期</td><td></td></tr>
+            <tr><td>NEAR</td><td>Near-term</td><td>短期近期</td><td></td></tr>
+            <tr><td>FWD</td><td>Forward</td><td>远期后市</td><td></td></tr>
+            <tr><td>CMG</td><td>Coming</td><td>确认已经发生了，接下来、后市行情会....</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- 十六、逻辑连接词 -->
+    <h2>十六、伪代码逻辑连接词（if…elif…else 配套，分类索引）</h2>
+    <table>
+        <thead>
+            <tr><th>缩写</th><th>完整英文</th><th>中文释义</th><th>边界区分</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Bcz</td><td>Because</td><td>因果衔接：阐述行情成因</td><td></td></tr>
+            <tr><td>So / Thus</td><td>So / Thus</td><td>因果衔接：推导后市结论</td><td></td></tr>
+            <tr><td>Then</td><td>Then</td><td>顺承衔接：条件成立后执行动作</td><td></td></tr>
+            <tr><td>Sub</td><td>Subsequent</td><td>时序衔接：描述后续衍生行情</td><td></td></tr>
+            <tr><td>if</td><td>if</td><td>条件判断：伪代码基础判断起点</td><td></td></tr>
+            <tr><td>when</td><td>when</td><td>条件判断：当某条件/信号出现时</td><td></td></tr>
+            <tr><td>once</td><td>once</td><td>条件判断：一旦出现即触发动作</td><td></td></tr>
+            <tr><td>while</td><td>while</td><td>条件判断：某状态持续期间同时进行</td><td></td></tr>
+            <tr><td>unless</td><td>unless</td><td>反向限定：除非…否则不（高频风控搭配）</td><td></td></tr>
+            <tr><td>or</td><td>or</td><td>选择并列：多条件选一</td><td></td></tr>
+            <tr><td>and</td><td>and</td><td>选择并列：多条件共存</td><td></td></tr>
+            <tr><td>W8</td><td>Wait</td><td>动作指令：观望等待，暂不操作</td><td></td></tr>
+            <tr><td>CONF</td><td>Confirmed</td><td>确认状态：走势/信号已确认</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+    <h2>十七、复盘速记例句（可直接复制）</h2>
     <ol>
         <li>UPT + BRK → L SP<br>趋势向上+有效突破，轻仓做多</li>
         <li>DNT + BKD → Avoid L<br>下跌趋势破位，禁止做多</li>
         <li>FUD + DUMP → CFK High Risk<br>空头恐慌砸盘，抄底属于接飞刀高风险</li>
         <li>No GOV INT → DIS Market<br>无政府干预，市场走势分化</li>
-        <li>DCA on PB (Small SZ)<br>小幅回调分批低吸，控制轻仓</li>
+        <li>DCA on PB (Small SZ)<br>波段回调分批低吸，控制轻仓</li>
         <li>FOMO Rally → STR Tap Out<br>情绪拉涨行情，逢高分批止盈</li>
+        <li>5-Wave UPT CYCL done → LAD OUT<br>完整五浪上涨周期走完，阶梯分批离场</li>
+        <li>Liquidity Hunt near SUP → Watch Fake BKD<br>支撑附近扫止损，警惕假破位</li>
+        <!-- 新增 BTD 与 BTP 速记例句 -->
+        <li>DIP / PB → BTD (SML SZ)<br>出现小幅浅回调，执行逢低吸纳，轻仓介入</li>
+        <li>PD / FUD / DUMP → BTP (High Risk / CFK)<br>市场恐慌踩踏或主力砸盘时抄底，属于高风险接飞刀，严控仓位或等待右侧确认</li>
+        <!-- 新增 Only / unless 限定类速记例句 -->
+        <li>Only if UPT CONF → L SP<br>唯有上涨趋势确认，才可轻仓做多</li>
+        <li>Only after CONF → open pos<br>确认后方可开仓</li>
+        <li>Trade within RNG only<br>只在震荡区间内部交易</li>
+        <li>unless CPR appears → No BTP<br>除非出现割肉投降信号，否则不抄底</li>
+        <li>DNT + BKD → Avoid L / only SML S allowed<br>下跌破位，禁止做多，只允许轻仓做空</li>
     </ol>
 
     <hr>
 
-    <p class="subhead" style="margin-top:16px;">总计：11 张缩写表 + 3 组速记句式 · 适配复盘伪代码风格</p>
+    <!-- 十八、目的导向／限定约束／范围修饰 -->
+    <h2>十八、目的导向、限定约束、范围修饰词</h2>
+    <table>
+        <thead>
+            <tr><th>缩写</th><th>完整英文</th><th>中文释义</th><th>边界区分</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>to</td><td>to</td><td>目的导向：用来、目的是（表达动作意图）</td><td></td></tr>
+            <tr><td>for</td><td>for</td><td>目的导向：为了（说明操作理由）</td><td></td></tr>
+            <tr><td>TGT</td><td>Target</td><td>目的导向：目标价位 / 操作目的</td><td></td></tr>
+            <tr><td>Only</td><td>Only</td><td>强限定：唯有满足条件才可操作（高频限定词）</td><td></td></tr>
+            <tr><td>only if</td><td>only if</td><td>限定条件：唯有在…条件下才</td><td></td></tr>
+            <tr><td>only when</td><td>only when</td><td>限定条件：唯有在…之时才</td><td></td></tr>
+            <tr><td>limited to</td><td>limited to</td><td>范围限定：仅限于（划定边界）</td><td></td></tr>
+            <tr><td>within</td><td>within</td><td>范围限定：在…区间之内操作</td><td></td></tr>
+            <tr><td>under</td><td>under … environment</td><td>环境限定：在某种情绪/行情环境下</td><td></td></tr>
+            <tr><td>near</td><td>near</td><td>价位限定：临近某关键价位</td><td></td></tr>
+            <tr><td>above</td><td>above</td><td>价位限定：高于某价位</td><td></td></tr>
+            <tr><td>below</td><td>below</td><td>价位限定：低于某价位</td><td></td></tr>
+            <tr><td>prior to</td><td>prior to</td><td>时序限定：在…之前</td><td></td></tr>
+            <tr><td>after</td><td>after</td><td>时序限定：在…之后</td><td></td></tr>
+            <tr><td>Avoid</td><td>Avoid</td><td>隐性限定：禁止做反向操作（等同于 only not）</td><td></td></tr>
+        </tbody>
+    </table>
+    <p class="subhead">笔记高频句式：Only UPT → L ｜ Only after CONF → open pos ｜ Trade within RNG only ｜ unless CPR → No BTP</p>
 
 </div>
 
-<!-- 🔍 搜索功能 JavaScript -->
+<!-- 🔍 搜索功能 JavaScript【完全保留原版逻辑，无需修改】 -->
 <script>
 (function() {
     'use strict';
@@ -551,5 +701,26 @@
     console.log('[搜索] 已索引 ' + items.length + ' 个条目，搜索功能已就绪');
 })();
 </script>
+
+<!-- ⬆️ 回到顶部按钮 -->
+<button id="back-to-top" title="回到顶部">⬆</button>
+
+<script>
+(function() {
+    'use strict';
+    var btn = document.getElementById('back-to-top');
+    function onScroll() {
+        if (window.scrollY > 400) {
+            btn.classList.add('show');
+        } else {
+            btn.classList.remove('show');
+        }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    btn.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+})();
+</script>
+
 </body>
-</html>
