@@ -11,11 +11,11 @@
 <div class="container">
 
     <h1>🗄️ 数据库架构设计 — InvStrat_db</h1>
-    <div class="subhead">MariaDB 11.4 · 23 张表 · utf8mb4 · InnoDB · 最后更新: 2026-07-01 全线升级 v4</div>
+    <div class="subhead">MariaDB 11.4 · 25 张表 · utf8mb4 · InnoDB · 最后更新: 2026-07-24 全线升级 v5（新增 Lucifer 工具库 + Price 九价格）</div>
 
     <!-- 概览 -->
     <h2>概览</h2>
-    <p>数据库 <code>InvStrat_db</code>（MariaDB 11.4）服务于五个分析/数据模块，共 <strong>23 张表</strong>。</p>
+    <p>数据库 <code>InvStrat_db</code>（MariaDB 11.4）服务于六个分析/数据模块，共 <strong>25 张表</strong>。</p>
     <pre><code>InvStrat_db
 ├── 🌍 GeoEnv（地缘政治分析）    3 表
 │   ├── geo_env_events          主表
@@ -35,8 +35,8 @@
 │   └── industry_event_sources     来源引用
 │
 ├── 📊 Price（价格数据）         2 表
-│   ├── price_spot_data            现货价格
-│   └── price_calc_records         斐波那契计算结果
+│   ├── price_spot_data            现货价格（唯一约束 uk_price_code）
+│   └── price_calc_records         斐波那契计算结果（price1~price9，2026-07-24 扩展）
 │
 ├── 💳 PerAcc（个人账户管理）    8 表（2026-06 大幅扩展）
 │   ├── per_accounts                       人员主表
@@ -48,9 +48,13 @@
 │   ├── per_account_futures_daily          期货每日资金快照（2026-06 v2 新表）
 │   └── per_account_futures_positions_daily 期货每日持仓明细（2026-06 v2 新表）
 │
-└── 🏢 FinData（企业财务数据）  2 表
-    ├── fin_enterprises            企业主表（JSON reports 存储多周期财务数据）
-    └── fin_bank_flows             银行流水数据表
+├── 🏢 FinData（企业财务数据）  2 表
+│   ├── fin_enterprises            企业主表（JSON reports 存储多周期财务数据）
+│   └── fin_bank_flows             银行流水数据表
+│
+└── ⚙️ Lucifer（工具库系统）    2 表（2026-07 新增）
+    ├── lucifer_tools              工具主表（名称/分类/截图/下载链接）
+    └── lucifer_unlock_codes       解锁码表（支付验证/状态/有效期）
     <br><br>
     📥 PerAcc 自动导入管道（2026-06-29 全线投产）
     ─────────────────────────────────────────────
@@ -98,7 +102,7 @@
    ┌──────────────────┐   ┌──────────────────┐
    │ (PK) id          │   │ (PK) id          │
    │ code / variety   │   │ code / variety   │
-   │ price / model    │   │ price1~price5    │
+   │ price / model    │   │ price1~price9    │
    │ ...              │   │ result_json      │
    └──────────────────┘   └──────────────────┘
    （两张表各自独立，无外键约束）</code></pre>
@@ -339,7 +343,7 @@ positions       cash_flows      (预留)
             <tr><td><code>user_id</code></td><td>BIGINT UNSIGNED</td><td>用户 ID（默认 1）</td></tr>
             <tr><td><code>code</code></td><td>VARCHAR(50)</td><td>品种代码</td></tr>
             <tr><td><code>variety</code></td><td>VARCHAR(100)</td><td>品种名称</td></tr>
-            <tr><td><code>price1</code> ~ <code>price5</code></td><td>DECIMAL(12,2)</td><td>最多 5 个输入价格</td></tr>
+            <tr><td><code>price1</code> ~ <code>price9</code></td><td>DECIMAL(12,2) DEFAULT 0</td><td>最多 9 个输入价格（2026-07-24 从 5 扩展至 9）</td></tr>
             <tr><td><code>result_json</code></td><td>TEXT</td><td>完整计算结果（JSON 编码）</td></tr>
             <tr><td><code>created_at</code></td><td>DATETIME</td><td>创建时间</td></tr>
         </tbody>
@@ -605,11 +609,15 @@ CREATE TABLE price_calc_records (
     user_id           BIGINT UNSIGNED NOT NULL DEFAULT 1,
     code              VARCHAR(50) DEFAULT NULL,
     variety           VARCHAR(100) DEFAULT NULL,
-    price1            DECIMAL(12,2) DEFAULT NULL,
-    price2            DECIMAL(12,2) DEFAULT NULL,
-    price3            DECIMAL(12,2) DEFAULT NULL,
-    price4            DECIMAL(12,2) DEFAULT NULL,
-    price5            DECIMAL(12,2) DEFAULT NULL,
+    price1            DECIMAL(12,2) DEFAULT 0,
+    price2            DECIMAL(12,2) DEFAULT 0,
+    price3            DECIMAL(12,2) DEFAULT 0,
+    price4            DECIMAL(12,2) DEFAULT 0,
+    price5            DECIMAL(12,2) DEFAULT 0,
+    price6            DECIMAL(12,2) DEFAULT 0,
+    price7            DECIMAL(12,2) DEFAULT 0,
+    price8            DECIMAL(12,2) DEFAULT 0,
+    price9            DECIMAL(12,2) DEFAULT 0,
     result_json       TEXT DEFAULT NULL,
     created_at        DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
@@ -845,6 +853,93 @@ CREATE TABLE per_account_cash_flows (
     created_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at        DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uk_company_month (uscc, report_month)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+    <!-- ════════════════════════════════════════════════════════════
+         Lucifer 工具库系统（2026-07 新增）
+         ════════════════════════════════════════════════════════════ -->
+    <h2>⚙️ Lucifer — 工具库系统（2026-07 新增）</h2>
+    <p>工具库销售/下载系统，提供工具展示、支付解锁码生成、下载验证等功能。前后端分离，数据独立于分析模块。</p>
+    <p>两张表通过 <code>tool_id</code> 外键关联（CASCADE 级联删除），支持解锁码状态管理（pending/used/expired/exhausted）。</p>
+
+    <h3><code>lucifer_tools</code> — 工具主表</h3>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>name</code></td><td>VARCHAR(100)</td><td>工具名称</td></tr>
+            <tr><td><code>icon</code></td><td>VARCHAR(50)</td><td>图标 emoji</td></tr>
+            <tr><td><code>category</code></td><td>VARCHAR(50)</td><td>分类（办公/图像/开发等）</td></tr>
+            <tr><td><code>description</code></td><td>TEXT</td><td>工具描述</td></tr>
+            <tr><td><code>version</code></td><td>VARCHAR(20)</td><td>版本号</td></tr>
+            <tr><td><code>tags</code></td><td>VARCHAR(255)</td><td>标签（逗号分隔）</td></tr>
+            <tr><td><code>cover</code></td><td>VARCHAR(500)</td><td>封面图 URL</td></tr>
+            <tr><td><code>screenshots</code></td><td>TEXT</td><td>截图列表（JSON 数组）</td></tr>
+            <tr><td><code>developer</code></td><td>VARCHAR(100)</td><td>开发者</td></tr>
+            <tr><td><code>release_date</code></td><td>DATE</td><td>发布日期</td></tr>
+            <tr><td><code>update_date</code></td><td>DATE</td><td>更新日期</td></tr>
+            <tr><td><code>download_link</code></td><td>VARCHAR(500)</td><td>下载链接（仅验证通过后返回）</td></tr>
+            <tr><td><code>extract_code</code></td><td>VARCHAR(50)</td><td>提取码（备用）</td></tr>
+            <tr><td><code>download_count</code></td><td>INT UNSIGNED DEFAULT 0</td><td>下载次数</td></tr>
+            <tr><td><code>rating</code></td><td>DECIMAL(2,1)</td><td>评分</td></tr>
+            <tr><td><code>is_active</code></td><td>TINYINT(1) DEFAULT 1</td><td>是否上架</td></tr>
+        </tbody>
+    </table>
+
+    <h3><code>lucifer_unlock_codes</code> — 解锁码表</h3>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>id</code></td><td>BIGINT UNSIGNED PK</td><td>自增主键</td></tr>
+            <tr><td><code>tool_id</code></td><td>BIGINT UNSIGNED FK</td><td>→ <code>lucifer_tools.id</code>（CASCADE）</td></tr>
+            <tr><td><code>unlock_code</code></td><td>VARCHAR(50)</td><td>解锁码（格式 LUC-XXXX-XXXX）</td></tr>
+            <tr><td><code>status</code></td><td>ENUM('pending','used','expired','exhausted')</td><td>状态：待使用/已使用/已过期/已耗尽</td></tr>
+            <tr><td><code>expires_at</code></td><td>DATETIME</td><td>过期时间（生成后30分钟有效）</td></tr>
+            <tr><td><code>max_uses</code></td><td>INT UNSIGNED DEFAULT 1</td><td>最大使用次数</td></tr>
+            <tr><td><code>used_count</code></td><td>INT UNSIGNED DEFAULT 0</td><td>已使用次数</td></tr>
+            <tr><td><code>used_at</code></td><td>DATETIME</td><td>首次使用时间</td></tr>
+            <tr><td><code>requester_ip</code></td><td>VARCHAR(45)</td><td>请求者 IP</td></tr>
+            <tr><td><code>created_at</code></td><td>DATETIME</td><td>创建时间</td></tr>
+        </tbody>
+    </table>
+
+    <h3>DDL</h3>
+    <pre><code>CREATE TABLE lucifer_tools (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name              VARCHAR(100) NOT NULL,
+    icon              VARCHAR(50) DEFAULT NULL,
+    category          VARCHAR(50) DEFAULT NULL,
+    description       TEXT DEFAULT NULL,
+    version           VARCHAR(20) DEFAULT NULL,
+    tags              VARCHAR(255) DEFAULT NULL,
+    cover             VARCHAR(500) DEFAULT NULL,
+    screenshots       TEXT DEFAULT NULL COMMENT 'JSON 数组',
+    developer         VARCHAR(100) DEFAULT NULL,
+    release_date      DATE DEFAULT NULL,
+    update_date       DATE DEFAULT NULL,
+    download_link     VARCHAR(500) DEFAULT NULL COMMENT '仅验证通过后返回',
+    extract_code      VARCHAR(50) DEFAULT NULL,
+    download_count    INT UNSIGNED DEFAULT 0,
+    rating            DECIMAL(2,1) DEFAULT NULL,
+    is_active         TINYINT(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE lucifer_unlock_codes (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    tool_id           BIGINT UNSIGNED NOT NULL,
+    unlock_code       VARCHAR(50) NOT NULL,
+    status            ENUM('pending','used','expired','exhausted') DEFAULT 'pending',
+    expires_at        DATETIME DEFAULT NULL,
+    max_uses          INT UNSIGNED DEFAULT 1,
+    used_count        INT UNSIGNED DEFAULT 0,
+    used_at           DATETIME DEFAULT NULL,
+    requester_ip      VARCHAR(45) DEFAULT NULL,
+    created_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tool_id) REFERENCES lucifer_tools(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
 
     <!-- 命名规范 -->
