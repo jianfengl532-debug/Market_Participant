@@ -338,6 +338,15 @@
 }
 .results-wrap table .result-num { font-weight: 600; color: #2d3748; }
 
+/* 计算结果颜色分组（覆盖默认色） */
+.results-wrap table .result-num.r-price-1,
+.results-wrap table .result-num.r-price-2,
+.results-wrap table .result-num.r-price-3 { color: #e53e3e !important; }     /* 价格1~3：柔和红 */
+.results-wrap table .result-num.r-price-4,
+.results-wrap table .result-num.r-price-5,
+.results-wrap table .result-num.r-price-6 { color: #a67c00 !important; }     /* 价格4~6：深黄色 */
+/* 价格7~9：默认黑色 */
+
 .calc-empty {
     text-align: center;
     padding: 28px 10px;

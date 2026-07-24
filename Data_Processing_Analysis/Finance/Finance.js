@@ -136,8 +136,10 @@
         var h = '<div class="results-wrap"><table><thead><tr><th>#</th><th>来源</th><th>价格</th><th>乘数</th><th>位</th></tr></thead><tbody>';
         for (var i=0; i<results.length; i++) {
             var r = results[i];
+            // 根据价格来源分组着色 (P1~P3=红, P4~P6=深黄, P7~P9=黑色默认)
+            var colorClass = 'r-price-' + r.pi;
             h += '<tr'+(r.gold?' class="gold-row"':'')+'>'
-                + '<td>'+(i+1)+'</td><td>P'+r.pi+'</td><td>'+r.price.toFixed(2)+'</td><td>'+r.mlab+'</td><td class="result-num">'+r.result.toFixed(2)+'</td></tr>';
+                + '<td>'+(i+1)+'</td><td>P'+r.pi+'</td><td>'+r.price.toFixed(2)+'</td><td>'+r.mlab+'</td><td class="result-num '+colorClass+'">'+r.result.toFixed(2)+'</td></tr>';
         }
         h += '</tbody></table></div>';
         h += '<div class="calc-legend"><span><span class="gold-dot"></span> 金色 = 0.618 / 1.618（关键位）</span><span>乘数: 0.236 · 0.382 · 0.5 · 0.618 · 0.786 · 1.272 · 1.618</span></div>';
@@ -162,17 +164,17 @@
     function fillLeft(data) {
         setDisplay('sr_variety', data.variety);
         var prices = data.prices||data.price_list||[];
-        for (var i=1; i<=5; i++) {
+        for (var i=1; i<=9; i++) {
             setDisplay('sr_p'+i, prices[i-1]);
         }
         var calcPrices = [];
-        for (var j=0; j<5; j++) calcPrices.push(prices[j]||0);
+        for (var j=0; j<9; j++) calcPrices.push(prices[j]||0);
         renderResults(calcFib(calcPrices), 'sr_results');
     }
 
     function clearLeft() {
         setDisplay('sr_variety');
-        for (var i=1; i<=5; i++) setDisplay('sr_p'+i);
+        for (var i=1; i<=9; i++) setDisplay('sr_p'+i);
         renderResults([], 'sr_results');
     }
 
